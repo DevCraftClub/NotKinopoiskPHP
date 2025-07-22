@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<ruleset name="NotKinopoisk PHP CodeSniffer">
+    <description>PHP CodeSniffer rules for NotKinopoisk project</description>
+
+    <file>src</file>
+    <file>tests</file>
+    <file>examples</file>
+
+    <exclude-pattern>vendor</exclude-pattern>
+
+    <rule ref="PSR12"/>
+    
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="120"/>
+            <property name="absoluteLineLimit" value="150"/>
+        </properties>
+    </rule>
+
+    <rule ref="Generic.Arrays.DisallowShortArraySyntax"/>
+    <rule ref="Generic.Files.InlineHTML"/>
+    <rule ref="Generic.Files.LowercaseConstant"/>
+    <rule ref="Generic.Files.OneClassPerFile"/>
+    <rule ref="Generic.Files.OneInterfacePerFile"/>
+    <rule ref="Generic.Files.OneTraitPerFile"/>
+    <rule ref="Generic.NamingConventions.ConstructorName"/>
+    <rule ref="Generic.NamingConventions.UpperCaseConstantName"/>
+    <rule ref="Generic.PHP.CharacterBeforePHPOpeningTag"/>
+    <rule ref="Generic.PHP.ClosingPHPTag"/>
+    <rule ref="Generic.PHP.DeprecatedFunctions"/>
+    <rule ref="Generic.PHP.DisallowAlternativePHPTags"/>
+    <rule ref="Generic.PHP.DisallowShortOpenTag"/>
+    <rule ref="Generic.PHP.ForbiddenFunctions"/>
+    <rule ref="Generic.PHP.LowerCaseConstant"/>
+    <rule ref="Generic.PHP.LowerCaseKeyword"/>
+    <rule ref="Generic.PHP.LowerCaseType"/>
+    <rule ref="Generic.PHP.NoSilencedErrors"/>
+    <rule ref="Generic.PHP.SAPIUsage"/>
+    <rule ref="Generic.WhiteSpace.DisallowSpaceIndent"/>
+    <rule ref="Generic.WhiteSpace.ScopeIndent">
+        <properties>
+            <property name="indent" value="4"/>
+            <property name="tabIndent" value="false"/>
+        </properties>
+    </rule>
+    <rule ref="Generic.WhiteSpace.SpreadOperatorSpacingAfter"/>
+    <rule ref="Generic.WhiteSpace.SpreadOperatorSpacingBefore"/>
+</ruleset> 
