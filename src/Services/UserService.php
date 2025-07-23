@@ -63,9 +63,7 @@ class UserService extends AbstractService
      */
     public function getApiKeyInfo(string $apiKey): ApiKeyInfo
     {
-        $data = $this->get($this->buildV1Uri("api_key_info"), [
-            'key' => $apiKey
-        ]);
+        $data = $this->get($this->buildV1Uri("api_keys/{$apiKey}"));
         return ApiKeyInfo::fromArray($data);
     }
 } 

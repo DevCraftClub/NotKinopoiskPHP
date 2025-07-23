@@ -4,51 +4,29 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Models\Person;
+
 /**
- * Модель результата поиска персон из Kinopoisk API
- * 
- * Представляет результат поиска персон с пагинацией,
- * включая массив найденных персон и общее количество результатов.
- * 
- * Основные возможности:
- * - Хранение результатов поиска персон в неизменяемом виде
- * - Создание объекта из массива данных API
- * - Удобные методы для работы с результатами поиска
- * 
+ * Модель результатов поиска персон
+ *
+ * Представляет результаты поиска персон в Kinopoisk API.
+ * Содержит массив найденных персон и общее количество результатов.
+ *
  * @package NotKinopoisk\Models
- * @author Maxim Harder <dev@devcraft.club>
+ * @author  Maxim Harder
  * @version 1.0.0
- * @since 1.0.0
- * 
- * @see \NotKinopoisk\Services\PersonService
- * @see \NotKinopoisk\Models\Person
- * 
- * @example
- * ```php
- * // Создание из данных API
- * $searchResult = PersonSearchResult::fromArray($apiData);
- * 
- * // Работа с результатами
- * echo "Найдено персон: {$searchResult->getCount()}\n";
- * echo "Всего результатов: {$searchResult->total}\n";
- * 
- * if (!$searchResult->isEmpty()) {
- *     foreach ($searchResult->items as $person) {
- *         echo "- {$person->getDisplayName()}\n";
- *     }
- * }
- * ```
+ * @since   1.0.0
  */
 class PersonSearchResult
 {
     /**
-     * Конструктор модели результата поиска персон
+     * Конструктор модели результатов поиска персон
      * 
-     * Создает новый экземпляр результата поиска с массивом персон и общим количеством.
+     * Создает новый экземпляр результатов поиска со всеми необходимыми данными.
      * Все свойства являются readonly для обеспечения неизменяемости объекта.
      * 
-     * @param array $items Массив объектов Person в результатах поиска
-     * @param int $total Общее количество персон (всего в базе данных)
+     * @param array $items Массив найденных персон
+     * @param int $total Общее количество результатов поиска
      * 
      * @example
      * ```php
@@ -65,14 +43,15 @@ class PersonSearchResult
     }
 
     /**
-     * Создает экземпляр результата поиска персон из массива данных API
+     * Создает экземпляр результатов поиска из массива данных API
      * 
      * Статический метод для удобного создания объекта PersonSearchResult из данных,
-     * полученных от Kinopoisk API. Автоматически создает объекты Person для каждого элемента.
+     * полученных от Kinopoisk API. Автоматически создает объекты Person
+     * для каждого элемента в массиве items.
      * 
-     * @param array $data Массив данных результата поиска от API
+     * @param array $data Массив данных результатов поиска от API
      * 
-     * @return self Новый экземпляр результата поиска персон
+     * @return self Новый экземпляр результатов поиска
      * 
      * @throws \InvalidArgumentException Если данные имеют неверный формат
      * 
@@ -80,8 +59,8 @@ class PersonSearchResult
      * ```php
      * $apiData = [
      *     'items' => [
-     *         ['personId' => 123, 'nameRu' => 'Том Круз', ...],
-     *         ['personId' => 124, 'nameRu' => 'Том Хэнкс', ...]
+     *         ['kinopoiskId' => 123, 'nameRu' => 'Актер 1', ...],
+     *         ['kinopoiskId' => 456, 'nameRu' => 'Актер 2', ...]
      *     ],
      *     'total' => 150
      * ];
@@ -98,16 +77,15 @@ class PersonSearchResult
     }
 
     /**
-     * Получает количество персон в текущих результатах поиска
+     * Получает количество найденных персон
      * 
-     * Возвращает количество персон в текущей странице результатов,
-     * а не общее количество найденных персон.
+     * Возвращает количество персон в текущей странице результатов.
      * 
-     * @return int Количество персон в текущих результатах
+     * @return int Количество найденных персон
      * 
      * @example
      * ```php
-     * echo "Найдено на текущей странице: {$searchResult->getCount()} персон";
+     * echo "Найдено персон: {$searchResult->getCount()}";
      * ```
      */
     public function getCount(): int
@@ -116,10 +94,9 @@ class PersonSearchResult
     }
 
     /**
-     * Проверяет, пуст ли результат поиска
+     * Проверяет, пусты ли результаты поиска
      * 
-     * Определяет, содержит ли результат поиска какие-либо персоны
-     * на текущей странице.
+     * Определяет, содержит ли результат поиска какие-либо персоны.
      * 
      * @return bool true если результат пуст, false в противном случае
      * 
@@ -128,7 +105,7 @@ class PersonSearchResult
      * if ($searchResult->isEmpty()) {
      *     echo "Персоны не найдены";
      * } else {
-     *     echo "Найдено {$searchResult->getCount()} персон";
+     *     echo "Найдено персон: {$searchResult->getCount()}";
      * }
      * ```
      */

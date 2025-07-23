@@ -18,6 +18,8 @@ use NotKinopoisk\Models\RelatedFilm;
 use NotKinopoisk\Models\FilmCollection;
 use NotKinopoisk\Models\Premiere;
 use NotKinopoisk\Models\Filters;
+use NotKinopoisk\Enums\ImageType;
+use NotKinopoisk\Enums\CollectionType;
 
 /**
  * Сервис для работы с фильмами в Kinopoisk API
@@ -288,7 +290,7 @@ class FilmService extends AbstractService
      * кадры, постеры, обложки, промо-материалы.
      * 
      * @param int $id Уникальный идентификатор фильма в Кинопоиске
-     * @param string $type Тип изображений (STILL, SHOOTING, POSTER, FAN_ART, PROMO, CONCEPT, WALLPAPER, COVER, SCREENSHOT)
+     * @param ImageType $type Тип изображений
      * @param int $page Номер страницы для пагинации
      * 
      * @return \NotKinopoisk\Models\Image[] Массив изображений
@@ -309,10 +311,10 @@ class FilmService extends AbstractService
      * }
      * ```
      */
-    public function getImages(int $id, string $type = 'STILL', int $page = 1): array
+    public function getImages(int $id, ImageType $type = ImageType::STILL, int $page = 1): array
     {
         $data = $this->get($this->buildUri("films/{$id}/images"), [
-            'type' => $type,
+            'type' => $type->value,
             'page' => $page
         ]);
         return array_map(fn($imageData) => Image::fromArray($imageData), $data['items']);
@@ -456,7 +458,7 @@ class FilmService extends AbstractService
      * READ операция - извлекает предустановленные коллекции фильмов:
      * популярные, топ-250, новинки и другие подборки.
      * 
-     * @param string $type Тип коллекции (TOP_POPULAR_ALL, TOP_POPULAR_MOVIES, TOP_250_MOVIES, TOP_250_SERIES, VAMPIRE_THEME, COMICS_THEME, CLOSES_RELEASES, FAMILY, OSKAR_WINNERS_2021, LOVE_THEME, ZOMBIE_THEME, CANDY_THEME, KRISTIANSTAD_THEME, COURTSHIP_THEME, CRIME_THEME, DOCS_THEME, BEST_FILMS_2021, RUSSIAN_FILMS, YOUTH_THEME, FOREIGN_FILMS, HISTORICAL_THEME, PSYCHOLOGICAL_THEME, DETECTIVE_THEME, SPACE_THEME, FAMILY_THEME, KARATE_THEME, KNIGHT_THEME, CATASTROPHE_THEME, MIKHAIL_KALATOZOV_THEME, FRENCH_FILMS, NETFLIX_THEME, NON_FICTION_THEME, APPLE_THEME, BIOPICS_THEME, BOEVAIA_FILMS, FOR_FAMILY_THEME, VAMPIRE_THEME, LOST_THEME, DISNEY_THEME, MARVEL_THEME, DC_THEME, STAR_WARS_THEME, STAR_TREK_THEME, OSCAR_2024, GOLDEN_GLOBE_THEME, CANNES_2024, SUNDANCE_2024, BERLINALE_2024, VENICE_2024, TORONTO_2024, SXSW_2024, TRIBECA_2024, ROTTERDAM_2024, LOCARNO_2024, SAN_SEBASTIAN_2024, KARLOVY_VARY_2024, WARSAW_2024, ROME_2024, LONDON_2024, ROTTERDAM_2024, GOTHENBURG_2024, TALLINN_2024, VILNIUS_2024, RIGA_2024, HELSINKI_2024, OSLO_2024, STOCKHOLM_2024, COPENHAGEN_2024, REYKJAVIK_2024, TALLINN_2024, VILNIUS_2024, RIGA_2024, HELSINKI_2024, OSLO_2024, STOCKHOLM_2024, COPENHAGEN_2024, REYKJAVIK_2024)
+     * @param CollectionType $type Тип коллекции
      * @param int $page Номер страницы для пагинации
      * 
      * @return \NotKinopoisk\Models\FilmCollection Коллекция фильмов
@@ -474,10 +476,10 @@ class FilmService extends AbstractService
      * echo "В коллекции: {$top250->getCount()} фильмов\n";
      * ```
      */
-    public function getCollections(string $type = 'TOP_POPULAR_ALL', int $page = 1): FilmCollection
+    public function getCollections(CollectionType $type = CollectionType::TOP_POPULAR_ALL, int $page = 1): FilmCollection
     {
         $data = $this->get($this->buildUri("films/collections"), [
-            'type' => $type,
+            'type' => $type->value,
             'page' => $page
         ]);
         return FilmCollection::fromArray($data);
@@ -600,8 +602,8 @@ class FilmService extends AbstractService
      */
     public function getPopular(int $page = 1): FilmCollection
     {
-        $data = $this->get($this->buildUri("films/top"), [
-            'type' => 'TOP_POPULAR_ALL',
+        $data = $this->get($this->buildUri("films/collections"), [
+            'type' => CollectionType::TOP_POPULAR_ALL->value,
             'page' => $page
         ]);
         return FilmCollection::fromArray($data);
@@ -631,8 +633,8 @@ class FilmService extends AbstractService
      */
     public function getTop250(int $page = 1): FilmCollection
     {
-        $data = $this->get($this->buildUri("films/top"), [
-            'type' => 'TOP_250_MOVIES',
+        $data = $this->get($this->buildUri("films/collections"), [
+            'type' => CollectionType::TOP_250_MOVIES->value,
             'page' => $page
         ]);
         return FilmCollection::fromArray($data);
@@ -662,8 +664,8 @@ class FilmService extends AbstractService
      */
     public function getTop250Series(int $page = 1): FilmCollection
     {
-        $data = $this->get($this->buildUri("films/top"), [
-            'type' => 'TOP_250_SERIES',
+        $data = $this->get($this->buildUri("films/collections"), [
+            'type' => CollectionType::TOP_250_SERIES->value,
             'page' => $page
         ]);
         return FilmCollection::fromArray($data);

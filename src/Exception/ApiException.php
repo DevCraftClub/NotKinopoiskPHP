@@ -46,7 +46,7 @@ class ApiException extends \Exception {
 	 * throw new ApiException('Ошибка сети при обращении к API', 500, $previousException);
 	 * ```
 	 */
-	public function __construct(string $message = '', int $code = 0, ?\Throwable $previous = NULL) {
+	public function __construct(string $message = '', int $code = 0, ?\Throwable $previous = null) {
 		parent::__construct($message, $code, $previous);
 	}
 

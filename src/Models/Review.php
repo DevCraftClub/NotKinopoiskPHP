@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Enums\ReviewType;
+
 /**
  * Модель рецензии из Kinopoisk API
  * 
@@ -21,6 +23,7 @@ namespace NotKinopoisk\Models;
  * @since 1.0.0
  * 
  * @see \NotKinopoisk\Services\FilmService
+ * @see \NotKinopoisk\Enums\ReviewType
  * 
  * @example
  * ```php
@@ -30,6 +33,7 @@ namespace NotKinopoisk\Models;
  * // Использование
  * echo "Автор: {$review->author}\n";
  * echo "Дата: {$review->date}\n";
+ * echo "Тип: {$review->type->getDisplayName()}\n";
  * echo "Рейтинг: {$review->positiveRating}/{$review->negativeRating}";
  * ```
  */
@@ -42,7 +46,7 @@ class Review
      * Все свойства являются readonly для обеспечения неизменяемости объекта.
      * 
      * @param int $kinopoiskId Уникальный идентификатор рецензии в Кинопоиске
-     * @param string $type Тип рецензии
+     * @param ReviewType $type Тип рецензии
      * @param string $date Дата публикации рецензии
      * @param int $positiveRating Количество положительных оценок
      * @param int $negativeRating Количество отрицательных оценок
@@ -54,7 +58,7 @@ class Review
      * ```php
      * $review = new Review(
      *     kinopoiskId: 12345,
-     *     type: 'POSITIVE',
+     *     type: ReviewType::POSITIVE,
      *     date: '2023-01-15',
      *     positiveRating: 85,
      *     negativeRating: 15,
@@ -66,7 +70,7 @@ class Review
      */
     public function __construct(
         public readonly int $kinopoiskId,
-        public readonly string $type,
+        public readonly ReviewType $type,
         public readonly string $date,
         public readonly int $positiveRating,
         public readonly int $negativeRating,
@@ -108,7 +112,7 @@ class Review
     {
         return new self(
             kinopoiskId: $data['kinopoiskId'],
-            type: $data['type'],
+            type: ReviewType::from($data['type']),
             date: $data['date'],
             positiveRating: $data['positiveRating'],
             negativeRating: $data['negativeRating'],

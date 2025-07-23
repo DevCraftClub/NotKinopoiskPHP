@@ -39,7 +39,6 @@ dist/
 .phpunit.result.cache
 coverage/
 .phpunit.cache/
-.phpunit.cache/**/
 
 # Node modules (if any)
 node_modules/

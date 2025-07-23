@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Enums\FactType;
+
 /**
- * Модель факта или ошибки в фильме из Kinopoisk API
+ * Модель факта из Kinopoisk API
  * 
- * Представляет интересные факты, ошибки (блуперы) и другие
- * занимательные детали, связанные с фильмом или сериалом.
+ * Представляет информацию о факте или ошибке, связанной с фильмом:
+ * интересные факты о съемках, ошибки в фильме (блуперы) и т.д.
  * 
  * Основные возможности:
- * - Хранение информации о фактах в неизменяемом виде
+ * - Хранение информации о факте в неизменяемом виде
  * - Создание объекта из массива данных API
  * - Определение типа факта (ошибка или интересный факт)
  * - Проверка на спойлеры
@@ -22,6 +24,7 @@ namespace NotKinopoisk\Models;
  * @since 1.0.0
  * 
  * @see \NotKinopoisk\Services\FilmService
+ * @see \NotKinopoisk\Enums\FactType
  * 
  * @example
  * ```php
@@ -29,9 +32,9 @@ namespace NotKinopoisk\Models;
  * $fact = Fact::fromArray($apiData);
  * 
  * // Работа с фактом
- * if ($fact->isBlooper()) {
+ * if ($fact->type === FactType::BLOOPER) {
  *     echo "Ошибка в фильме: {$fact->text}\n";
- * } elseif ($fact->isFact()) {
+ * } elseif ($fact->type === FactType::FACT) {
  *     echo "Интересный факт: {$fact->text}\n";
  * }
  * 
@@ -49,21 +52,21 @@ class Fact
      * Все свойства являются readonly для обеспечения неизменяемости объекта.
      * 
      * @param string $text Текст факта или описания ошибки
-     * @param string $type Тип факта (FACT, BLOOPER и т.д.)
+     * @param FactType $type Тип факта (FACT, BLOOPER и т.д.)
      * @param bool $spoiler Флаг, указывающий на наличие спойлера
      * 
      * @example
      * ```php
      * $fact = new Fact(
      *     text: 'В сцене драки видно, что актер использует дублера',
-     *     type: 'BLOOPER',
+     *     type: FactType::BLOOPER,
      *     spoiler: false
      * );
      * ```
      */
     public function __construct(
         public readonly string $text,
-        public readonly string $type,
+        public readonly FactType $type,
         public readonly bool $spoiler
     ) {
     }
@@ -95,7 +98,7 @@ class Fact
     {
         return new self(
             text: $data['text'],
-            type: $data['type'],
+            type: FactType::from($data['type']),
             spoiler: $data['spoiler']
         );
     }
@@ -117,26 +120,26 @@ class Fact
      */
     public function isBlooper(): bool
     {
-        return $this->type === 'BLOOPER';
+        return $this->type->isBlooper();
     }
 
     /**
      * Проверяет, является ли факт интересным фактом
      * 
      * Определяет, относится ли факт к категории интересных фактов
-     * о фильме, съемках или актерах.
+     * о съемках, актерах или других аспектах создания фильма.
      * 
      * @return bool true если это интересный факт, false в противном случае
      * 
      * @example
      * ```php
      * if ($fact->isFact()) {
-     *     echo "Интересно: {$fact->text}";
+     *     echo "Интересный факт: {$fact->text}";
      * }
      * ```
      */
     public function isFact(): bool
     {
-        return $this->type === 'FACT';
+        return $this->type->isFact();
     }
 } 

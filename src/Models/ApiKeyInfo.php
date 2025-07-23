@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Enums\AccountType;
+
 /**
  * Модель информации об API ключе из Kinopoisk API
  *
- * Представляет детальную информацию об API ключе пользователя, включая
- * статистику использования, лимиты запросов и тип аккаунта.
+ * Представляет информацию о текущем API ключе, включая
+ * лимиты запросов, тип аккаунта и доступные возможности.
  *
  * Основные возможности:
- * - Хранение информации об использовании API ключа
- * - Предоставление удобных методов для работы с квотами
- * - Информация о типе аккаунта и лимитах
+ * - Хранение информации об API ключе в неизменяемом виде
+ * - Создание объекта из массива данных API
+ * - Проверка лимитов и типа аккаунта
+ * - Получение информации о доступных запросах
  *
  * @package NotKinopoisk\Models
  * @since   1.0.0
@@ -21,16 +24,21 @@ namespace NotKinopoisk\Models;
  * @author  Maxim Harder <dev@devcraft.club>
  * @version 1.0.0
  * @see     \NotKinopoisk\Services\UserService
+ * @see     \NotKinopoisk\Enums\AccountType
  *
  * @example
  * ```php
  * // Создание из данных API
- * $keyInfo = ApiKeyInfo::fromArray($apiData);
+ * $apiKeyInfo = ApiKeyInfo::fromArray($apiData);
  *
- * // Проверка лимитов
- * echo "Использовано запросов: {$keyInfo->getTotalQuotaUsed()}\n";
- * echo "Лимит запросов: {$keyInfo->getTotalQuotaValue()}\n";
- * echo "Осталось запросов: {$keyInfo->getRemainingQuota()}\n";
+ * // Работа с информацией
+ * echo "Тип аккаунта: {$apiKeyInfo->accountType->getDisplayName()}\n";
+ * echo "Всего запросов: {$apiKeyInfo->totalQuota['total']}\n";
+ * echo "Использовано: {$apiKeyInfo->totalQuota['used']}\n";
+ *
+ * if ($apiKeyInfo->accountType->isUnlimited()) {
+ *     echo "Безлимитный аккаунт!";
+ * }
  * ```
  */
 class ApiKeyInfo {
@@ -38,38 +46,26 @@ class ApiKeyInfo {
 	/**
 	 * Конструктор модели информации об API ключе
 	 *
-	 * Создает новый экземпляр с информацией об API ключе.
+	 * Создает новый экземпляр информации об API ключе со всеми необходимыми данными.
 	 * Все свойства являются readonly для обеспечения неизменяемости объекта.
 	 *
-	 * @param   string  $accountType        Тип аккаунта (FREE, PAID и т.д.)
-	 * @param   int     $totalQuotaUsed     Общее количество использованных запросов
-	 * @param   int     $totalQuotaValue    Общий лимит запросов
-	 * @param   int     $dailyQuotaUsed     Количество использованных запросов за день
-	 * @param   int     $dailyQuotaValue    Дневной лимит запросов
-	 * @param   int     $monthlyQuotaUsed   Количество использованных запросов за месяц
-	 * @param   int     $monthlyQuotaValue  Месячный лимит запросов
+	 * @param   array        $totalQuota   Информация об общих лимитах запросов
+	 * @param   array        $dailyQuota   Информация о дневных лимитах запросов
+	 * @param   AccountType  $accountType  Тип аккаунта (FREE, PAID, UNLIMITED)
 	 *
 	 * @example
 	 * ```php
-	 * $keyInfo = new ApiKeyInfo(
-	 *     accountType: 'FREE',
-	 *     totalQuotaUsed: 150,
-	 *     totalQuotaValue: 1000,
-	 *     dailyQuotaUsed: 10,
-	 *     dailyQuotaValue: 100,
-	 *     monthlyQuotaUsed: 150,
-	 *     monthlyQuotaValue: 1000
+	 * $apiKeyInfo = new ApiKeyInfo(
+	 *     totalQuota: ['total' => 1000, 'used' => 150],
+	 *     dailyQuota: ['total' => 100, 'used' => 25],
+	 *     accountType: AccountType::FREE
 	 * );
 	 * ```
 	 */
 	public function __construct(
-		public readonly string $accountType,
-		public readonly int    $totalQuotaUsed,
-		public readonly int    $totalQuotaValue,
-		public readonly int    $dailyQuotaUsed,
-		public readonly int    $dailyQuotaValue,
-		public readonly int    $monthlyQuotaUsed,
-		public readonly int    $monthlyQuotaValue,
+		public readonly array       $totalQuota,
+		public readonly array       $dailyQuota,
+		public readonly AccountType $accountType,
 	) {}
 
 	/**
@@ -78,7 +74,7 @@ class ApiKeyInfo {
 	 * Статический метод для удобного создания объекта ApiKeyInfo из данных,
 	 * полученных от Kinopoisk API.
 	 *
-	 * @param   array  $data  Массив данных об API ключе от API
+	 * @param   array  $data  Массив данных информации об API ключе от API
 	 *
 	 * @return self Новый экземпляр информации об API ключе
 	 *
@@ -87,83 +83,75 @@ class ApiKeyInfo {
 	 * @example
 	 * ```php
 	 * $apiData = [
-	 *     'accountType' => 'FREE',
-	 *     'totalQuotaUsed' => 150,
-	 *     'totalQuotaValue' => 1000,
-	 *     'dailyQuotaUsed' => 10,
-	 *     'dailyQuotaValue' => 100,
-	 *     'monthlyQuotaUsed' => 150,
-	 *     'monthlyQuotaValue' => 1000
+	 *     'totalQuota' => ['total' => 1000, 'used' => 150],
+	 *     'dailyQuota' => ['total' => 100, 'used' => 25],
+	 *     'accountType' => 'FREE'
 	 * ];
 	 *
-	 * $keyInfo = ApiKeyInfo::fromArray($apiData);
+	 * $apiKeyInfo = ApiKeyInfo::fromArray($apiData);
 	 * ```
 	 */
 	public static function fromArray(array $data): self {
 		return new self(
-			accountType      : $data['accountType'],
-			totalQuotaUsed   : $data['totalQuotaUsed'],
-			totalQuotaValue  : $data['totalQuotaValue'],
-			dailyQuotaUsed   : $data['dailyQuotaUsed'],
-			dailyQuotaValue  : $data['dailyQuotaValue'],
-			monthlyQuotaUsed : $data['monthlyQuotaUsed'],
-			monthlyQuotaValue: $data['monthlyQuotaValue'],
+			totalQuota : $data['totalQuota'],
+			dailyQuota : $data['dailyQuota'],
+			accountType: AccountType::from($data['accountType']),
 		);
 	}
 
 	/**
-	 * Получает общее количество использованных запросов
+	 * Проверяет, является ли аккаунт безлимитным
 	 *
-	 * Возвращает количество запросов, которые были использованы
-	 * с момента создания API ключа.
+	 * Определяет, имеет ли аккаунт безлимитные возможности
+	 * без ограничений на количество запросов.
 	 *
-	 * @return int Количество использованных запросов
-	 *
-	 * @example
-	 * ```php
-	 * echo "Использовано запросов: {$keyInfo->getTotalQuotaUsed()}";
-	 * ```
-	 */
-	public function getTotalQuotaUsed(): int {
-		return $this->totalQuotaUsed;
-	}
-
-	/**
-	 * Получает общий лимит запросов
-	 *
-	 * Возвращает максимальное количество запросов, доступных
-	 * для данного типа аккаунта.
-	 *
-	 * @return int Общий лимит запросов
+	 * @return bool true если аккаунт безлимитный, false в противном случае
 	 *
 	 * @example
 	 * ```php
-	 * echo "Лимит запросов: {$keyInfo->getTotalQuotaValue()}";
+	 * if ($apiKeyInfo->isUnlimited()) {
+	 *     echo "Безлимитный аккаунт - можно делать неограниченное количество запросов";
+	 * }
 	 * ```
 	 */
-	public function getTotalQuotaValue(): int {
-		return $this->totalQuotaValue;
+	public function isUnlimited(): bool {
+		return $this->accountType->isUnlimited();
 	}
 
 	/**
-	 * Получает количество оставшихся запросов
+	 * Получает количество оставшихся общих запросов
 	 *
-	 * Вычисляет разность между общим лимитом и использованными запросами.
+	 * Вычисляет количество запросов, которые еще можно сделать
+	 * в рамках общего лимита аккаунта.
 	 *
 	 * @return int Количество оставшихся запросов
 	 *
 	 * @example
 	 * ```php
-	 * $remaining = $keyInfo->getRemainingQuota();
-	 * if ($remaining > 0) {
-	 *     echo "Осталось запросов: {$remaining}";
-	 * } else {
-	 *     echo "Лимит запросов исчерпан";
-	 * }
+	 * $remaining = $apiKeyInfo->getRemainingTotalQuota();
+	 * echo "Осталось запросов: {$remaining}";
 	 * ```
 	 */
-	public function getRemainingQuota(): int {
-		return max(0, $this->totalQuotaValue - $this->totalQuotaUsed);
+	public function getRemainingTotalQuota(): int {
+		return $this->totalQuota['total'] - $this->totalQuota['used'];
+	}
+
+	/**
+	 * Получает количество оставшихся дневных запросов
+	 *
+	 * Вычисляет количество запросов, которые еще можно сделать
+	 * в рамках дневного лимита аккаунта.
+	 *
+	 * @return int Количество оставшихся дневных запросов
+	 *
+	 * @example
+	 * ```php
+	 * $remaining = $apiKeyInfo->getRemainingDailyQuota();
+	 * echo "Осталось дневных запросов: {$remaining}";
+	 * ```
+	 */
+	public function getRemainingDailyQuota(): int {
+		return $this->dailyQuota['total'] - $this->dailyQuota['used'];
 	}
 
 }

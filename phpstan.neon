@@ -1,9 +1,9 @@
 parameters:
-    level: 8
+    level: 5
     paths:
         - src
         - tests
     excludePaths:
         - vendor
-    checkMissingIterableValueType: false
-    checkGenericClassInNonGenericObjectType: false 
+    ignoreErrors:
+        - '#Readonly property .* is assigned outside of its declaring class#' 

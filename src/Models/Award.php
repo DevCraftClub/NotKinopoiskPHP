@@ -100,7 +100,7 @@ class Award {
 		return new self(
 			name          : $data['name'],
 			win           : $data['win'],
-			imageUrl      : $data['imageUrl'] ?? NULL,
+			imageUrl      : $data['imageUrl'] ?? null,
 			nominationName: $data['nominationName'],
 			year          : $data['year'],
 			persons       : $data['persons'] ?? [],

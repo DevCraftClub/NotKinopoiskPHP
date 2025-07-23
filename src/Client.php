@@ -55,11 +55,11 @@ use NotKinopoisk\Services\UserService;
 class Client {
 
 	/**
-	 * Базовый URL для Kinopoisk Unofficial API
+	 * Базовый URL для API запросов
 	 *
 	 * @var string
 	 */
-	private string $BASE_URL = 'https://kinopoiskapiunofficial.tech';
+	private string $_baseUrl = 'https://kinopoiskapiunofficial.tech';
 
 	/**
 	 * Сервис для работы с фильмами
@@ -94,15 +94,15 @@ class Client {
 	/**
 	 * HTTP клиент для выполнения запросов к API
 	 *
-	 * @var \GuzzleHttp\Client
+	 * @var HttpClient
 	 */
-	private HttpClient $httpClient;
+	private HttpClient $_httpClient;
 	/**
-	 * API ключ для аутентификации в Kinopoisk API
+	 * API ключ для доступа к Kinopoisk API
 	 *
-	 * @var string
+	 * @var string|null
 	 */
-	private string $apiKey;
+	private string|null $_apiKey;
 
 	/**
 	 * Конструктор клиента
@@ -133,28 +133,32 @@ class Client {
 	 * ]);
 	 * ```
 	 */
-	public function __construct(?string $apiKey = NULL, array $config = []) {
+	public function __construct(?string $apiKey = null, array $config = []) {
 		// Автоматически загружаем .env файл, если он существует
-		$this->loadDotenv();
+		$this->_loadDotenv();
 
-		$this->apiKey = $apiKey ?? getenv('KINOPOISK_API_KEY');
-		if (!$this->apiKey) {
+		$envApiKey = getenv('KINOPOISK_API_KEY');
+		$this->_apiKey = $apiKey ?? ($envApiKey !== false ? $envApiKey : null);
+		if (!$this->_apiKey) {
 			throw new \InvalidArgumentException('API ключ не передан и не найден в переменной окружения KINOPOISK_API_KEY');
 		}
 
-		$this->BASE_URL = getenv('KINOPOISK_API_BASE_URL')?? $this->BASE_URL;
+		$baseUrl = getenv('KINOPOISK_API_BASE_URL');
+		if ($baseUrl !== false) {
+			$this->_baseUrl = $baseUrl;
+		}
 
 		$defaultConfig = [
-			'base_uri' => $this->BASE_URL,
+			'base_uri' => $this->_baseUrl,
 			'timeout'  => 30,
 			'headers'  => [
-				'X-API-KEY'    => $this->apiKey,
+				'X-API-KEY'    => $this->_apiKey,
 				'Content-Type' => 'application/json',
 				'Accept'       => 'application/json',
 			],
 		];
 
-		$this->httpClient = new HttpClient(array_merge($defaultConfig, $config));
+		$this->_httpClient = new HttpClient(array_merge($defaultConfig, $config));
 
 		// Инициализация сервисов
 		$this->films    = new FilmService($this);
@@ -177,7 +181,7 @@ class Client {
 	 * @internal Этот метод вызывается автоматически в конструкторе
 	 *
 	 */
-	private function loadDotenv(): void {
+	private function _loadDotenv(): void {
 		if (class_exists('\Dotenv\Dotenv')) {
 			$envFile = getcwd() . '/.env';
 			if (file_exists($envFile)) {
@@ -247,12 +251,14 @@ class Client {
 	 */
 	public function request(string $method, string $uri, array $options = []): array {
 		try {
-			$response = $this->httpClient->request($method, $uri, $options);
+			$response = $this->_httpClient->request($method, $uri, $options);
 			$content  = $response->getBody()->getContents();
 
-			return json_decode($content, TRUE, 512, JSON_THROW_ON_ERROR);
+			return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 		} catch (GuzzleException $e) {
-			$this->handleHttpException($e);
+			$this->_handleHttpException($e);
+			// Этот код недостижим, но PHPStan требует return statement
+			throw new ApiException('Ошибка HTTP запроса', 0, $e);
 		} catch (\JsonException $e) {
 			throw new ApiException('Ошибка парсинга JSON ответа: ' . $e->getMessage(), 0, $e);
 		}
@@ -273,10 +279,10 @@ class Client {
 	 *
 	 * @internal Этот метод используется внутренне для обработки ошибок HTTP запросов
 	 */
-	private function handleHttpException(GuzzleException $e): void {
+	private function _handleHttpException(GuzzleException $e): void {
 		if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
 			$response = $e->getResponse();
-			if ($response === NULL) {
+			if ($response === null) {
 				throw new ApiException('Ошибка сети: ' . $e->getMessage(), 0, $e);
 			}
 			$statusCode = $response->getStatusCode();
@@ -308,7 +314,7 @@ class Client {
 	 * Возвращает API ключ, который используется для аутентификации в API.
 	 * Ключ может быть передан в конструкторе или получен из переменной окружения.
 	 *
-	 * @return string API ключ для доступа к Kinopoisk API
+	 * @return string|null API ключ для доступа к Kinopoisk API
 	 *
 	 * @example
 	 * ```php
@@ -316,8 +322,8 @@ class Client {
 	 * echo "Используется ключ: " . substr($apiKey, 0, 8) . "...";
 	 * ```
 	 */
-	public function getApiKey(): string {
-		return $this->apiKey;
+	public function getApiKey(): string|null {
+		return $this->_apiKey;
 	}
 
 	/**
@@ -334,7 +340,7 @@ class Client {
 	 * ```
 	 */
 	public function getBaseUrl(): string {
-		return $this->BASE_URL;
+		return $this->_baseUrl;
 	}
 
 	/**
@@ -353,7 +359,7 @@ class Client {
 	 * @since 1.0.0
 	 */
 	public function setBaseUrl(string $url): void {
-		$this->BASE_URL = $url;
+		$this->_baseUrl = $url;
 	}
 
 }

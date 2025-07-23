@@ -57,7 +57,7 @@ class FilmServiceTest extends TestCase
 
     public function testGetImages(): void
     {
-        $images = self::$client->films->getImages(301, 'POSTER');
+        $images = self::$client->films->getImages(301, \NotKinopoisk\Enums\ImageType::POSTER);
         $this->assertIsArray($images);
         $this->assertNotEmpty($images);
         $this->assertNotEmpty($images[0]->imageUrl);
@@ -85,7 +85,7 @@ class FilmServiceTest extends TestCase
 
     public function testGetCollections(): void
     {
-        $collections = self::$client->films->getCollections('TOP_250_MOVIES');
+        $collections = self::$client->films->getCollections(\NotKinopoisk\Enums\CollectionType::TOP_250_MOVIES);
         $this->assertGreaterThan(0, $collections->getCount());
     }
 

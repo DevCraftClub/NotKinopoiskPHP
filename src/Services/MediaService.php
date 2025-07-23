@@ -68,7 +68,7 @@ class MediaService extends AbstractService
      */
     public function getByFilmId(int $filmId): array
     {
-        $data = $this->get($this->buildUri("films/{$filmId}/media"));
+        $data = $this->get($this->buildV1Uri("media_posts"), ['filmId' => $filmId]);
         return array_map(fn($postData) => MediaPost::fromArray($postData), $data['items']);
     }
 } 

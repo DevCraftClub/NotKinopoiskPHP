@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Enums\ContentType;
+
 /**
  * Модель фильма из Kinopoisk API
  * 
@@ -82,7 +84,7 @@ class Film
      * @param string|null $editorAnnotation Редакторская аннотация
      * @param bool|null $isTicketsAvailable Доступны ли билеты в кинотеатрах
      * @param string|null $productionStatus Статус производства фильма
-     * @param string $type Тип контента (FILM, TV_SERIES, MINI_SERIES, TV_SHOW)
+     * @param ContentType $type Тип контента (FILM, SERIES, MINI_SERIES, TV_SHOW)
      * @param string|null $ratingMpaa Рейтинг MPAA
      * @param string|null $ratingAgeLimits Возрастные ограничения
      * @param bool|null $hasImax Доступен ли в формате IMAX
@@ -104,7 +106,7 @@ class Film
      *     nameEn: 'The Matrix',
      *     posterUrl: 'https://...',
      *     posterUrlPreview: 'https://...',
-     *     type: 'FILM',
+     *     type: ContentType::FILM,
      *     year: 1999,
      *     countries: [],
      *     genres: []
@@ -144,7 +146,7 @@ class Film
         public readonly ?string $editorAnnotation,
         public readonly ?bool $isTicketsAvailable,
         public readonly ?string $productionStatus,
-        public readonly string $type,
+        public readonly ContentType $type,
         public readonly ?string $ratingMpaa,
         public readonly ?string $ratingAgeLimits,
         public readonly ?bool $hasImax,
@@ -224,7 +226,7 @@ class Film
             editorAnnotation: $data['editorAnnotation'] ?? null,
             isTicketsAvailable: $data['isTicketsAvailable'] ?? null,
             productionStatus: $data['productionStatus'] ?? null,
-            type: $data['type'],
+            type: ContentType::from($data['type']),
             ratingMpaa: $data['ratingMpaa'] ?? null,
             ratingAgeLimits: $data['ratingAgeLimits'] ?? null,
             hasImax: $data['hasImax'] ?? null,
@@ -277,7 +279,7 @@ class Film
      */
     public function isSerial(): bool
     {
-        return in_array($this->type, ['TV_SERIES', 'MINI_SERIES', 'TV_SHOW'], true);
+        return $this->type->isSeries();
     }
 
     /**

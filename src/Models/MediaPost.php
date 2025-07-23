@@ -5,60 +5,27 @@ declare(strict_types=1);
 namespace NotKinopoisk\Models;
 
 /**
- * Модель медиа поста из Kinopoisk API
- * 
- * Представляет информацию о медиа посте, связанном с фильмом:
- * новости, статьи, интервью и другие публикации.
- * 
- * Основные возможности:
- * - Хранение информации о медиа посте в неизменяемом виде
- * - Создание объекта из массива данных API
- * - Доступ к метаданным и содержанию поста
- * 
+ * Модель медиа-поста
+ *
+ * Представляет медиа-пост в Kinopoisk API.
+ * Содержит информацию о изображении, заголовке, описании и ссылке.
+ *
  * @package NotKinopoisk\Models
- * @author Maxim Harder <dev@devcraft.club>
+ * @author  Maxim Harder
  * @version 1.0.0
- * @since 1.0.0
- * 
- * @see \NotKinopoisk\Services\MediaService
- * 
- * @example
- * ```php
- * // Создание из данных API
- * $mediaPost = MediaPost::fromArray($apiData);
- * 
- * // Использование
- * echo "Заголовок: {$mediaPost->title}\n";
- * echo "Описание: {$mediaPost->description}\n";
- * echo "URL: {$mediaPost->url}";
- * ```
+ * @since   1.0.0
  */
 class MediaPost
 {
     /**
-     * Конструктор модели медиа поста
-     * 
-     * Создает новый экземпляр медиа поста со всеми необходимыми данными.
-     * Все свойства являются readonly для обеспечения неизменяемости объекта.
-     * 
-     * @param int $kinopoiskId Уникальный идентификатор фильма в Кинопоиске
-     * @param string $imageUrl URL изображения поста
-     * @param string $title Заголовок поста
-     * @param string $description Описание поста
-     * @param string $url URL поста
-     * @param string $publishedAt Дата публикации поста
-     * 
-     * @example
-     * ```php
-     * $mediaPost = new MediaPost(
-     *     kinopoiskId: 12345,
-     *     imageUrl: 'https://...',
-     *     title: 'Новости о фильме',
-     *     description: 'Подробности о съемках...',
-     *     url: 'https://kinopoisk.ru/news/...',
-     *     publishedAt: '2023-01-15T10:30:00Z'
-     * );
-     * ```
+     * Конструктор модели медиа-поста
+     *
+     * @param int    $kinopoiskId  Уникальный идентификатор в Кинопоиске
+     * @param string $imageUrl     URL изображения
+     * @param string $title        Заголовок поста
+     * @param string $description  Описание поста
+     * @param string $url          URL поста
+     * @param string $publishedAt  Дата публикации
      */
     public function __construct(
         public readonly int $kinopoiskId,
@@ -71,29 +38,25 @@ class MediaPost
     }
 
     /**
-     * Создает экземпляр медиа поста из массива данных API
-     * 
-     * Статический метод для удобного создания объекта MediaPost из данных,
-     * полученных от Kinopoisk API.
-     * 
-     * @param array $data Массив данных медиа поста от API
-     * 
-     * @return self Новый экземпляр медиа поста
-     * 
-     * @throws \InvalidArgumentException Если данные имеют неверный формат
-     * 
+     * Создает экземпляр модели из массива данных API
+     *
+     * @param array $data Массив данных от API
+     *
+     * @return self Экземпляр модели
+     *
+     * @throws \InvalidArgumentException При некорректных данных
+     *
      * @example
      * ```php
-     * $apiData = [
-     *     'kinopoiskId' => 12345,
-     *     'imageUrl' => 'https://...',
+     * $postData = [
+     *     'kinopoiskId' => 301,
+     *     'imageUrl' => 'https://example.com/image.jpg',
      *     'title' => 'Новости о фильме',
-     *     'description' => 'Подробности о съемках...',
-     *     'url' => 'https://kinopoisk.ru/news/...',
-     *     'publishedAt' => '2023-01-15T10:30:00Z'
+     *     'description' => 'Описание новости',
+     *     'url' => 'https://example.com/post',
+     *     'publishedAt' => '2024-01-01T12:00:00'
      * ];
-     * 
-     * $mediaPost = MediaPost::fromArray($apiData);
+     * $post = MediaPost::fromArray($postData);
      * ```
      */
     public static function fromArray(array $data): self

@@ -66,7 +66,7 @@ class StaffService extends AbstractService
      */
     public function getByFilmId(int $filmId): array
     {
-        $data = $this->get($this->buildUri("films/{$filmId}/staff"));
+        $data = $this->get($this->buildV1Uri("staff"), ['filmId' => $filmId]);
         return array_map(fn($staffData) => Staff::fromArray($staffData), $data);
     }
 } 
