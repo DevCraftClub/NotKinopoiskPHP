@@ -5,10 +5,60 @@ declare(strict_types=1);
 namespace NotKinopoisk\Models;
 
 /**
- * Модель коллекции фильмов
+ * Модель коллекции фильмов из Kinopoisk API
+ * 
+ * Представляет коллекцию фильмов, полученную в результате поиска или
+ * запроса списков (популярные, топ-250 и т.д.). Содержит массив фильмов
+ * и метаданные о пагинации.
+ * 
+ * Основные возможности:
+ * - Хранение массива фильмов в неизменяемом виде
+ * - Информация о пагинации (общее количество, количество страниц)
+ * - Удобные методы для работы с коллекцией
+ * 
+ * @package NotKinopoisk\Models
+ * @author Maxim Harder <dev@devcraft.club>
+ * @version 1.0.0
+ * @since 1.0.0
+ * 
+ * @see \NotKinopoisk\Models\Film
+ * @see \NotKinopoisk\Services\FilmService
+ * 
+ * @example
+ * ```php
+ * // Создание из данных API
+ * $collection = FilmCollection::fromArray($apiData);
+ * 
+ * // Работа с коллекцией
+ * echo "Найдено фильмов: {$collection->getCount()}\n";
+ * echo "Всего страниц: {$collection->totalPages}\n";
+ * 
+ * foreach ($collection->items as $film) {
+ *     echo "- {$film->getDisplayName()}\n";
+ * }
+ * ```
  */
 class FilmCollection
 {
+    /**
+     * Конструктор коллекции фильмов
+     * 
+     * Создает новую коллекцию фильмов с указанными данными.
+     * Все свойства являются readonly для обеспечения неизменяемости объекта.
+     * 
+     * @param array $items Массив объектов Film в коллекции
+     * @param int $total Общее количество фильмов (всего в базе данных)
+     * @param int $totalPages Общее количество страниц для пагинации
+     * 
+     * @example
+     * ```php
+     * $collection = new FilmCollection(
+     *     items: [$film1, $film2, $film3],
+     *     total: 150,
+     *     totalPages: 5
+     * );
+     * ```
+     */
     public function __construct(
         public readonly array $items,
         public readonly int $total,
@@ -18,9 +68,30 @@ class FilmCollection
 
     /**
      * Создает экземпляр коллекции фильмов из массива данных API
-     *
-     * @param array $data Данные коллекции
-     * @return self
+     * 
+     * Статический метод для удобного создания объекта FilmCollection из данных,
+     * полученных от Kinopoisk API. Автоматически обрабатывает различные форматы
+     * ответов API и создает объекты Film для каждого элемента.
+     * 
+     * @param array $data Массив данных коллекции от API
+     * 
+     * @return self Новый экземпляр коллекции фильмов
+     * 
+     * @throws \InvalidArgumentException Если данные имеют неверный формат
+     * 
+     * @example
+     * ```php
+     * $apiData = [
+     *     'items' => [
+     *         ['kinopoiskId' => 301, 'nameRu' => 'Матрица', ...],
+     *         ['kinopoiskId' => 302, 'nameRu' => 'Матрица: Перезагрузка', ...]
+     *     ],
+     *     'total' => 150,
+     *     'totalPages' => 5
+     * ];
+     * 
+     * $collection = FilmCollection::fromArray($apiData);
+     * ```
      */
     public static function fromArray(array $data): self
     {
@@ -39,9 +110,19 @@ class FilmCollection
     }
 
     /**
-     * Получает количество фильмов в коллекции
-     *
-     * @return int
+     * Получает количество фильмов в текущей коллекции
+     * 
+     * Возвращает количество фильмов на текущей странице/в текущем результате.
+     * Для получения общего количества фильмов используйте свойство $total.
+     * 
+     * @return int Количество фильмов в коллекции
+     * 
+     * @example
+     * ```php
+     * $collection = FilmCollection::fromArray($apiData);
+     * echo "На этой странице: {$collection->getCount()} фильмов\n";
+     * echo "Всего найдено: {$collection->total} фильмов\n";
+     * ```
      */
     public function getCount(): int
     {
@@ -50,8 +131,19 @@ class FilmCollection
 
     /**
      * Проверяет, пуста ли коллекция
-     *
-     * @return bool
+     * 
+     * Возвращает true, если в коллекции нет фильмов, и false в противном случае.
+     * 
+     * @return bool true если коллекция пуста, false если содержит фильмы
+     * 
+     * @example
+     * ```php
+     * if ($collection->isEmpty()) {
+     *     echo "Фильмы не найдены\n";
+     * } else {
+     *     echo "Найдено фильмов: {$collection->getCount()}\n";
+     * }
+     * ```
      */
     public function isEmpty(): bool
     {
@@ -60,8 +152,18 @@ class FilmCollection
 
     /**
      * Получает первый фильм из коллекции
-     *
-     * @return Film|null
+     * 
+     * Возвращает первый элемент массива фильмов или null, если коллекция пуста.
+     * 
+     * @return \NotKinopoisk\Models\Film|null Первый фильм или null
+     * 
+     * @example
+     * ```php
+     * $firstFilm = $collection->getFirst();
+     * if ($firstFilm !== null) {
+     *     echo "Первый фильм: {$firstFilm->getDisplayName()}\n";
+     * }
+     * ```
      */
     public function getFirst(): ?Film
     {
@@ -70,8 +172,18 @@ class FilmCollection
 
     /**
      * Получает последний фильм из коллекции
-     *
-     * @return Film|null
+     * 
+     * Возвращает последний элемент массива фильмов или null, если коллекция пуста.
+     * 
+     * @return \NotKinopoisk\Models\Film|null Последний фильм или null
+     * 
+     * @example
+     * ```php
+     * $lastFilm = $collection->getLast();
+     * if ($lastFilm !== null) {
+     *     echo "Последний фильм: {$lastFilm->getDisplayName()}\n";
+     * }
+     * ```
      */
     public function getLast(): ?Film
     {

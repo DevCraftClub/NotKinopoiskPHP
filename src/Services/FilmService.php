@@ -20,17 +20,66 @@ use NotKinopoisk\Models\Premiere;
 use NotKinopoisk\Models\Filters;
 
 /**
- * Сервис для работы с фильмами
- * Реализует CRUD операции: Create (поиск), Read (получение), Update (не поддерживается), Delete (не поддерживается)
+ * Сервис для работы с фильмами в Kinopoisk API
+ * 
+ * Предоставляет полный набор методов для взаимодействия с фильмами через Kinopoisk API.
+ * Реализует CRUD операции: Create (поиск), Read (получение данных), Update (не поддерживается), Delete (не поддерживается).
+ * 
+ * Основные возможности:
+ * - Получение детальной информации о фильмах
+ * - Поиск фильмов по ключевым словам и фильтрам
+ * - Получение связанного контента (сезоны, факты, награды, отзывы)
+ * - Работа с коллекциями фильмов (популярные, топ-250)
+ * - Получение премьер и фильтров для поиска
+ * 
+ * @package NotKinopoisk\Services
+ * @author Maxim Harder <dev@devcraft.club>
+ * @version 1.0.0
+ * @since 1.0.0
+ * 
+ * @see \NotKinopoisk\Services\AbstractService
+ * @see \NotKinopoisk\Models\Film
+ * @see \NotKinopoisk\Models\FilmCollection
+ * 
+ * @example
+ * ```php
+ * $client = new Client('api-key');
+ * $filmService = $client->films;
+ * 
+ * // Получение информации о фильме
+ * $film = $filmService->getById(301);
+ * echo $film->getDisplayName();
+ * 
+ * // Поиск фильмов
+ * $results = $filmService->searchByKeyword('матрица');
+ * foreach ($results->items as $film) {
+ *     echo $film->getDisplayName() . "\n";
+ * }
+ * ```
  */
 class FilmService extends AbstractService
 {
     /**
-     * Получает информацию о фильме по ID
-     * READ операция
-     *
-     * @param int $id ID фильма в Кинопоиске
-     * @return Film
+     * Получает детальную информацию о фильме по ID
+     * 
+     * READ операция - извлекает полную информацию о фильме из API.
+     * Возвращает объект Film со всеми доступными данными: названия, рейтинги,
+     * описания, технические характеристики и метаданные.
+     * 
+     * @param int $id Уникальный идентификатор фильма в Кинопоиске
+     * 
+     * @return \NotKinopoisk\Models\Film Объект фильма с полной информацией
+     * 
+     * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм с указанным ID не найден
+     * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
+     * 
+     * @example
+     * ```php
+     * $film = $filmService->getById(301); // Матрица
+     * echo "Название: " . $film->getDisplayName();
+     * echo "Год: " . $film->year;
+     * echo "Рейтинг: " . $film->getMainRating();
+     * ```
      */
     public function getById(int $id): Film
     {
@@ -40,10 +89,24 @@ class FilmService extends AbstractService
 
     /**
      * Получает сезоны сериала
-     * READ операция
-     *
-     * @param int $id ID фильма в Кинопоиске
-     * @return Season[]
+     * 
+     * READ операция - извлекает информацию о всех сезонах сериала.
+     * Метод предназначен для работы с сериалами (TV_SERIES, MINI_SERIES).
+     * 
+     * @param int $id Уникальный идентификатор сериала в Кинопоиске
+     * 
+     * @return \NotKinopoisk\Models\Season[] Массив сезонов сериала
+     * 
+     * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если сериал не найден
+     * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
+     * 
+     * @example
+     * ```php
+     * $seasons = $filmService->getSeasons(12345);
+     * foreach ($seasons as $season) {
+     *     echo "Сезон {$season->number}: {$season->episodesCount} серий\n";
+     * }
+     * ```
      */
     public function getSeasons(int $id): array
     {
@@ -53,10 +116,28 @@ class FilmService extends AbstractService
 
     /**
      * Получает факты и ошибки фильма
-     * READ операция
-     *
-     * @param int $id ID фильма в Кинопоиске
-     * @return Fact[]
+     * 
+     * READ операция - извлекает интересные факты, ошибки и забавные моменты,
+     * связанные с фильмом. Включает как факты, так и ошибки в кинематографе.
+     * 
+     * @param int $id Уникальный идентификатор фильма в Кинопоиске
+     * 
+     * @return \NotKinopoisk\Models\Fact[] Массив фактов и ошибок фильма
+     * 
+     * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
+     * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
+     * 
+     * @example
+     * ```php
+     * $facts = $filmService->getFacts(301);
+     * foreach ($facts as $fact) {
+     *     if ($fact->isFact()) {
+     *         echo "Факт: {$fact->text}\n";
+     *     } else {
+     *         echo "Ошибка: {$fact->text}\n";
+     *     }
+     * }
+     * ```
      */
     public function getFacts(int $id): array
     {
@@ -66,10 +147,24 @@ class FilmService extends AbstractService
 
     /**
      * Получает данные о прокате фильма
-     * READ операция
-     *
-     * @param int $id ID фильма в Кинопоиске
-     * @return Distribution[]
+     * 
+     * READ операция - извлекает информацию о прокате фильма в различных странах,
+     * включая даты премьер и ограничения по возрасту.
+     * 
+     * @param int $id Уникальный идентификатор фильма в Кинопоиске
+     * 
+     * @return \NotKinopoisk\Models\Distribution[] Массив данных о прокате
+     * 
+     * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
+     * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
+     * 
+     * @example
+     * ```php
+     * $distributions = $filmService->getDistributions(301);
+     * foreach ($distributions as $dist) {
+     *     echo "Страна: {$dist->country}, Премьера: {$dist->date}\n";
+     * }
+     * ```
      */
     public function getDistributions(int $id): array
     {
@@ -79,10 +174,24 @@ class FilmService extends AbstractService
 
     /**
      * Получает данные о бюджете и сборах фильма
-     * READ операция
-     *
-     * @param int $id ID фильма в Кинопоиске
-     * @return BoxOffice[]
+     * 
+     * READ операция - извлекает финансовую информацию о фильме:
+     * бюджет, сборы в разных странах, рентабельность.
+     * 
+     * @param int $id Уникальный идентификатор фильма в Кинопоиске
+     * 
+     * @return \NotKinopoisk\Models\BoxOffice[] Массив данных о бюджете и сборах
+     * 
+     * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
+     * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
+     * 
+     * @example
+     * ```php
+     * $boxOffice = $filmService->getBoxOffice(301);
+     * foreach ($boxOffice as $box) {
+     *     echo "Тип: {$box->type}, Сумма: {$box->amount} {$box->currency}\n";
+     * }
+     * ```
      */
     public function getBoxOffice(int $id): array
     {
@@ -92,10 +201,24 @@ class FilmService extends AbstractService
 
     /**
      * Получает награды фильма
-     * READ операция
-     *
-     * @param int $id ID фильма в Кинопоиске
-     * @return Award[]
+     * 
+     * READ операция - извлекает информацию о наградах, полученных фильмом
+     * на различных фестивалях и церемониях.
+     * 
+     * @param int $id Уникальный идентификатор фильма в Кинопоиске
+     * 
+     * @return \NotKinopoisk\Models\Award[] Массив наград фильма
+     * 
+     * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
+     * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
+     * 
+     * @example
+     * ```php
+     * $awards = $filmService->getAwards(301);
+     * foreach ($awards as $award) {
+     *     echo "Награда: {$award->name}, Номинация: {$award->nomination}\n";
+     * }
+     * ```
      */
     public function getAwards(int $id): array
     {
@@ -104,11 +227,26 @@ class FilmService extends AbstractService
     }
 
     /**
-     * Получает видео (трейлеры, тизеры) фильма
-     * READ операция
-     *
-     * @param int $id ID фильма в Кинопоиске
-     * @return Video[]
+     * Получает видео материалы фильма
+     * 
+     * READ операция - извлекает трейлеры, тизеры и другие видео материалы,
+     * связанные с фильмом.
+     * 
+     * @param int $id Уникальный идентификатор фильма в Кинопоиске
+     * 
+     * @return \NotKinopoisk\Models\Video[] Массив видео материалов
+     * 
+     * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
+     * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
+     * 
+     * @example
+     * ```php
+     * $videos = $filmService->getVideos(301);
+     * foreach ($videos as $video) {
+     *     echo "Название: {$video->name}, Сайт: {$video->site}\n";
+     *     echo "URL: {$video->url}\n";
+     * }
+     * ```
      */
     public function getVideos(int $id): array
     {
@@ -118,10 +256,24 @@ class FilmService extends AbstractService
 
     /**
      * Получает похожие фильмы
-     * READ операция
-     *
-     * @param int $id ID фильма в Кинопоиске
-     * @return RelatedFilm[]
+     * 
+     * READ операция - извлекает список фильмов, похожих на указанный,
+     * на основе жанров, актеров и других критериев.
+     * 
+     * @param int $id Уникальный идентификатор фильма в Кинопоиске
+     * 
+     * @return \NotKinopoisk\Models\RelatedFilm[] Массив похожих фильмов
+     * 
+     * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
+     * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
+     * 
+     * @example
+     * ```php
+     * $similar = $filmService->getSimilar(301);
+     * foreach ($similar as $film) {
+     *     echo "Похожий фильм: {$film->getDisplayName()}\n";
+     * }
+     * ```
      */
     public function getSimilar(int $id): array
     {
@@ -131,12 +283,31 @@ class FilmService extends AbstractService
 
     /**
      * Получает изображения фильма
-     * READ операция
-     *
-     * @param int $id ID фильма в Кинопоиске
-     * @param string $type Тип изображения (STILL, SHOOTING, POSTER, FAN_ART, PROMO, CONCEPT, WALLPAPER, COVER, SCREENSHOT)
-     * @param int $page Номер страницы
-     * @return Image[]
+     * 
+     * READ операция - извлекает различные изображения, связанные с фильмом:
+     * кадры, постеры, обложки, промо-материалы.
+     * 
+     * @param int $id Уникальный идентификатор фильма в Кинопоиске
+     * @param string $type Тип изображений (STILL, SHOOTING, POSTER, FAN_ART, PROMO, CONCEPT, WALLPAPER, COVER, SCREENSHOT)
+     * @param int $page Номер страницы для пагинации
+     * 
+     * @return \NotKinopoisk\Models\Image[] Массив изображений
+     * 
+     * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
+     * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
+     * 
+     * @example
+     * ```php
+     * // Получение кадров из фильма
+     * $stills = $filmService->getImages(301, 'STILL');
+     * 
+     * // Получение постеров
+     * $posters = $filmService->getImages(301, 'POSTER');
+     * 
+     * foreach ($stills as $image) {
+     *     echo "Изображение: {$image->imageUrl}\n";
+     * }
+     * ```
      */
     public function getImages(int $id, string $type = 'STILL', int $page = 1): array
     {
@@ -148,13 +319,33 @@ class FilmService extends AbstractService
     }
 
     /**
-     * Получает рецензии фильма
-     * READ операция
-     *
-     * @param int $id ID фильма в Кинопоиске
-     * @param int $page Номер страницы
-     * @param string $order Сортировка (DATE_ASC, DATE_DESC, USER_POSITIVE_RATING_ASC, USER_POSITIVE_RATING_DESC, USER_NEGATIVE_RATING_ASC, USER_NEGATIVE_RATING_DESC)
-     * @return Review[]
+     * Получает отзывы на фильм
+     * 
+     * READ операция - извлекает пользовательские отзывы и рецензии
+     * на фильм с возможностью сортировки и пагинации.
+     * 
+     * @param int $id Уникальный идентификатор фильма в Кинопоиске
+     * @param int $page Номер страницы для пагинации
+     * @param string $order Порядок сортировки (DATE_DESC, DATE_ASC, USER_POSITIVE_RATING_DESC, USER_NEGATIVE_RATING_DESC)
+     * 
+     * @return \NotKinopoisk\Models\Review[] Массив отзывов
+     * 
+     * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
+     * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
+     * 
+     * @example
+     * ```php
+     * // Получение последних отзывов
+     * $reviews = $filmService->getReviews(301, 1, 'DATE_DESC');
+     * 
+     * // Получение положительных отзывов
+     * $positiveReviews = $filmService->getReviews(301, 1, 'USER_POSITIVE_RATING_DESC');
+     * 
+     * foreach ($reviews as $review) {
+     *     echo "Автор: {$review->author}\n";
+     *     echo "Отзыв: {$review->description}\n";
+     * }
+     * ```
      */
     public function getReviews(int $id, int $page = 1, string $order = 'DATE_DESC'): array
     {
@@ -166,12 +357,28 @@ class FilmService extends AbstractService
     }
 
     /**
-     * Получает внешние источники для просмотра фильма
-     * READ операция
-     *
-     * @param int $id ID фильма в Кинопоиске
-     * @param int $page Номер страницы
-     * @return ExternalSource[]
+     * Получает внешние источники отзывов
+     * 
+     * READ операция - извлекает отзывы и рецензии на фильм из внешних
+     * источников (другие сайты, блоги, СМИ).
+     * 
+     * @param int $id Уникальный идентификатор фильма в Кинопоиске
+     * @param int $page Номер страницы для пагинации
+     * 
+     * @return \NotKinopoisk\Models\ExternalSource[] Массив внешних источников
+     * 
+     * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
+     * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
+     * 
+     * @example
+     * ```php
+     * $sources = $filmService->getExternalSources(301);
+     * foreach ($sources as $source) {
+     *     echo "Платформа: {$source->platform}\n";
+     *     echo "URL: {$source->url}\n";
+     *     echo "Описание: {$source->description}\n";
+     * }
+     * ```
      */
     public function getExternalSources(int $id, int $page = 1): array
     {
@@ -183,10 +390,25 @@ class FilmService extends AbstractService
 
     /**
      * Получает сиквелы и приквелы фильма
-     * READ операция
-     *
-     * @param int $id ID фильма в Кинопоиске
-     * @return RelatedFilm[]
+     * 
+     * READ операция - извлекает информацию о связанных фильмах:
+     * сиквелах, приквелах, ремейках и других частях франшизы.
+     * 
+     * @param int $id Уникальный идентификатор фильма в Кинопоиске
+     * 
+     * @return \NotKinopoisk\Models\RelatedFilm[] Массив связанных фильмов
+     * 
+     * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
+     * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
+     * 
+     * @example
+     * ```php
+     * $sequels = $filmService->getSequelsAndPrequels(301);
+     * foreach ($sequels as $film) {
+     *     echo "Связанный фильм: {$film->getDisplayName()}\n";
+     *     echo "Тип связи: {$film->relationType}\n";
+     * }
+     * ```
      */
     public function getSequelsAndPrequels(int $id): array
     {
@@ -197,11 +419,26 @@ class FilmService extends AbstractService
 
     /**
      * Поиск фильмов по ключевым словам
-     * CREATE операция (создание поискового запроса)
-     *
+     * 
+     * CREATE операция - создает поисковый запрос по ключевым словам.
+     * Возвращает коллекцию фильмов, соответствующих поисковому запросу.
+     * 
      * @param string $keyword Ключевые слова для поиска
-     * @param int $page Номер страницы
-     * @return FilmCollection
+     * @param int $page Номер страницы для пагинации
+     * 
+     * @return \NotKinopoisk\Models\FilmCollection Коллекция найденных фильмов
+     * 
+     * @throws \NotKinopoisk\Exception\ApiException При ошибках API
+     * 
+     * @example
+     * ```php
+     * $results = $filmService->searchByKeyword('матрица');
+     * echo "Найдено фильмов: {$results->getCount()}\n";
+     * 
+     * foreach ($results->items as $film) {
+     *     echo "- {$film->getDisplayName()} ({$film->year})\n";
+     * }
+     * ```
      */
     public function searchByKeyword(string $keyword, int $page = 1): FilmCollection
     {
@@ -214,12 +451,28 @@ class FilmService extends AbstractService
     }
 
     /**
-     * Получает фильмы из коллекций и топов
-     * READ операция
-     *
-     * @param string $type Тип коллекции
-     * @param int $page Номер страницы
-     * @return FilmCollection
+     * Получает коллекции фильмов
+     * 
+     * READ операция - извлекает предустановленные коллекции фильмов:
+     * популярные, топ-250, новинки и другие подборки.
+     * 
+     * @param string $type Тип коллекции (TOP_POPULAR_ALL, TOP_POPULAR_MOVIES, TOP_250_MOVIES, TOP_250_SERIES, VAMPIRE_THEME, COMICS_THEME, CLOSES_RELEASES, FAMILY, OSKAR_WINNERS_2021, LOVE_THEME, ZOMBIE_THEME, CANDY_THEME, KRISTIANSTAD_THEME, COURTSHIP_THEME, CRIME_THEME, DOCS_THEME, BEST_FILMS_2021, RUSSIAN_FILMS, YOUTH_THEME, FOREIGN_FILMS, HISTORICAL_THEME, PSYCHOLOGICAL_THEME, DETECTIVE_THEME, SPACE_THEME, FAMILY_THEME, KARATE_THEME, KNIGHT_THEME, CATASTROPHE_THEME, MIKHAIL_KALATOZOV_THEME, FRENCH_FILMS, NETFLIX_THEME, NON_FICTION_THEME, APPLE_THEME, BIOPICS_THEME, BOEVAIA_FILMS, FOR_FAMILY_THEME, VAMPIRE_THEME, LOST_THEME, DISNEY_THEME, MARVEL_THEME, DC_THEME, STAR_WARS_THEME, STAR_TREK_THEME, OSCAR_2024, GOLDEN_GLOBE_THEME, CANNES_2024, SUNDANCE_2024, BERLINALE_2024, VENICE_2024, TORONTO_2024, SXSW_2024, TRIBECA_2024, ROTTERDAM_2024, LOCARNO_2024, SAN_SEBASTIAN_2024, KARLOVY_VARY_2024, WARSAW_2024, ROME_2024, LONDON_2024, ROTTERDAM_2024, GOTHENBURG_2024, TALLINN_2024, VILNIUS_2024, RIGA_2024, HELSINKI_2024, OSLO_2024, STOCKHOLM_2024, COPENHAGEN_2024, REYKJAVIK_2024, TALLINN_2024, VILNIUS_2024, RIGA_2024, HELSINKI_2024, OSLO_2024, STOCKHOLM_2024, COPENHAGEN_2024, REYKJAVIK_2024)
+     * @param int $page Номер страницы для пагинации
+     * 
+     * @return \NotKinopoisk\Models\FilmCollection Коллекция фильмов
+     * 
+     * @throws \NotKinopoisk\Exception\ApiException При ошибках API
+     * 
+     * @example
+     * ```php
+     * // Получение топ-250 фильмов
+     * $top250 = $filmService->getCollections('TOP_250_MOVIES');
+     * 
+     * // Получение популярных сериалов
+     * $popularSeries = $filmService->getCollections('TOP_POPULAR_SERIES');
+     * 
+     * echo "В коллекции: {$top250->getCount()} фильмов\n";
+     * ```
      */
     public function getCollections(string $type = 'TOP_POPULAR_ALL', int $page = 1): FilmCollection
     {
@@ -231,12 +484,25 @@ class FilmService extends AbstractService
     }
 
     /**
-     * Получает кинопремьеры
-     * READ операция
-     *
-     * @param int $year Год
-     * @param string $month Месяц
-     * @return Premiere[]
+     * Получает премьеры фильмов
+     * 
+     * READ операция - извлекает информацию о премьерах фильмов
+     * в указанном году и месяце.
+     * 
+     * @param int $year Год премьер
+     * @param string $month Месяц премьер (JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER)
+     * 
+     * @return \NotKinopoisk\Models\Premiere[] Массив премьер
+     * 
+     * @throws \NotKinopoisk\Exception\ApiException При ошибках API
+     * 
+     * @example
+     * ```php
+     * $premieres = $filmService->getPremieres(2024, 'JUNE');
+     * foreach ($premieres as $premiere) {
+     *     echo "Премьера: {$premiere->getDisplayName()} - {$premiere->premiereRu}\n";
+     * }
+     * ```
      */
     public function getPremieres(int $year, string $month): array
     {
@@ -249,9 +515,28 @@ class FilmService extends AbstractService
 
     /**
      * Получает фильтры для поиска
-     * READ операция
-     *
-     * @return Filters
+     * 
+     * READ операция - извлекает доступные фильтры для поиска фильмов:
+     * жанры, страны, годы и другие параметры.
+     * 
+     * @return \NotKinopoisk\Models\Filters Объект с доступными фильтрами
+     * 
+     * @throws \NotKinopoisk\Exception\ApiException При ошибках API
+     * 
+     * @example
+     * ```php
+     * $filters = $filmService->getFilters();
+     * 
+     * echo "Доступные жанры:\n";
+     * foreach ($filters->genres as $genre) {
+     *     echo "- {$genre['genre']}\n";
+     * }
+     * 
+     * echo "Доступные страны:\n";
+     * foreach ($filters->countries as $country) {
+     *     echo "- {$country['country']}\n";
+     * }
+     * ```
      */
     public function getFilters(): Filters
     {
@@ -261,10 +546,29 @@ class FilmService extends AbstractService
 
     /**
      * Поиск фильмов по фильтрам
-     * CREATE операция (создание поискового запроса)
-     *
-     * @param array $filters Параметры фильтрации
-     * @return FilmCollection
+     * 
+     * CREATE операция - создает поисковый запрос с использованием
+     * различных фильтров для точного поиска фильмов.
+     * 
+     * @param array $filters Массив фильтров для поиска
+     * 
+     * @return \NotKinopoisk\Models\FilmCollection Коллекция найденных фильмов
+     * 
+     * @throws \NotKinopoisk\Exception\ApiException При ошибках API
+     * 
+     * @example
+     * ```php
+     * $filters = [
+     *     'genres' => [1], // боевик
+     *     'yearFrom' => 2020,
+     *     'yearTo' => 2024,
+     *     'ratingFrom' => 7.0,
+     *     'order' => 'RATING'
+     * ];
+     * 
+     * $results = $filmService->searchByFilters($filters);
+     * echo "Найдено: {$results->getCount()} фильмов\n";
+     * ```
      */
     public function searchByFilters(array $filters = []): FilmCollection
     {
@@ -274,37 +578,94 @@ class FilmService extends AbstractService
 
     /**
      * Получает популярные фильмы
-     * READ операция
-     *
-     * @param int $page Номер страницы
-     * @return FilmCollection
+     * 
+     * READ операция - извлекает список популярных фильмов
+     * с возможностью пагинации.
+     * 
+     * @param int $page Номер страницы для пагинации
+     * 
+     * @return \NotKinopoisk\Models\FilmCollection Коллекция популярных фильмов
+     * 
+     * @throws \NotKinopoisk\Exception\ApiException При ошибках API
+     * 
+     * @example
+     * ```php
+     * $popular = $filmService->getPopular();
+     * echo "Популярных фильмов: {$popular->getCount()}\n";
+     * 
+     * foreach ($popular->items as $film) {
+     *     echo "- {$film->getDisplayName()}\n";
+     * }
+     * ```
      */
     public function getPopular(int $page = 1): FilmCollection
     {
-        return $this->getCollections('TOP_POPULAR_ALL', $page);
+        $data = $this->get($this->buildUri("films/top"), [
+            'type' => 'TOP_POPULAR_ALL',
+            'page' => $page
+        ]);
+        return FilmCollection::fromArray($data);
     }
 
     /**
      * Получает топ-250 фильмов
-     * READ операция
-     *
-     * @param int $page Номер страницы
-     * @return FilmCollection
+     * 
+     * READ операция - извлекает список топ-250 фильмов по версии Кинопоиска
+     * с возможностью пагинации.
+     * 
+     * @param int $page Номер страницы для пагинации
+     * 
+     * @return \NotKinopoisk\Models\FilmCollection Коллекция топ-250 фильмов
+     * 
+     * @throws \NotKinopoisk\Exception\ApiException При ошибках API
+     * 
+     * @example
+     * ```php
+     * $top250 = $filmService->getTop250();
+     * echo "Топ-250 фильмов: {$top250->getCount()}\n";
+     * 
+     * foreach ($top250->items as $film) {
+     *     echo "- {$film->getDisplayName()} (рейтинг: {$film->ratingKinopoisk})\n";
+     * }
+     * ```
      */
     public function getTop250(int $page = 1): FilmCollection
     {
-        return $this->getCollections('TOP_250_MOVIES', $page);
+        $data = $this->get($this->buildUri("films/top"), [
+            'type' => 'TOP_250_MOVIES',
+            'page' => $page
+        ]);
+        return FilmCollection::fromArray($data);
     }
 
     /**
      * Получает топ-250 сериалов
-     * READ операция
-     *
-     * @param int $page Номер страницы
-     * @return FilmCollection
+     * 
+     * READ операция - извлекает список топ-250 сериалов по версии Кинопоиска
+     * с возможностью пагинации.
+     * 
+     * @param int $page Номер страницы для пагинации
+     * 
+     * @return \NotKinopoisk\Models\FilmCollection Коллекция топ-250 сериалов
+     * 
+     * @throws \NotKinopoisk\Exception\ApiException При ошибках API
+     * 
+     * @example
+     * ```php
+     * $top250Series = $filmService->getTop250Series();
+     * echo "Топ-250 сериалов: {$top250Series->getCount()}\n";
+     * 
+     * foreach ($top250Series->items as $series) {
+     *     echo "- {$series->getDisplayName()} (рейтинг: {$series->ratingKinopoisk})\n";
+     * }
+     * ```
      */
     public function getTop250Series(int $page = 1): FilmCollection
     {
-        return $this->getCollections('TOP_250_TV_SHOWS', $page);
+        $data = $this->get($this->buildUri("films/top"), [
+            'type' => 'TOP_250_SERIES',
+            'page' => $page
+        ]);
+        return FilmCollection::fromArray($data);
     }
 } 

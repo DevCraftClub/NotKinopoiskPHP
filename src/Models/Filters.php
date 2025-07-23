@@ -5,21 +5,100 @@ declare(strict_types=1);
 namespace NotKinopoisk\Models;
 
 /**
- * Модель фильтров
+ * Модель фильтров из Kinopoisk API
+ * 
+ * Представляет доступные фильтры для поиска фильмов,
+ * включая списки жанров и стран для фильтрации.
+ * 
+ * Основные возможности:
+ * - Хранение списков доступных фильтров в неизменяемом виде
+ * - Создание объекта из массива данных API
+ * - Доступ к спискам жанров и стран
+ * 
+ * @package NotKinopoisk\Models
+ * @author Maxim Harder <dev@devcraft.club>
+ * @version 1.0.0
+ * @since 1.0.0
+ * 
+ * @see \NotKinopoisk\Services\FilmService
+ * @see \NotKinopoisk\Models\Genre
+ * @see \NotKinopoisk\Models\Country
+ * 
+ * @example
+ * ```php
+ * // Создание из данных API
+ * $filters = Filters::fromArray($apiData);
+ * 
+ * // Использование
+ * echo "Доступно жанров: " . count($filters->genres) . "\n";
+ * echo "Доступно стран: " . count($filters->countries) . "\n";
+ * 
+ * foreach ($filters->genres as $genre) {
+ *     echo "- {$genre->genre}\n";
+ * }
+ * ```
  */
 class Filters
 {
+    /**
+     * Конструктор модели фильтров
+     * 
+     * Создает новый экземпляр фильтров со списками доступных жанров и стран.
+     * Все свойства являются readonly для обеспечения неизменяемости объекта.
+     * 
+     * @param array $genres Массив доступных жанров
+     * @param array $countries Массив доступных стран
+     * 
+     * @example
+     * ```php
+     * $filters = new Filters(
+     *     genres: [$genre1, $genre2, $genre3],
+     *     countries: [$country1, $country2]
+     * );
+     * ```
+     */
     public function __construct(
         public readonly array $genres,
         public readonly array $countries
     ) {
     }
 
+    /**
+     * Создает экземпляр фильтров из массива данных API
+     * 
+     * Статический метод для удобного создания объекта Filters из данных,
+     * полученных от Kinopoisk API. Автоматически создает объекты Genre и Country
+     * для каждого элемента в соответствующих массивах.
+     * 
+     * @param array $data Массив данных фильтров от API
+     * 
+     * @return self Новый экземпляр фильтров
+     * 
+     * @throws \InvalidArgumentException Если данные имеют неверный формат
+     * 
+     * @example
+     * ```php
+     * $apiData = [
+     *     'genres' => [
+     *         ['genre' => 'Боевик'],
+     *         ['genre' => 'Драма'],
+     *         ['genre' => 'Комедия']
+     *     ],
+     *     'countries' => [
+     *         ['country' => 'США'],
+     *         ['country' => 'Россия'],
+     *         ['country' => 'Великобритания']
+     *     ]
+     * ];
+     * 
+     * $filters = Filters::fromArray($apiData);
+     * ```
+     */
     public static function fromArray(array $data): self
     {
         return new self(
-            genres: $data['genres'],
-            countries: $data['countries']
+            genres: array_map(fn($genre) => Genre::fromArray($genre), $data['genres']),
+            countries: array_map(fn($country) => Country::fromArray($country), $data['countries'])
         );
     }
 } 

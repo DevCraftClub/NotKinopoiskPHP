@@ -5,10 +5,112 @@ declare(strict_types=1);
 namespace NotKinopoisk\Models;
 
 /**
- * Модель фильма
+ * Модель фильма из Kinopoisk API
+ * 
+ * Представляет полную информацию о фильме, полученную из Kinopoisk Unofficial API.
+ * Содержит все основные данные: названия, рейтинги, описания, технические характеристики
+ * и метаданные фильма.
+ * 
+ * Основные возможности:
+ * - Хранение полной информации о фильме в неизменяемом виде (readonly свойства)
+ * - Создание объекта из массива данных API
+ * - Удобные методы для получения отображаемого названия и основного рейтинга
+ * - Определение типа контента (фильм/сериал)
+ * 
+ * @package NotKinopoisk\Models
+ * @author Maxim Harder <dev@devcraft.club>
+ * @version 1.0.0
+ * @since 1.0.0
+ * 
+ * @see \NotKinopoisk\Services\FilmService
+ * @see \NotKinopoisk\Models\FilmCollection
+ * 
+ * @example
+ * ```php
+ * // Создание из данных API
+ * $film = Film::fromArray($apiData);
+ * 
+ * // Получение отображаемого названия
+ * echo $film->getDisplayName(); // "Матрица" или "The Matrix"
+ * 
+ * // Проверка типа контента
+ * if ($film->isSerial()) {
+ *     echo "Это сериал";
+ * }
+ * 
+ * // Получение основного рейтинга
+ * $rating = $film->getMainRating(); // 8.7
+ * ```
  */
 class Film
 {
+    /**
+     * Конструктор модели фильма
+     * 
+     * Создает новый экземпляр фильма со всеми необходимыми данными.
+     * Все свойства являются readonly для обеспечения неизменяемости объекта.
+     * 
+     * @param int $kinopoiskId Уникальный идентификатор фильма в Кинопоиске
+     * @param string|null $kinopoiskHDId Идентификатор фильма в Кинопоиск HD (если доступен)
+     * @param string|null $imdbId Идентификатор фильма в IMDb
+     * @param string|null $nameRu Название фильма на русском языке
+     * @param string|null $nameEn Название фильма на английском языке
+     * @param string|null $nameOriginal Оригинальное название фильма
+     * @param string $posterUrl URL постера фильма в высоком разрешении
+     * @param string $posterUrlPreview URL постера фильма в низком разрешении
+     * @param string|null $coverUrl URL обложки фильма
+     * @param string|null $logoUrl URL логотипа фильма
+     * @param int|null $reviewsCount Количество рецензий на фильм
+     * @param float|null $ratingGoodReview Рейтинг хороших рецензий
+     * @param int|null $ratingGoodReviewVoteCount Количество голосов за хорошие рецензии
+     * @param float|null $ratingKinopoisk Рейтинг Кинопоиска
+     * @param int|null $ratingKinopoiskVoteCount Количество голосов на Кинопоиске
+     * @param float|null $ratingImdb Рейтинг IMDb
+     * @param int|null $ratingImdbVoteCount Количество голосов на IMDb
+     * @param float|null $ratingFilmCritics Рейтинг кинокритиков
+     * @param int|null $ratingFilmCriticsVoteCount Количество голосов кинокритиков
+     * @param float|null $ratingAwait Рейтинг ожидания
+     * @param int|null $ratingAwaitCount Количество голосов ожидания
+     * @param float|null $ratingRfCritics Рейтинг российских кинокритиков
+     * @param int|null $ratingRfCriticsVoteCount Количество голосов российских кинокритиков
+     * @param string|null $webUrl URL страницы фильма на Кинопоиске
+     * @param int|null $year Год выпуска фильма
+     * @param int|null $filmLength Длительность фильма в минутах
+     * @param string|null $slogan Слоган фильма
+     * @param string|null $description Полное описание фильма
+     * @param string|null $shortDescription Краткое описание фильма
+     * @param string|null $editorAnnotation Редакторская аннотация
+     * @param bool|null $isTicketsAvailable Доступны ли билеты в кинотеатрах
+     * @param string|null $productionStatus Статус производства фильма
+     * @param string $type Тип контента (FILM, TV_SERIES, MINI_SERIES, TV_SHOW)
+     * @param string|null $ratingMpaa Рейтинг MPAA
+     * @param string|null $ratingAgeLimits Возрастные ограничения
+     * @param bool|null $hasImax Доступен ли в формате IMAX
+     * @param bool|null $has3D Доступен ли в формате 3D
+     * @param string|null $lastSync Время последней синхронизации данных
+     * @param array $countries Массив стран производства
+     * @param array $genres Массив жанров фильма
+     * @param int|null $startYear Год начала производства (для сериалов)
+     * @param int|null $endYear Год окончания производства (для сериалов)
+     * @param bool|null $serial Является ли сериалом
+     * @param bool|null $shortFilm Является ли короткометражным фильмом
+     * @param bool|null $completed Завершен ли (для сериалов)
+     * 
+     * @example
+     * ```php
+     * $film = new Film(
+     *     kinopoiskId: 301,
+     *     nameRu: 'Матрица',
+     *     nameEn: 'The Matrix',
+     *     posterUrl: 'https://...',
+     *     posterUrlPreview: 'https://...',
+     *     type: 'FILM',
+     *     year: 1999,
+     *     countries: [],
+     *     genres: []
+     * );
+     * ```
+     */
     public function __construct(
         public readonly int $kinopoiskId,
         public readonly ?string $kinopoiskHDId,
@@ -60,9 +162,32 @@ class Film
 
     /**
      * Создает экземпляр фильма из массива данных API
-     *
-     * @param array $data Данные фильма
-     * @return self
+     * 
+     * Статический метод для удобного создания объекта Film из данных,
+     * полученных от Kinopoisk API. Автоматически обрабатывает nullable поля
+     * и устанавливает значения по умолчанию.
+     * 
+     * @param array $data Массив данных фильма от API
+     * 
+     * @return self Новый экземпляр фильма
+     * 
+     * @throws \InvalidArgumentException Если отсутствуют обязательные поля
+     * 
+     * @example
+     * ```php
+     * $apiData = [
+     *     'kinopoiskId' => 301,
+     *     'nameRu' => 'Матрица',
+     *     'nameEn' => 'The Matrix',
+     *     'posterUrl' => 'https://...',
+     *     'posterUrlPreview' => 'https://...',
+     *     'type' => 'FILM',
+     *     'countries' => [],
+     *     'genres' => []
+     * ];
+     * 
+     * $film = Film::fromArray($apiData);
+     * ```
      */
     public static function fromArray(array $data): self
     {
@@ -116,9 +241,17 @@ class Film
     }
 
     /**
-     * Получает название фильма на русском языке или английском, если русское недоступно
-     *
-     * @return string
+     * Получает отображаемое название фильма
+     * 
+     * Возвращает наиболее подходящее название для отображения пользователю.
+     * Приоритет: русское название → английское название → оригинальное название → "Без названия"
+     * 
+     * @return string Отображаемое название фильма
+     * 
+     * @example
+     * ```php
+     * echo $film->getDisplayName(); // "Матрица" или "The Matrix" или "Без названия"
+     * ```
      */
     public function getDisplayName(): string
     {
@@ -126,9 +259,21 @@ class Film
     }
 
     /**
-     * Проверяет, является ли фильм сериалом
-     *
-     * @return bool
+     * Проверяет, является ли контент сериалом
+     * 
+     * Определяет тип контента на основе поля type. Возвращает true для
+     * TV_SERIES, MINI_SERIES и TV_SHOW.
+     * 
+     * @return bool true если это сериал, false если фильм
+     * 
+     * @example
+     * ```php
+     * if ($film->isSerial()) {
+     *     echo "Это сериал";
+     * } else {
+     *     echo "Это фильм";
+     * }
+     * ```
      */
     public function isSerial(): bool
     {
@@ -137,8 +282,21 @@ class Film
 
     /**
      * Получает основной рейтинг фильма
-     *
-     * @return float|null
+     * 
+     * Возвращает наиболее значимый рейтинг из доступных.
+     * Приоритет: рейтинг Кинопоиска → рейтинг IMDb → рейтинг кинокритиков
+     * 
+     * @return float|null Основной рейтинг или null если рейтинги отсутствуют
+     * 
+     * @example
+     * ```php
+     * $rating = $film->getMainRating();
+     * if ($rating !== null) {
+     *     echo "Рейтинг: {$rating}";
+     * } else {
+     *     echo "Рейтинг не доступен";
+     * }
+     * ```
      */
     public function getMainRating(): ?float
     {
