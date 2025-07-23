@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NotKinopoisk\Services;
 
 use NotKinopoisk\Client;
+use NotKinopoisk\Enums\ApiVersion;
 
 /**
  * Абстрактный базовый класс для сервисов Kinopoisk API
@@ -20,12 +21,12 @@ use NotKinopoisk\Client;
  * - Базовая валидация данных
  *
  * @package NotKinopoisk\Services
+ * @api     https://kinopoiskapiunofficial.tech
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
  * @version 1.0.0
  * @see     \NotKinopoisk\Services\HttpClient
- * @api     https://kinopoiskapiunofficial.tech
  * @link    https://kinopoiskapiunofficial.tech/documentation/api
  *
  * @example
@@ -47,24 +48,70 @@ abstract class AbstractService {
 	 *
 	 * @var \NotKinopoisk\Client
 	 */
-	protected Client $client;
+	protected Client     $client;
+	protected ApiVersion $apiVersion;
 
 	/**
-	 * Конструктор абстрактного сервиса
+	 * Конструктор абстрактного сервиса для работы с Kinopoisk API
 	 *
-	 * Инициализирует сервис с переданным клиентом API. Все наследующие классы
-	 * должны вызывать этот конструктор для корректной работы.
+	 * Инициализирует базовый сервис с переданным клиентом API и версией API.
+	 * Все наследующие классы должны вызывать этот конструктор для корректной
+	 * инициализации и работы с API. Устанавливает версию API по умолчанию
+	 * как 'v1', если не указано иное.
 	 *
-	 * @param   \NotKinopoisk\Client  $client  Основной клиент для работы с API
+	 * @since 1.0.0
+	 *
+	 * @see   \NotKinopoisk\Client
+	 * @see   \NotKinopoisk\Services\FilmService
+	 * @see   \NotKinopoisk\Services\PersonService
+	 *
+	 * @param   \NotKinopoisk\Client  $client      Основной клиент для работы с API
+	 * @param   ApiVersion            $apiVersion  Версия API для использования (по умолчанию 'v1')
+	 *
+	 * @return void
 	 *
 	 * @example
 	 * ```php
-	 * $client = new Client('api-key');
+	 * // Создание сервиса с версией API по умолчанию
+	 * $client = new Client('your-api-key');
 	 * $service = new FilmService($client);
+	 *
+	 * // Создание сервиса с указанной версией API
+	 * $service = new FilmService($client, 'v2.2');
 	 * ```
 	 */
-	public function __construct(Client $client) {
-		$this->client = $client;
+	public function __construct(Client $client, ApiVersion $apiVersion = ApiVersion::V1) {
+		$this->client     = $client;
+		$this->apiVersion = $apiVersion;
+	}
+
+	/**
+	 * Устанавливает версию API для работы сервиса
+	 *
+	 * Защищенный метод для установки версии API, которая будет использоваться
+	 * при построении URL-адресов запросов к Kinopoisk API. Версия определяет
+	 * структуру запросов и доступные эндпоинты.
+	 *
+	 * @param ApiVersion $apiVersion Версия API из перечисления доступных версий
+	 *
+	 * @return void
+	 *
+	 * @see ApiVersion::getApiVersions() Получение всех доступных версий API
+	 * @see AbstractService::buildUri() Построение URI с учетом версии API
+	 *
+	 * @example
+	 * ```php
+	 * // Установка версии API v2.2
+	 * $this->setApiVersion(ApiVersion::V22);
+	 *
+	 * // Установка версии API v2.1
+	 * $this->setApiVersion(ApiVersion::V21);
+	 * ```
+	 *
+	 * @internal Метод предназначен для внутреннего использования в классах-наследниках
+	 */
+	protected function setApiVersion(ApiVersion $apiVersion): void {
+		$this->apiVersion = $apiVersion;
 	}
 
 	/**
@@ -98,7 +145,7 @@ abstract class AbstractService {
 	 * Формирует полный URI для запросов к API версии 2.2, добавляя
 	 * соответствующий префикс к переданному пути.
 	 *
-	 * @param   string  $path  Путь к ресурсу (без префикса /api/v2.2/)
+	 * @param   string  $endpoint  Путь к ресурсу (без префикса /api/v2.2/)
 	 *
 	 * @return string Полный URI для запроса к API v2.2
 	 *
@@ -111,31 +158,8 @@ abstract class AbstractService {
 	 * // Результат: '/api/v2.2/films/301'
 	 * ```
 	 */
-	protected function buildUri(string $path): string {
-		return '/api/v2.2/' . ltrim($path, '/');
-	}
-
-	/**
-	 * Строит URI для API запроса версии 1
-	 *
-	 * Формирует полный URI для запросов к API версии 1, добавляя
-	 * соответствующий префикс к переданному пути.
-	 *
-	 * @param   string  $path  Путь к ресурсу (без префикса /api/v1/)
-	 *
-	 * @return string Полный URI для запроса к API v1
-	 *
-	 * @example
-	 * ```php
-	 * $uri = $this->buildV1Uri('films/search-by-keyword');
-	 * // Результат: '/api/v1/films/search-by-keyword'
-	 *
-	 * $uri = $this->buildV1Uri('/films/search-by-keyword');
-	 * // Результат: '/api/v1/films/search-by-keyword'
-	 * ```
-	 */
-	protected function buildV1Uri(string $path): string {
-		return '/api/v1/' . ltrim($path, '/');
+	protected function buildUri(string $endpoint): string {
+		return "/api/{$this->apiVersion->value}/" . ltrim($endpoint, '/');
 	}
 
 }

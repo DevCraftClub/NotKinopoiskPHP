@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Services;
 
+use NotKinopoisk\Client;
+use NotKinopoisk\Enums\ApiVersion;
 use NotKinopoisk\Enums\CollectionType;
+use NotKinopoisk\Enums\ContentType;
+use NotKinopoisk\Enums\FilmOrder;
 use NotKinopoisk\Enums\ImageType;
 use NotKinopoisk\Enums\Month;
 use NotKinopoisk\Enums\ReviewOrder;
@@ -22,6 +26,8 @@ use NotKinopoisk\Models\RelatedFilm;
 use NotKinopoisk\Models\Review;
 use NotKinopoisk\Models\Season;
 use NotKinopoisk\Models\Video;
+use NotKinopoisk\Responses\DefaultResponse;
+use NotKinopoisk\Responses\PaginatedResponse;
 
 /**
  * Сервис для работы с фильмами в Kinopoisk API
@@ -64,19 +70,43 @@ use NotKinopoisk\Models\Video;
 class FilmService extends AbstractService {
 
 	/**
+	 * Конструктор класса сервиса
+	 *
+	 * Инициализирует новый экземпляр сервиса с переданным HTTP-клиентом
+	 * и устанавливает версию API v2.2 для работы с Kinopoisk Unofficial API.
+	 * Вызывает родительский конструктор для настройки базовой конфигурации.
+	 *
+	 * @see AbstractService::__construct() Родительский конструктор
+	 * @see ApiVersion::V22 Используемая версия API
+	 *
+	 * @param   Client  $client  HTTP-клиент для выполнения запросов к API
+	 *
+	 * @example
+	 * ```php
+	 * $client = new Client('your-api-key');
+	 * $service = new FilmService($client);
+	 * ```
+	 */
+	public function __construct(Client $client) {
+		parent::__construct($client, ApiVersion::V22);
+	}
+
+	/**
 	 * Получает детальную информацию о фильме по ID
 	 *
 	 * READ операция - извлекает полную информацию о фильме из API.
 	 * Возвращает объект Film со всеми доступными данными: названия, рейтинги,
 	 * описания, технические характеристики и метаданные.
 	 *
+	 * @api /api/v2.2/films/{id}
+	 *
 	 * @param   int  $id  Уникальный идентификатор фильма в Кинопоиске
 	 *
 	 * @return \NotKinopoisk\Models\Film Объект фильма с полной информацией
 	 *
-	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм с указанным ID не найден
 	 * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
 	 *
+	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм с указанным ID не найден
 	 * @example
 	 * ```php
 	 * $film = $filmService->getById(301); // Матрица
@@ -97,25 +127,37 @@ class FilmService extends AbstractService {
 	 * READ операция - извлекает информацию о всех сезонах сериала.
 	 * Метод предназначен для работы с сериалами (TV_SERIES, MINI_SERIES).
 	 *
+	 * @api /api/v2.2/films/{id}/seasons
+	 *
 	 * @param   int  $id  Уникальный идентификатор сериала в Кинопоиске
 	 *
-	 * @return \NotKinopoisk\Models\Season[] Массив сезонов сериала
+	 * @return \NotKinopoisk\Responses\DefaultResponse Массив сезонов сериала
 	 *
-	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если сериал не найден
 	 * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
-	 *
+	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
+	 * @throws \NotKinopoisk\Exception\KpValidationException
+	 * @throws \NotKinopoisk\Exception\RateLimitException
+	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если сериал не найден
 	 * @example
 	 * ```php
-	 * $seasons = $filmService->getSeasons(12345);
-	 * foreach ($seasons as $season) {
-	 *     echo "Сезон {$season->number}: {$season->episodesCount} серий\n";
+	 * // Получение сезонов популярного сериала
+	 * $response = $filmService->getSeasons(12345);
+	 *
+	 * echo "Всего сезонов: {$response->total}\n";
+	 *
+	 * foreach ($response->items as $season) {
+	 *     echo "Сезон {$season->number}: " . count($season->episodes) . " эпизодов\n";
+	 *
+	 *     foreach ($season->episodes as $episode) {
+	 *         echo "  - Эпизод {$episode->episodeNumber}: {$episode->getDisplayName()}\n";
+	 *     }
 	 * }
 	 * ```
-	 */
-	public function getSeasons(int $id): array {
+    */
+	public function getSeasons(int $id): DefaultResponse {
 		$data = $this->get($this->buildUri("films/{$id}/seasons"));
 
-		return array_map(fn ($seasonData) => Season::fromArray($seasonData), $data['items']);
+		return DefaultResponse::fromArray($data, Season::class);
 	}
 
 	/**
@@ -124,13 +166,17 @@ class FilmService extends AbstractService {
 	 * READ операция - извлекает интересные факты, ошибки и забавные моменты,
 	 * связанные с фильмом. Включает как факты, так и ошибки в кинематографе.
 	 *
+	 * @api /api/v2.2/films/{id}/facts
+	 *
 	 * @param   int  $id  Уникальный идентификатор фильма в Кинопоиске
 	 *
-	 * @return \NotKinopoisk\Models\Fact[] Массив фактов и ошибок фильма
+	 * @return \NotKinopoisk\Responses\DefaultResponse Массив фактов и ошибок фильма
 	 *
+	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
+	 * @throws \NotKinopoisk\Exception\KpValidationException При других ошибках API
+	 * @throws \NotKinopoisk\Exception\RateLimitException
 	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
 	 * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
-	 *
 	 * @example
 	 * ```php
 	 * $facts = $filmService->getFacts(301);
@@ -143,10 +189,10 @@ class FilmService extends AbstractService {
 	 * }
 	 * ```
 	 */
-	public function getFacts(int $id): array {
+	public function getFacts(int $id): DefaultResponse {
 		$data = $this->get($this->buildUri("films/{$id}/facts"));
 
-		return array_map(fn ($factData) => Fact::fromArray($factData), $data['items']);
+		return DefaultResponse::fromArray($data, Fact::class);
 	}
 
 	/**
@@ -328,9 +374,9 @@ class FilmService extends AbstractService {
 	 * READ операция - извлекает пользовательские отзывы и рецензии
 	 * на фильм с возможностью сортировки и пагинации.
 	 *
-	 * @param   int                                    $id     Уникальный идентификатор фильма в Кинопоиске
-	 * @param   int                                    $page   Номер страницы для пагинации
-	 * @param   \NotKinopoisk\Enums\ReviewOrder        $order  Порядок сортировки отзывов
+	 * @param   int                              $id     Уникальный идентификатор фильма в Кинопоиске
+	 * @param   int                              $page   Номер страницы для пагинации
+	 * @param   \NotKinopoisk\Enums\ReviewOrder  $order  Порядок сортировки отзывов
 	 *
 	 * @return \NotKinopoisk\Models\Review[] Массив отзывов
 	 *
@@ -524,8 +570,8 @@ class FilmService extends AbstractService {
 	 * READ операция - извлекает информацию о премьерах фильмов
 	 * в указанном году и месяце.
 	 *
-	 * @param   int                           $year   Год премьер
-	 * @param   \NotKinopoisk\Enums\Month     $month  Месяц премьер
+	 * @param   int                        $year   Год премьер
+	 * @param   \NotKinopoisk\Enums\Month  $month  Месяц премьер
 	 *
 	 * @return \NotKinopoisk\Models\Premiere[] Массив премьер
 	 *
@@ -670,6 +716,32 @@ class FilmService extends AbstractService {
 		]);
 
 		return FilmCollection::fromArray($data);
+	}
+
+	/**
+	 * @api /api/v2.2/films
+	 *
+	 * @param   array|null                       $country
+	 * @param   array|null                       $genre
+	 * @param   \NotKinopoisk\Enums\FilmOrder    $order
+	 * @param   \NotKinopoisk\Enums\ContentType  $type
+	 * @param   float                            $ratingFrom
+	 * @param   float                            $ratingTo
+	 * @param   int                              $yearFrom
+	 * @param   int                              $yearTo
+	 * @param   string|null                      $imdbId
+	 * @param   string|null                      $keyword
+	 * @param   int                              $page
+	 *
+	 * @return \NotKinopoisk\Responses\PaginatedResponse
+	 */
+	public function searchFilms(?array $country = NULL, ?array $genre = NULL, FilmOrder $order = FilmOrder::RATING, ContentType $type = ContentType::ALL, float $ratingFrom = 0, float $ratingTo = 10, int $yearFrom = 1000, int $yearTo = 3000, ?string $imdbId = null, ?string $keyword = null, int $page = 1): PaginatedResponse {
+		$filterQuery = [];
+
+		$countries = implode(',', $country?? []);
+		$genres = implode(',', $genre?? []);
+
+		return PaginatedResponse::fromArray([], )
 	}
 
 }
