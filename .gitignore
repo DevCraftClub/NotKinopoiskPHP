@@ -1,5 +1,6 @@
 # Composer
 /vendor/
+vendor/
 composer.lock
 
 # IDE
@@ -19,6 +20,8 @@ Thumbs.db
 # Cache
 /cache/
 /tmp/
+cache/
+tmp/
 
 # Environment
 .env
@@ -28,10 +31,13 @@ Thumbs.db
 # Build
 /build/
 /dist/
+build/
+dist/
 
 # Coverage
 /coverage/
 .phpunit.result.cache
+coverage/
 
 # Node modules (if any)
 node_modules/
