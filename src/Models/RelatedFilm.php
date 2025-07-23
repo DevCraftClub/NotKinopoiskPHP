@@ -13,60 +13,13 @@ use NotKinopoisk\Enums\RelationType;
  * (похожие фильмы, сиквелы, приквелы и т.д.).
  *
  * @package NotKinopoisk\Models
+ * @api     /api/v2.2/films/{id}/similars
  * @since   1.0.0
  * @author  Maxim Harder
  * @version 1.0.0
+ * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/films/get_api_v2_2_films__id__similars
  */
 class RelatedFilm {
-
-	/**
-	 * Уникальный идентификатор фильма в Кинопоиске
-	 *
-	 * @var integer
-	 */
-	public readonly int $filmId;
-
-	/**
-	 * Название фильма на русском языке
-	 *
-	 * @var string|null
-	 */
-	public readonly ?string $nameRu;
-
-	/**
-	 * Название фильма на английском языке
-	 *
-	 * @var string|null
-	 */
-	public readonly ?string $nameEn;
-
-	/**
-	 * Оригинальное название фильма
-	 *
-	 * @var string|null
-	 */
-	public readonly ?string $nameOriginal;
-
-	/**
-	 * URL постера фильма
-	 *
-	 * @var string
-	 */
-	public readonly string $posterUrl;
-
-	/**
-	 * URL превью постера фильма
-	 *
-	 * @var string
-	 */
-	public readonly string $posterUrlPreview;
-
-	/**
-	 * Тип связи с основным фильмом
-	 *
-	 * @var RelationType
-	 */
-	public readonly RelationType $relationType;
 
 	/**
 	 * Конструктор модели связанного фильма
@@ -80,22 +33,14 @@ class RelatedFilm {
 	 * @param   RelationType  $relationType      Тип связи
 	 */
 	public function __construct(
-		int          $filmId,
-		?string      $nameRu,
-		?string      $nameEn,
-		?string      $nameOriginal,
-		string       $posterUrl,
-		string       $posterUrlPreview,
-		RelationType $relationType,
-	) {
-		$this->filmId           = $filmId;
-		$this->nameRu           = $nameRu;
-		$this->nameEn           = $nameEn;
-		$this->nameOriginal     = $nameOriginal;
-		$this->posterUrl        = $posterUrl;
-		$this->posterUrlPreview = $posterUrlPreview;
-		$this->relationType     = $relationType;
-	}
+		public readonly int          $filmId,
+		public readonly ?string      $nameRu,
+		public readonly ?string      $nameEn,
+		public readonly ?string      $nameOriginal,
+		public readonly string       $posterUrl,
+		public readonly string       $posterUrlPreview,
+		public readonly RelationType $relationType,
+	) {}
 
 	/**
 	 * Создает экземпляр модели из массива данных API

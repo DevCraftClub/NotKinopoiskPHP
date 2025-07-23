@@ -21,13 +21,15 @@ use NotKinopoisk\Enums\ProductionStatus;
  * - Определение типа контента (фильм/сериал)
  *
  * @package NotKinopoisk\Models
+ * @api     /api/v2.2/films/{id}
+ *
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
  * @version 1.0.0
- * @see     \NotKinopoisk\Services\FilmService
  * @see     \NotKinopoisk\Models\FilmCollection
- *
+ * @see     \NotKinopoisk\Services\FilmService
+ * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/films/get_api_v2_2_films__id_
  * @example
  * ```php
  * // Создание из данных API
@@ -218,7 +220,7 @@ class Film {
 			ratingRfCriticsVoteCount  : $data['ratingRfCriticsVoteCount'] ?? NULL,
 			webUrl                    : $data['webUrl'] ?? NULL,
 			year                      : $data['year'] ?? NULL,
-			filmLength                 : $data['filmLength'] ?? NULL,
+			filmLength                : $data['filmLength'] ?? NULL,
 			slogan                    : $data['slogan'] ?? NULL,
 			description               : $data['description'] ?? NULL,
 			shortDescription          : $data['shortDescription'] ?? NULL,

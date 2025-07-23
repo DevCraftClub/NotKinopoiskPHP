@@ -38,7 +38,8 @@ class Country {
 	 * Создает новый экземпляр страны с указанным названием.
 	 * Свойство является readonly для обеспечения неизменяемости объекта.
 	 *
-	 * @param   string  $country  Название страны
+	 * @param   string    $country  Название страны
+	 * @param   int|null  $id       Уникальный идентификатор страны в Кинопоиске
 	 *
 	 * @example
 	 * ```php
@@ -47,31 +48,8 @@ class Country {
 	 */
 	public function __construct(
 		public readonly string $country,
+		public readonly ?int   $id = NULL,
 	) {}
-
-	/**
-	 * Создает экземпляр страны из массива данных API
-	 *
-	 * Статический метод для удобного создания объекта Country из данных,
-	 * полученных от Kinopoisk API.
-	 *
-	 * @param   array  $data  Массив данных страны от API
-	 *
-	 * @return self Новый экземпляр страны
-	 *
-	 * @throws \InvalidArgumentException Если данные имеют неверный формат
-	 *
-	 * @example
-	 * ```php
-	 * $apiData = ['country' => 'США'];
-	 * $country = Country::fromArray($apiData);
-	 * ```
-	 */
-	public static function fromArray(array $data): self {
-		return new self(
-			country: $data['country'],
-		);
-	}
 
 	/**
 	 * Преобразует объект страны в строку
@@ -94,6 +72,31 @@ class Country {
 	 */
 	public function __toString(): string {
 		return $this->country;
+	}
+
+	/**
+	 * Создает экземпляр страны из массива данных API
+	 *
+	 * Статический метод для удобного создания объекта Country из данных,
+	 * полученных от Kinopoisk API.
+	 *
+	 * @param   array  $data  Массив данных страны от API
+	 *
+	 * @return self Новый экземпляр страны
+	 *
+	 * @throws \InvalidArgumentException Если данные имеют неверный формат
+	 *
+	 * @example
+	 * ```php
+	 * $apiData = ['country' => 'США'];
+	 * $country = Country::fromArray($apiData);
+	 * ```
+	 */
+	public static function fromArray(array $data): self {
+		return new self(
+			country: $data['country'],
+			id     : $data['id'] ?? NULL,
+		);
 	}
 
 }

@@ -18,6 +18,7 @@ use NotKinopoisk\Enums\DistributionType;
  * - Доступ к метаданным проката и дистрибьюторам
  *
  * @package NotKinopoisk\Models
+ * @api     /api/v2.2/films/{id}/distributions
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
@@ -25,6 +26,7 @@ use NotKinopoisk\Enums\DistributionType;
  * @see     \NotKinopoisk\Services\FilmService
  * @see     \NotKinopoisk\Models\Country
  * @see     \NotKinopoisk\Enums\DistributionType
+ * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/films/get_api_v2_2_films__id__distributions
  *
  * @example
  * ```php

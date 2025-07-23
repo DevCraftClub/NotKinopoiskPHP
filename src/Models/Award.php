@@ -16,11 +16,13 @@ namespace NotKinopoisk\Models;
  * - Доступ к метаданным награды и связанным персонам
  *
  * @package NotKinopoisk\Models
+ * @api     /api/v2.2/films/{id}/awards
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
  * @version 1.0.0
  * @see     \NotKinopoisk\Services\FilmService
+ * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/films/get_api_v2_2_films__id__awards
  *
  * @example
  * ```php

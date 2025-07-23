@@ -18,6 +18,7 @@ namespace NotKinopoisk\Models;
  * - Поддержка фильмографии и информации о супругах
  *
  * @package NotKinopoisk\Models
+ * @api     /api/v1/staff/{id}
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
@@ -25,8 +26,7 @@ namespace NotKinopoisk\Models;
  * @see     \NotKinopoisk\Services\PersonService
  * @see     \NotKinopoisk\Models\PersonSpouse
  * @see     \NotKinopoisk\Models\PersonFilm
- * @api     /api/v1/persons/{id}
- * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/persons/get_api_v1_persons__id_
+ * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/staff/get_api_v1_staff__id_
  *
  * @example
  * ```php
@@ -65,7 +65,7 @@ class Person {
 	 * @param   int|null                             $hasAwards   Наличие наград
 	 * @param   string|null                          $profession  Профессия персоны
 	 * @param   string|null                          $facts       Интересные факты
-	 * @param   \NotKinopoisk\Models\PersonFilm[]    $films       Массив информации о фильмах
+	 * @param   \NotKinopoisk\Models\PersonFilm[]    $films        Массив информации о фильмах
 	 * @param   string|null                          $biography   Биография персоны
 	 * @param   string|null                          $births      Информация о рождении
 	 * @param   string|null                          $deaths      Информация о смерти
@@ -182,7 +182,7 @@ class Person {
 			hasAwards : $data['hasAwards'] ?? NULL,
 			profession: $data['profession'] ?? NULL,
 			facts     : $data['facts'] ?? NULL,
-			films      : $films,
+			films     : $films,
 			biography : $data['biography'] ?? NULL,
 			births    : $data['births'] ?? NULL,
 			deaths    : $data['deaths'] ?? NULL,

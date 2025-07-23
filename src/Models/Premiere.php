@@ -17,6 +17,7 @@ namespace NotKinopoisk\Models;
  * - Доступ к метаданным премьеры
  *
  * @package NotKinopoisk\Models
+ * @api     /api/v2.2/films/premieres
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
@@ -24,6 +25,7 @@ namespace NotKinopoisk\Models;
  * @see     \NotKinopoisk\Services\FilmService
  * @see     \NotKinopoisk\Models\Country
  * @see     \NotKinopoisk\Models\Genre
+ * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/films/get_api_v2_2_films_premieres
  *
  * @example
  * ```php

@@ -39,6 +39,7 @@ class Genre {
 	 * Свойство является readonly для обеспечения неизменяемости объекта.
 	 *
 	 * @param   string  $genre  Название жанра
+	 * @param   int|null  $id    Уникальный идентификатор жанра в Кинопоиске
 	 *
 	 * @example
 	 * ```php
@@ -47,31 +48,8 @@ class Genre {
 	 */
 	public function __construct(
 		public readonly string $genre,
+		public readonly ?int   $id = NULL,
 	) {}
-
-	/**
-	 * Создает экземпляр жанра из массива данных API
-	 *
-	 * Статический метод для удобного создания объекта Genre из данных,
-	 * полученных от Kinopoisk API.
-	 *
-	 * @param   array  $data  Массив данных жанра от API
-	 *
-	 * @return self Новый экземпляр жанра
-	 *
-	 * @throws \InvalidArgumentException Если данные имеют неверный формат
-	 *
-	 * @example
-	 * ```php
-	 * $apiData = ['genre' => 'Боевик'];
-	 * $genre = Genre::fromArray($apiData);
-	 * ```
-	 */
-	public static function fromArray(array $data): self {
-		return new self(
-			genre: $data['genre'],
-		);
-	}
 
 	/**
 	 * Преобразует объект жанра в строку
@@ -99,6 +77,31 @@ class Genre {
 	 */
 	public function __toString(): string {
 		return $this->genre;
+	}
+
+	/**
+	 * Создает экземпляр жанра из массива данных API
+	 *
+	 * Статический метод для удобного создания объекта Genre из данных,
+	 * полученных от Kinopoisk API.
+	 *
+	 * @param   array  $data  Массив данных жанра от API
+	 *
+	 * @return self Новый экземпляр жанра
+	 *
+	 * @throws \InvalidArgumentException Если данные имеют неверный формат
+	 *
+	 * @example
+	 * ```php
+	 * $apiData = ['genre' => 'Боевик'];
+	 * $genre = Genre::fromArray($apiData);
+	 * ```
+	 */
+	public static function fromArray(array $data): self {
+		return new self(
+			genre: $data['genre'],
+			id   : $data['id'] ?? NULL,
+		);
 	}
 
 }

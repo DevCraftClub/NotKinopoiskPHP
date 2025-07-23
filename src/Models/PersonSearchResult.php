@@ -16,13 +16,13 @@ namespace NotKinopoisk\Models;
  * - Удобные методы для работы с результатами поиска
  *
  * @package NotKinopoisk\Models
+ * @api     /api/v1/persons
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
  * @version 1.0.0
- * @see     \NotKinopoisk\Models\Person
  * @see     \NotKinopoisk\Services\PersonService
- * @api     /api/v1/persons
+ * @see     \NotKinopoisk\Models\Person
  * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/persons/get_api_v1_persons
  *
  * @example

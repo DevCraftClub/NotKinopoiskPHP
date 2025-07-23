@@ -23,8 +23,6 @@ namespace NotKinopoisk\Models;
  * @author  Maxim Harder <dev@devcraft.club>
  * @version 1.0.0
  * @see     \NotKinopoisk\Models\Person
- * @api     /api/v1/persons/{id}
- * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/persons/get_api_v1_persons__id_
  *
  * @example
  * ```php

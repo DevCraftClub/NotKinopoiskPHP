@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace NotKinopoisk\Tests\Integration;
 
 use NotKinopoisk\Client;
-use NotKinopoisk\Exception\ApiException;
+use NotKinopoisk\Enums\CollectionType;
+use NotKinopoisk\Enums\ImageType;
+use NotKinopoisk\Enums\Month;
+use NotKinopoisk\Enums\ReviewOrder;
 use PHPUnit\Framework\TestCase;
 
 class FilmServiceTest extends TestCase
@@ -65,7 +68,7 @@ class FilmServiceTest extends TestCase
 
     public function testGetReviews(): void
     {
-        $reviews = self::$client->films->getReviews(301);
+        $reviews = self::$client->films->getReviews(301, 1, ReviewOrder::DATE_DESC);
         $this->assertIsArray($reviews);
         $this->assertNotEmpty($reviews);
         $this->assertNotEmpty($reviews[0]->description);
@@ -91,7 +94,7 @@ class FilmServiceTest extends TestCase
 
     public function testGetPremieres(): void
     {
-        $premieres = self::$client->films->getPremieres(2024, 'JUNE');
+        $premieres = self::$client->films->getPremieres(2024, \NotKinopoisk\Enums\Month::JUNE);
         $this->assertIsArray($premieres);
     }
 

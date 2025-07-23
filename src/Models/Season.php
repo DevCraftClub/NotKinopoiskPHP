@@ -16,12 +16,14 @@ namespace NotKinopoisk\Models;
  * - Доступ к эпизодам сезона
  *
  * @package NotKinopoisk\Models
+ * @api     /api/v2.2/films/{id}/seasons
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
  * @version 1.0.0
- * @see     \NotKinopoisk\Models\Episode
  * @see     \NotKinopoisk\Services\FilmService
+ * @see     \NotKinopoisk\Models\Episode
+ * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/films/get_api_v2_2_films__id__seasons
  *
  * @example
  * ```php

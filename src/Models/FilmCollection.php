@@ -17,12 +17,14 @@ namespace NotKinopoisk\Models;
  * - Удобные методы для работы с коллекцией
  *
  * @package NotKinopoisk\Models
+ * @api     /api/v2.2/films/collections
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
  * @version 1.0.0
- * @see     \NotKinopoisk\Models\Film
  * @see     \NotKinopoisk\Services\FilmService
+ * @see     \NotKinopoisk\Models\Film
+ * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/films/get_api_v2_2_films_collections
  *
  * @example
  * ```php
@@ -93,7 +95,6 @@ class FilmCollection {
 	 * ```
 	 */
 	public static function fromArray(array $data): self {
-
 		return new self(
 			items     : array_map(fn ($filmData) => FilmCollectionItem::fromArray($filmData), $data['items']),
 			total     : $data['total'] ?? $data['searchFilmsCountResult'] ?? 0,

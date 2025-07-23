@@ -19,12 +19,14 @@ use NotKinopoisk\Enums\AccountType;
  * - Получение информации о доступных запросах
  *
  * @package NotKinopoisk\Models
+ * @api     /api/v1/api_keys/{apiKey}
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
  * @version 1.0.0
- * @see     \NotKinopoisk\Services\UserService
  * @see     \NotKinopoisk\Enums\AccountType
+ * @see     \NotKinopoisk\Services\UserService
+ * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/api_keys/get_api_v1_api_keys__apiKey_
  *
  * @example
  * ```php
@@ -63,8 +65,8 @@ class ApiKeyInfo {
 	 * ```
 	 */
 	public function __construct(
-		public readonly ApiKeyQouta       $totalQuota,
-		public readonly ApiKeyQouta       $dailyQuota,
+		public readonly ApiKeyQouta $totalQuota,
+		public readonly ApiKeyQouta $dailyQuota,
 		public readonly AccountType $accountType,
 	) {}
 

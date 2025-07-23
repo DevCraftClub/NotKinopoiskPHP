@@ -19,12 +19,14 @@ use NotKinopoisk\Enums\BoxOfficeType;
  * - Определение типа данных (бюджет или сборы)
  *
  * @package NotKinopoisk\Models
+ * @api     /api/v2.2/films/{id}/box_office
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
  * @version 1.0.0
- * @see     \NotKinopoisk\Services\FilmService
  * @see     \NotKinopoisk\Enums\BoxOfficeType
+ * @see     \NotKinopoisk\Services\FilmService
+ * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/films/get_api_v2_2_films__id__box_office
  *
  * @example
  * ```php
@@ -50,7 +52,7 @@ class BoxOffice {
 	 * Создает новый экземпляр кассовых сборов со всеми необходимыми данными.
 	 * Все свойства являются readonly для обеспечения неизменяемости объекта.
 	 *
-	 * @param   BoxOfficeType   $type      Тип данных (BUDGET, RUS, USA, WORLD)
+	 * @param   BoxOfficeType  $type      Тип данных (BUDGET, RUS, USA, WORLD)
 	 * @param   int            $amount    Сумма в долларах США
 	 * @param   string         $currency  Валюта (обычно USD)
 	 * @param   string         $symbol    Символ валюты ($)
@@ -66,7 +68,7 @@ class BoxOffice {
 	 * ```
 	 */
 	public function __construct(
-		public readonly BoxOfficeType  $type,
+		public readonly BoxOfficeType $type,
 		public readonly int           $amount,
 		public readonly string        $currency,
 		public readonly string        $symbol,

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Enums\ProfessionKey;
+
 /**
  * Модель персонала фильма из Kinopoisk API
  *
@@ -18,12 +20,14 @@ namespace NotKinopoisk\Models;
  * - Получение отображаемого имени
  *
  * @package NotKinopoisk\Models
+ * @api     /api/v1/staff
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
  * @version 1.0.0
- * @see     \NotKinopoisk\Services\StaffService
  * @see     \NotKinopoisk\Models\Person
+ * @see     \NotKinopoisk\Services\StaffService
+ * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/staff/get_api_v1_staff
  *
  * @example
  * ```php
@@ -49,13 +53,13 @@ class Staff {
 	 * Создает новый экземпляр персонала со всеми необходимыми данными.
 	 * Все свойства являются readonly для обеспечения неизменяемости объекта.
 	 *
-	 * @param   int          $staffId         Уникальный идентификатор персонала в Кинопоиске
-	 * @param   string|null  $nameRu          Имя персонала на русском языке
-	 * @param   string|null  $nameEn          Имя персонала на английском языке
-	 * @param   string|null  $description     Описание роли или работы в фильме
-	 * @param   string       $posterUrl       URL фотографии персонала
-	 * @param   string       $professionText  Текстовое описание профессии
-	 * @param   string       $professionKey   Ключ профессии (ACTOR, DIRECTOR, WRITER и т.д.)
+	 * @param   int            $staffId         Уникальный идентификатор персонала в Кинопоиске
+	 * @param   string|null    $nameRu          Имя персонала на русском языке
+	 * @param   string|null    $nameEn          Имя персонала на английском языке
+	 * @param   string|null    $description     Описание роли или работы в фильме
+	 * @param   string         $posterUrl       URL фотографии персонала
+	 * @param   string         $professionText  Текстовое описание профессии
+	 * @param   ProfessionKey  $professionKey   Ключ профессии (ACTOR, DIRECTOR, WRITER и т.д.)
 	 *
 	 * @example
 	 * ```php
@@ -71,13 +75,13 @@ class Staff {
 	 * ```
 	 */
 	public function __construct(
-		public readonly int     $staffId,
-		public readonly ?string $nameRu,
-		public readonly ?string $nameEn,
-		public readonly ?string $description,
-		public readonly string  $posterUrl,
-		public readonly string  $professionText,
-		public readonly string  $professionKey,
+		public readonly int           $staffId,
+		public readonly ?string       $nameRu,
+		public readonly ?string       $nameEn,
+		public readonly ?string       $description,
+		public readonly string        $posterUrl,
+		public readonly string        $professionText,
+		public readonly ProfessionKey $professionKey,
 	) {}
 
 	/**
@@ -116,7 +120,7 @@ class Staff {
 			description   : $data['description'] ?? NULL,
 			posterUrl     : $data['posterUrl'],
 			professionText: $data['professionText'],
-			professionKey : $data['professionKey'],
+			professionKey : ProfessionKey::from($data['professionKey']),
 		);
 	}
 

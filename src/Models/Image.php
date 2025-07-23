@@ -16,11 +16,13 @@ namespace NotKinopoisk\Models;
  * - Доступ к полному и превью изображениям
  *
  * @package NotKinopoisk\Models
+ * @api     /api/v2.2/films/{id}/images
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
  * @version 1.0.0
  * @see     \NotKinopoisk\Services\MediaService
+ * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/films/get_api_v2_2_films__id__images
  *
  * @example
  * ```php

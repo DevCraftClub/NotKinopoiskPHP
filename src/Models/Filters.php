@@ -16,6 +16,7 @@ namespace NotKinopoisk\Models;
  * - Доступ к спискам жанров и стран
  *
  * @package NotKinopoisk\Models
+ * @api     /api/v2.2/films/filters
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
@@ -23,6 +24,7 @@ namespace NotKinopoisk\Models;
  * @see     \NotKinopoisk\Services\FilmService
  * @see     \NotKinopoisk\Models\Genre
  * @see     \NotKinopoisk\Models\Country
+ * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/films/get_api_v2_2_films_filters
  *
  * @example
  * ```php

@@ -11,9 +11,11 @@ namespace NotKinopoisk\Models;
  * Содержит информацию о изображении, заголовке, описании и ссылке.
  *
  * @package NotKinopoisk\Models
+ * @api     /api/v1/media_posts
  * @since   1.0.0
  * @author  Maxim Harder
  * @version 1.0.0
+ * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/media_posts/get_api_v1_media_posts
  */
 class MediaPost {
 

@@ -6,6 +6,8 @@ namespace NotKinopoisk\Services;
 
 use NotKinopoisk\Enums\CollectionType;
 use NotKinopoisk\Enums\ImageType;
+use NotKinopoisk\Enums\Month;
+use NotKinopoisk\Enums\ReviewOrder;
 use NotKinopoisk\Models\Award;
 use NotKinopoisk\Models\BoxOffice;
 use NotKinopoisk\Models\Distribution;
@@ -326,9 +328,9 @@ class FilmService extends AbstractService {
 	 * READ операция - извлекает пользовательские отзывы и рецензии
 	 * на фильм с возможностью сортировки и пагинации.
 	 *
-	 * @param   int     $id     Уникальный идентификатор фильма в Кинопоиске
-	 * @param   int     $page   Номер страницы для пагинации
-	 * @param   string  $order  Порядок сортировки (DATE_DESC, DATE_ASC, USER_POSITIVE_RATING_DESC, USER_NEGATIVE_RATING_DESC)
+	 * @param   int                                    $id     Уникальный идентификатор фильма в Кинопоиске
+	 * @param   int                                    $page   Номер страницы для пагинации
+	 * @param   \NotKinopoisk\Enums\ReviewOrder        $order  Порядок сортировки отзывов
 	 *
 	 * @return \NotKinopoisk\Models\Review[] Массив отзывов
 	 *
@@ -338,10 +340,10 @@ class FilmService extends AbstractService {
 	 * @example
 	 * ```php
 	 * // Получение последних отзывов
-	 * $reviews = $filmService->getReviews(301, 1, 'DATE_DESC');
+	 * $reviews = $filmService->getReviews(301, 1, ReviewOrder::DATE_DESC);
 	 *
 	 * // Получение положительных отзывов
-	 * $positiveReviews = $filmService->getReviews(301, 1, 'USER_POSITIVE_RATING_DESC');
+	 * $positiveReviews = $filmService->getReviews(301, 1, ReviewOrder::USER_POSITIVE_RATING_DESC);
 	 *
 	 * foreach ($reviews as $review) {
 	 *     echo "Автор: {$review->author}\n";
@@ -349,10 +351,10 @@ class FilmService extends AbstractService {
 	 * }
 	 * ```
 	 */
-	public function getReviews(int $id, int $page = 1, string $order = 'DATE_DESC'): array {
+	public function getReviews(int $id, int $page = 1, ReviewOrder $order = ReviewOrder::DATE_DESC): array {
 		$data = $this->get($this->buildUri("films/{$id}/reviews"), [
 			'page'  => $page,
-			'order' => $order,
+			'order' => $order->value,
 		]);
 
 		return array_map(fn ($reviewData) => Review::fromArray($reviewData), $data['items']);
@@ -522,8 +524,8 @@ class FilmService extends AbstractService {
 	 * READ операция - извлекает информацию о премьерах фильмов
 	 * в указанном году и месяце.
 	 *
-	 * @param   int     $year   Год премьер
-	 * @param   string  $month  Месяц премьер (JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER)
+	 * @param   int                           $year   Год премьер
+	 * @param   \NotKinopoisk\Enums\Month     $month  Месяц премьер
 	 *
 	 * @return \NotKinopoisk\Models\Premiere[] Массив премьер
 	 *
@@ -531,16 +533,16 @@ class FilmService extends AbstractService {
 	 *
 	 * @example
 	 * ```php
-	 * $premieres = $filmService->getPremieres(2024, 'JUNE');
+	 * $premieres = $filmService->getPremieres(2024, Month::JUNE);
 	 * foreach ($premieres as $premiere) {
 	 *     echo "Премьера: {$premiere->getDisplayName()} - {$premiere->premiereRu}\n";
 	 * }
 	 * ```
 	 */
-	public function getPremieres(int $year, string $month): array {
+	public function getPremieres(int $year, Month $month): array {
 		$data = $this->get($this->buildUri("films/premieres"), [
 			'year'  => $year,
-			'month' => $month,
+			'month' => $month->value,
 		]);
 
 		return array_map(fn ($premiereData) => Premiere::fromArray($premiereData), $data['items']);

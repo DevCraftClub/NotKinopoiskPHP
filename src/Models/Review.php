@@ -18,12 +18,14 @@ use NotKinopoisk\Enums\ReviewType;
  * - Доступ к рейтингу и метаданным рецензии
  *
  * @package NotKinopoisk\Models
+ * @api     /api/v2.2/films/{id}/reviews
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
  * @version 1.0.0
- * @see     \NotKinopoisk\Services\FilmService
  * @see     \NotKinopoisk\Enums\ReviewType
+ * @see     \NotKinopoisk\Services\FilmService
+ * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/films/get_api_v2_2_films__id__reviews
  *
  * @example
  * ```php
