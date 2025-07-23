@@ -50,7 +50,7 @@ class BoxOffice {
 	 * Создает новый экземпляр кассовых сборов со всеми необходимыми данными.
 	 * Все свойства являются readonly для обеспечения неизменяемости объекта.
 	 *
-	 * @param   BoxOfficeType  $type      Тип данных (BUDGET, RUS, USA, WORLD)
+	 * @param   BoxOfficeType   $type      Тип данных (BUDGET, RUS, USA, WORLD)
 	 * @param   int            $amount    Сумма в долларах США
 	 * @param   string         $currency  Валюта (обычно USD)
 	 * @param   string         $symbol    Символ валюты ($)
@@ -66,7 +66,7 @@ class BoxOffice {
 	 * ```
 	 */
 	public function __construct(
-		public readonly BoxOfficeType $type,
+		public readonly BoxOfficeType  $type,
 		public readonly int           $amount,
 		public readonly string        $currency,
 		public readonly string        $symbol,

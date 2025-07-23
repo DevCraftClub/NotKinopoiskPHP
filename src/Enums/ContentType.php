@@ -72,7 +72,7 @@ enum ContentType: string {
 	 * ```
 	 */
 	public function isFilm(): bool {
-		return $this === self::FILM;
+		return in_array($this, [self::FILM, self::TV_MOVIE, self::VIDEO, self::SHORT, self::DOCUMENTARY]);
 	}
 
 	/**

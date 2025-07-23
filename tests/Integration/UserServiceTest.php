@@ -24,6 +24,6 @@ class UserServiceTest extends TestCase
         }
         $info = self::$client->users->getApiKeyInfo($apiKey);
         $this->assertNotEmpty($info->accountType);
-        $this->assertGreaterThanOrEqual(0, $info->totalQuota['used']);
+        $this->assertGreaterThanOrEqual(0, $info->totalQuota->used);
     }
 } 

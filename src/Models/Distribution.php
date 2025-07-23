@@ -104,10 +104,10 @@ class Distribution {
 	public static function fromArray(array $data): self {
 		return new self(
 			type     : DistributionType::from($data['type']),
-			subType  : $data['subType'] ?? null,
-			date     : $data['date'] ?? null,
-			reRelease: $data['reRelease'] ?? null,
-			country  : isset($data['country']) ? Country::fromArray($data['country']) : null,
+			subType  : $data['subType'] ?? NULL,
+			date     : $data['date'] ?? NULL,
+			reRelease: $data['reRelease'] ?? NULL,
+			country  : isset($data['country']) ? Country::fromArray($data['country']) : NULL,
 			companies: $data['companies'] ?? [],
 		);
 	}

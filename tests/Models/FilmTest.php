@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Models;
 
-use NotKinopoisk\Models\Film;
 use NotKinopoisk\Enums\ContentType;
+use NotKinopoisk\Enums\ProductionStatus;
+use NotKinopoisk\Models\Film;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -55,7 +56,7 @@ class FilmTest extends TestCase
             shortDescription: 'Краткое описание',
             editorAnnotation: null,
             isTicketsAvailable: false,
-            productionStatus: 'COMPLETED',
+            productionStatus: ProductionStatus::COMPLETED,
             type: ContentType::FILM,
             ratingMpaa: 'R',
             ratingAgeLimits: '16+',
@@ -135,7 +136,10 @@ class FilmTest extends TestCase
 
         $this->assertEquals(301, $film->kinopoiskId);
         $this->assertEquals('Матрица', $film->nameRu);
+        $this->assertEquals('The Matrix', $film->nameEn);
         $this->assertEquals(ContentType::FILM, $film->type);
+        $this->assertEquals(ProductionStatus::COMPLETED, $film->productionStatus);
+        $this->assertEquals(1999, $film->year);
     }
 
     /**

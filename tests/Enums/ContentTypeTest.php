@@ -59,13 +59,13 @@ class ContentTypeTest extends TestCase
     public function testIsFilm(): void
     {
         $this->assertTrue(ContentType::FILM->isFilm());
+        $this->assertTrue(ContentType::TV_MOVIE->isFilm());
+        $this->assertTrue(ContentType::VIDEO->isFilm());
+        $this->assertTrue(ContentType::SHORT->isFilm());
+        $this->assertTrue(ContentType::DOCUMENTARY->isFilm());
         $this->assertFalse(ContentType::SERIES->isFilm());
         $this->assertFalse(ContentType::MINI_SERIES->isFilm());
         $this->assertFalse(ContentType::TV_SHOW->isFilm());
-        $this->assertFalse(ContentType::TV_MOVIE->isFilm());
-        $this->assertFalse(ContentType::VIDEO->isFilm());
-        $this->assertFalse(ContentType::SHORT->isFilm());
-        $this->assertFalse(ContentType::DOCUMENTARY->isFilm());
     }
 
     /**

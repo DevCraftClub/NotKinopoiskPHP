@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace NotKinopoisk;
 
+use Dotenv\Dotenv;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
+use InvalidArgumentException;
+use JsonException;
 use NotKinopoisk\Exception\ApiException;
 use NotKinopoisk\Exception\InvalidApiKeyException;
 use NotKinopoisk\Exception\RateLimitException;
@@ -17,49 +21,40 @@ use NotKinopoisk\Services\StaffService;
 use NotKinopoisk\Services\UserService;
 
 /**
- * Основной клиент для работы с Kinopoisk Unofficial API
+ * Основной клиент для работы с Kinopoisk API
  *
- * Этот класс является центральной точкой входа для взаимодействия с Kinopoisk Unofficial API.
- * Предоставляет удобный интерфейс для работы с различными ресурсами API через специализированные сервисы.
+ * Предоставляет единую точку входа для работы с Kinopoisk API.
+ * Содержит все сервисы для работы с различными типами данных:
+ * фильмы, персоны, сериалы и другие.
  *
  * Основные возможности:
- * - Автоматическая загрузка конфигурации из .env файла
- * - Обработка HTTP запросов с автоматическим управлением ошибками
- * - Предоставление доступа к специализированным сервисам (фильмы, персоны, персонал и т.д.)
- * - Поддержка различных способов передачи API ключа
+ * - Инициализация с API ключом
+ * - Доступ к различным сервисам API
+ * - Централизованная обработка ошибок
+ * - Управление HTTP клиентом
  *
  * @package NotKinopoisk
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
  * @version 1.0.0
- * @see     \NotKinopoisk\Services\FilmService
  * @see     \NotKinopoisk\Services\PersonService
- * @see     \NotKinopoisk\Services\StaffService
- * @see     \NotKinopoisk\Services\UserService
- * @see     \NotKinopoisk\Services\MediaService
+ * @see     \NotKinopoisk\Services\HttpClient
+ * @api     https://kinopoiskapiunofficial.tech
+ * @link    https://kinopoiskapiunofficial.tech/documentation/api
  *
  * @example
  * ```php
- * // Создание клиента с API ключом
  * $client = new Client('your-api-key');
  *
- * // Создание клиента с ключом из .env файла
- * $client = new Client();
+ * // Работа с персонами
+ * $person = $client->persons->getById(12345);
  *
- * // Получение информации о фильме
- * $film = $client->films->getById(301);
- * echo $film->getDisplayName();
+ * // Поиск персон
+ * $searchResult = $client->persons->search('Том Круз');
  * ```
  */
 class Client {
-
-	/**
-	 * Базовый URL для API запросов
-	 *
-	 * @var string
-	 */
-	private string $_baseUrl = 'https://kinopoiskapiunofficial.tech';
 
 	/**
 	 * Сервис для работы с фильмами
@@ -91,6 +86,12 @@ class Client {
 	 * @var \NotKinopoisk\Services\MediaService
 	 */
 	public readonly MediaService $media;
+	/**
+	 * Базовый URL для API запросов
+	 *
+	 * @var string
+	 */
+	private string $_baseUrl = 'https://kinopoiskapiunofficial.tech';
 	/**
 	 * HTTP клиент для выполнения запросов к API
 	 *
@@ -133,18 +134,18 @@ class Client {
 	 * ]);
 	 * ```
 	 */
-	public function __construct(?string $apiKey = null, array $config = []) {
+	public function __construct(?string $apiKey = NULL, array $config = []) {
 		// Автоматически загружаем .env файл, если он существует
 		$this->_loadDotenv();
 
-		$envApiKey = getenv('KINOPOISK_API_KEY');
-		$this->_apiKey = $apiKey ?? ($envApiKey !== false ? $envApiKey : null);
+		$envApiKey     = getenv('KINOPOISK_API_KEY');
+		$this->_apiKey = $apiKey ?? ($envApiKey !== FALSE ? $envApiKey : NULL);
 		if (!$this->_apiKey) {
-			throw new \InvalidArgumentException('API ключ не передан и не найден в переменной окружения KINOPOISK_API_KEY');
+			throw new InvalidArgumentException('API ключ не передан и не найден в переменной окружения KINOPOISK_API_KEY');
 		}
 
 		$baseUrl = getenv('KINOPOISK_API_BASE_URL');
-		if ($baseUrl !== false) {
+		if ($baseUrl !== FALSE) {
 			$this->_baseUrl = $baseUrl;
 		}
 
@@ -161,7 +162,7 @@ class Client {
 		$this->_httpClient = new HttpClient(array_merge($defaultConfig, $config));
 
 		// Инициализация сервисов
-		$this->films    = new FilmService($this);
+		$this->films   = new FilmService($this);
 		$this->persons = new PersonService($this);
 		$this->staff   = new StaffService($this);
 		$this->users   = new UserService($this);
@@ -185,7 +186,7 @@ class Client {
 		if (class_exists('\Dotenv\Dotenv')) {
 			$envFile = getcwd() . '/.env';
 			if (file_exists($envFile)) {
-				\Dotenv\Dotenv::createImmutable(dirname($envFile))->load();
+				Dotenv::createImmutable(dirname($envFile))->load();
 			}
 		}
 	}
@@ -254,12 +255,12 @@ class Client {
 			$response = $this->_httpClient->request($method, $uri, $options);
 			$content  = $response->getBody()->getContents();
 
-			return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+			return json_decode($content, TRUE, 512, JSON_THROW_ON_ERROR);
 		} catch (GuzzleException $e) {
 			$this->_handleHttpException($e);
 			// Этот код недостижим, но PHPStan требует return statement
 			throw new ApiException('Ошибка HTTP запроса', 0, $e);
-		} catch (\JsonException $e) {
+		} catch (JsonException $e) {
 			throw new ApiException('Ошибка парсинга JSON ответа: ' . $e->getMessage(), 0, $e);
 		}
 	}
@@ -280,9 +281,9 @@ class Client {
 	 * @internal Этот метод используется внутренне для обработки ошибок HTTP запросов
 	 */
 	private function _handleHttpException(GuzzleException $e): void {
-		if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
+		if ($e instanceof RequestException && $e->hasResponse()) {
 			$response = $e->getResponse();
-			if ($response === null) {
+			if ($response === NULL) {
 				throw new ApiException('Ошибка сети: ' . $e->getMessage(), 0, $e);
 			}
 			$statusCode = $response->getStatusCode();
@@ -350,13 +351,15 @@ class Client {
 	 * По умолчанию используется URL 'https://kinopoiskapiunofficial.tech', но метод позволяет
 	 * переопределить его для тестирования или использования альтернативных эндпоинтов.
 	 *
-	 * @param string $url Новый базовый URL для API запросов (должен быть валидным URL)
+	 * @since 1.0.0
+	 * @see   Client::request() Метод, использующий базовый URL для выполнения запросов
+	 *
+	 * @see   Client::getBaseUrl() Получение текущего базового URL
+	 *
+	 * @param   string  $url  Новый базовый URL для API запросов (должен быть валидным URL)
+	 *
 	 * @return void
 	 *
-	 * @see Client::getBaseUrl() Получение текущего базового URL
-	 * @see Client::request() Метод, использующий базовый URL для выполнения запросов
-	 *
-	 * @since 1.0.0
 	 */
 	public function setBaseUrl(string $url): void {
 		$this->_baseUrl = $url;

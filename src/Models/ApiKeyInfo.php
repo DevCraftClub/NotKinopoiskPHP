@@ -49,9 +49,9 @@ class ApiKeyInfo {
 	 * Создает новый экземпляр информации об API ключе со всеми необходимыми данными.
 	 * Все свойства являются readonly для обеспечения неизменяемости объекта.
 	 *
-	 * @param   array        $totalQuota   Информация об общих лимитах запросов
-	 * @param   array        $dailyQuota   Информация о дневных лимитах запросов
-	 * @param   AccountType  $accountType  Тип аккаунта (FREE, PAID, UNLIMITED)
+	 * @param   \NotKinopoisk\Models\ApiKeyQouta  $totalQuota   Информация об общих лимитах запросов
+	 * @param   \NotKinopoisk\Models\ApiKeyQouta  $dailyQuota   Информация о дневных лимитах запросов
+	 * @param   AccountType                       $accountType  Тип аккаунта (FREE, PAID, UNLIMITED)
 	 *
 	 * @example
 	 * ```php
@@ -63,8 +63,8 @@ class ApiKeyInfo {
 	 * ```
 	 */
 	public function __construct(
-		public readonly array       $totalQuota,
-		public readonly array       $dailyQuota,
+		public readonly ApiKeyQouta       $totalQuota,
+		public readonly ApiKeyQouta       $dailyQuota,
 		public readonly AccountType $accountType,
 	) {}
 
@@ -93,8 +93,8 @@ class ApiKeyInfo {
 	 */
 	public static function fromArray(array $data): self {
 		return new self(
-			totalQuota : $data['totalQuota'],
-			dailyQuota : $data['dailyQuota'],
+			totalQuota : ApiKeyQouta::fromArray($data['totalQuota']),
+			dailyQuota : ApiKeyQouta::fromArray($data['dailyQuota']),
 			accountType: AccountType::from($data['accountType']),
 		);
 	}
@@ -133,7 +133,7 @@ class ApiKeyInfo {
 	 * ```
 	 */
 	public function getRemainingTotalQuota(): int {
-		return $this->totalQuota['total'] - $this->totalQuota['used'];
+		return $this->totalQuota->getRemainingQuota();
 	}
 
 	/**
@@ -151,7 +151,7 @@ class ApiKeyInfo {
 	 * ```
 	 */
 	public function getRemainingDailyQuota(): int {
-		return $this->dailyQuota['total'] - $this->dailyQuota['used'];
+		return $this->dailyQuota->getRemainingQuota();
 	}
 
 }

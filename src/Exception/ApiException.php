@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Exception;
 
+use Exception;
+use Throwable;
+
 /**
  * Базовое исключение для всех ошибок, связанных с Kinopoisk API
  *
@@ -29,7 +32,7 @@ namespace NotKinopoisk\Exception;
  * }
  * ```
  */
-class ApiException extends \Exception {
+class ApiException extends Exception {
 
 	/**
 	 * Конструктор исключения API
@@ -46,7 +49,7 @@ class ApiException extends \Exception {
 	 * throw new ApiException('Ошибка сети при обращении к API', 500, $previousException);
 	 * ```
 	 */
-	public function __construct(string $message = '', int $code = 0, ?\Throwable $previous = null) {
+	public function __construct(string $message = '', int $code = 0, ?Throwable $previous = NULL) {
 		parent::__construct($message, $code, $previous);
 	}
 
