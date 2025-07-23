@@ -6,7 +6,7 @@ namespace Tests\Models;
 
 use NotKinopoisk\Enums\ContentType;
 use NotKinopoisk\Models\Country;
-use NotKinopoisk\Models\FilmCollectionItem;
+use NotKinopoisk\Models\FilmCollection;
 use NotKinopoisk\Models\Genre;
 use PHPUnit\Framework\TestCase;
 
@@ -25,7 +25,7 @@ class FilmCollectionItemTest extends TestCase
      */
     public function testCreateFilmCollectionItem(): void
     {
-        $item = new FilmCollectionItem(
+        $item = new FilmCollection(
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',
@@ -78,7 +78,7 @@ class FilmCollectionItemTest extends TestCase
             'posterUrlPreview' => 'https://example.com/poster_small.jpg'
         ];
 
-        $item = FilmCollectionItem::fromArray($data);
+        $item = FilmCollection::fromArray($data);
 
         $this->assertEquals(301, $item->kinopoiskId);
         $this->assertEquals('Матрица', $item->nameRu);
@@ -118,7 +118,7 @@ class FilmCollectionItemTest extends TestCase
             'posterUrlPreview' => 'https://example.com/poster_small.jpg'
         ];
 
-        $item = FilmCollectionItem::fromArray($data);
+        $item = FilmCollection::fromArray($data);
 
         $this->assertNull($item->nameRu);
         $this->assertNull($item->nameEn);
@@ -135,7 +135,7 @@ class FilmCollectionItemTest extends TestCase
      */
     public function testGetDisplayName(): void
     {
-        $item = new FilmCollectionItem(
+        $item = new FilmCollection(
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',
@@ -158,7 +158,7 @@ class FilmCollectionItemTest extends TestCase
      */
     public function testGetDisplayNameWithEnglishName(): void
     {
-        $item = new FilmCollectionItem(
+        $item = new FilmCollection(
             kinopoiskId: 301,
             nameRu: null,
             nameEn: 'The Matrix',
@@ -181,7 +181,7 @@ class FilmCollectionItemTest extends TestCase
      */
     public function testGetDisplayNameWithOriginalName(): void
     {
-        $item = new FilmCollectionItem(
+        $item = new FilmCollection(
             kinopoiskId: 301,
             nameRu: null,
             nameEn: null,
@@ -204,7 +204,7 @@ class FilmCollectionItemTest extends TestCase
      */
     public function testGetDisplayNameWithNoName(): void
     {
-        $item = new FilmCollectionItem(
+        $item = new FilmCollection(
             kinopoiskId: 301,
             nameRu: null,
             nameEn: null,
@@ -227,7 +227,7 @@ class FilmCollectionItemTest extends TestCase
      */
     public function testGetMainRating(): void
     {
-        $item = new FilmCollectionItem(
+        $item = new FilmCollection(
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',
@@ -250,7 +250,7 @@ class FilmCollectionItemTest extends TestCase
      */
     public function testGetMainRatingWithImdbRating(): void
     {
-        $item = new FilmCollectionItem(
+        $item = new FilmCollection(
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',
@@ -273,7 +273,7 @@ class FilmCollectionItemTest extends TestCase
      */
     public function testGetMainRatingWithNoRatings(): void
     {
-        $item = new FilmCollectionItem(
+        $item = new FilmCollection(
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',
@@ -296,7 +296,7 @@ class FilmCollectionItemTest extends TestCase
      */
     public function testIsSerial(): void
     {
-        $filmItem = new FilmCollectionItem(
+        $filmItem = new FilmCollection(
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',
@@ -311,7 +311,7 @@ class FilmCollectionItemTest extends TestCase
             posterUrlPreview: ''
         );
 
-        $seriesItem = new FilmCollectionItem(
+        $seriesItem = new FilmCollection(
             kinopoiskId: 302,
             nameRu: 'Игра престолов',
             nameEn: 'Game of Thrones',
@@ -335,7 +335,7 @@ class FilmCollectionItemTest extends TestCase
      */
     public function testGetCountriesString(): void
     {
-        $item = new FilmCollectionItem(
+        $item = new FilmCollection(
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',
@@ -361,7 +361,7 @@ class FilmCollectionItemTest extends TestCase
      */
     public function testGetCountriesStringWithEmptyArray(): void
     {
-        $item = new FilmCollectionItem(
+        $item = new FilmCollection(
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',
@@ -384,7 +384,7 @@ class FilmCollectionItemTest extends TestCase
      */
     public function testGetGenresString(): void
     {
-        $item = new FilmCollectionItem(
+        $item = new FilmCollection(
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',
@@ -410,7 +410,7 @@ class FilmCollectionItemTest extends TestCase
      */
     public function testGetGenresStringWithEmptyArray(): void
     {
-        $item = new FilmCollectionItem(
+        $item = new FilmCollection(
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',

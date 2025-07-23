@@ -12,6 +12,7 @@ use NotKinopoisk\Enums\FilmOrder;
 use NotKinopoisk\Enums\ImageType;
 use NotKinopoisk\Enums\Month;
 use NotKinopoisk\Enums\ReviewOrder;
+use NotKinopoisk\Exception\KpValidationException;
 use NotKinopoisk\Models\Award;
 use NotKinopoisk\Models\BoxOffice;
 use NotKinopoisk\Models\Distribution;
@@ -153,7 +154,7 @@ class FilmService extends AbstractService {
 	 *     }
 	 * }
 	 * ```
-    */
+	 */
 	public function getSeasons(int $id): DefaultResponse {
 		$data = $this->get($this->buildUri("films/{$id}/seasons"));
 
@@ -709,13 +710,13 @@ class FilmService extends AbstractService {
 	 * }
 	 * ```
 	 */
-	public function getTop250Series(int $page = 1): FilmCollection {
+	public function getTop250Series(int $page = 1): PaginatedResponse {
 		$data = $this->get($this->buildUri("films/collections"), [
 			'type' => CollectionType::TOP_250_SERIES->value,
 			'page' => $page,
 		]);
 
-		return FilmCollection::fromArray($data);
+		return PaginatedResponse::fromArray($data, FilmCollection::class);
 	}
 
 	/**
@@ -725,8 +726,8 @@ class FilmService extends AbstractService {
 	 * @param   array|null                       $genre
 	 * @param   \NotKinopoisk\Enums\FilmOrder    $order
 	 * @param   \NotKinopoisk\Enums\ContentType  $type
-	 * @param   float                            $ratingFrom
-	 * @param   float                            $ratingTo
+	 * @param   float                             $ratingFrom
+	 * @param   float                             $ratingTo
 	 * @param   int                              $yearFrom
 	 * @param   int                              $yearTo
 	 * @param   string|null                      $imdbId
@@ -734,14 +735,75 @@ class FilmService extends AbstractService {
 	 * @param   int                              $page
 	 *
 	 * @return \NotKinopoisk\Responses\PaginatedResponse
+	 * @throws \NotKinopoisk\Exception\KpValidationException
 	 */
-	public function searchFilms(?array $country = NULL, ?array $genre = NULL, FilmOrder $order = FilmOrder::RATING, ContentType $type = ContentType::ALL, float $ratingFrom = 0, float $ratingTo = 10, int $yearFrom = 1000, int $yearTo = 3000, ?string $imdbId = null, ?string $keyword = null, int $page = 1): PaginatedResponse {
+	public function searchFilms(
+		?array      $country = NULL,
+		?array      $genre = NULL,
+		FilmOrder   $order = FilmOrder::RATING,
+		ContentType $type = ContentType::ALL,
+		float        $ratingFrom = 0,
+		float        $ratingTo = 10,
+		int         $yearFrom = 1000,
+		int         $yearTo = 3000,
+		?string     $imdbId = NULL,
+		?string     $keyword = NULL,
+		int         $page = 1,
+	): PaginatedResponse {
 		$filterQuery = [];
 
-		$countries = implode(',', $country?? []);
-		$genres = implode(',', $genre?? []);
+		if ($ratingFrom < 0) {
+			throw new KpValidationException('Параметр "ratingFrom" не может быть отрицательным');
+		}
 
-		return PaginatedResponse::fromArray([], )
+		if ($ratingTo > 10) {
+			throw new KpValidationException('Параметр "ratingTo" не может быть больше 10');
+		}
+
+		if ($page < 1) {
+			throw new KpValidationException('Параметр "page" не может быть меньше 1');
+		}
+
+		if (!is_null($country)) {
+			$countryString = [];
+			foreach ($country as $countryCode) {
+				$countryString[] = "countries={$countryCode->country}";
+			}
+			$filterQuery[] = implode('&', $countryString);
+			unset($countryString);
+		}
+
+		if (!is_null($genre)) {
+			$genreString = [];
+			foreach ($genre as $genreCode) {
+				$genreString[] = "genres={$genreCode->genre}";
+			}
+			$filterQuery[] = implode('&', $genreString);
+			unset($genreString);
+		}
+
+		if (!is_null($imdbId)) {
+			$filterQuery['imdbId'] = $imdbId;
+		}
+
+		if (!is_null($keyword)) {
+			$filterQuery['keyword'] = $keyword;
+		}
+
+		$filterQuery['order']      = $order->value;
+		$filterQuery['type']       = $type->value;
+		$filterQuery['ratingFrom'] = $ratingFrom;
+		$filterQuery['ratingTo']   = $ratingTo;
+		$filterQuery['yearFrom']   = $yearFrom;
+		$filterQuery['yearTo']     = $yearTo;
+		$filterQuery['page']       = $page;
+
+		$data = $this->get($this->buildUri('films'), $filterQuery);
+
+		$response              = PaginatedResponse::fromArray($data, FilmCollection::class);
+		$response->currentPage = $page;
+
+		return $response;
 	}
 
 }

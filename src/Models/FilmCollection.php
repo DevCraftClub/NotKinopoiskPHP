@@ -4,179 +4,249 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Enums\ContentType;
+
 /**
- * Модель коллекции фильмов из Kinopoisk API
+ * Модель элемента коллекции фильмов из Kinopoisk API
  *
- * Представляет коллекцию фильмов, полученную в результате поиска или
- * запроса списков (популярные, топ-250 и т.д.). Содержит массив фильмов
- * и метаданные о пагинации.
+ * Представляет упрощенную информацию о фильме в коллекциях,
+ * содержащую только основные поля без детальной информации.
+ * Используется в ответах API для коллекций фильмов.
  *
  * Основные возможности:
- * - Хранение массива фильмов в неизменяемом виде
- * - Информация о пагинации (общее количество, количество страниц)
- * - Удобные методы для работы с коллекцией
+ * - Хранение базовой информации о фильме в неизменяемом виде
+ * - Создание объекта из массива данных API
+ * - Удобные методы для работы с названиями фильмов
  *
  * @package NotKinopoisk\Models
- * @api     /api/v2.2/films/collections
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
  * @version 1.0.0
- * @see     \NotKinopoisk\Services\FilmService
  * @see     \NotKinopoisk\Models\Film
- * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/films/get_api_v2_2_films_collections
+ * @see     \NotKinopoisk\Models\FilmCollection
+ * @see     \NotKinopoisk\Services\FilmService
  *
  * @example
  * ```php
  * // Создание из данных API
- * $collection = FilmCollection::fromArray($apiData);
+ * $item = FilmCollectionItem::fromArray($apiData);
  *
- * // Работа с коллекцией
- * echo "Найдено фильмов: {$collection->getCount()}\n";
- * echo "Всего страниц: {$collection->totalPages}\n";
- *
- * foreach ($collection->items as $film) {
- *     echo "- {$film->getDisplayName()}\n";
- * }
+ * // Использование
+ * echo "Название: {$item->getDisplayName()}\n";
+ * echo "Год: {$item->year}\n";
+ * echo "Рейтинг: {$item->ratingKinopoisk}\n";
  * ```
  */
 class FilmCollection {
 
 	/**
-	 * Конструктор коллекции фильмов
+	 * Конструктор элемента коллекции фильмов
 	 *
-	 * Создает новую коллекцию фильмов с указанными данными.
+	 * Создает новый экземпляр элемента коллекции со всеми необходимыми данными.
 	 * Все свойства являются readonly для обеспечения неизменяемости объекта.
 	 *
-	 * @param   \NotKinopoisk\Models\FilmCollectionItem[]  $items       Массив объектов Film в коллекции
-	 * @param   int                                        $total       Общее количество фильмов (всего в базе данных)
-	 * @param   int                                        $totalPages  Общее количество страниц для пагинации
+	 * @package string|null                     $imdbId            Идентификатор фильма в IMDb
+	 *
+	 * @param   int                             $kinopoiskId       Уникальный идентификатор фильма в Кинопоиске
+	 * @param   string|null                     $nameRu            Название фильма на русском языке
+	 * @param   string|null                     $nameEn            Название фильма на английском языке
+	 * @param   string|null                     $nameOriginal      Оригинальное название фильма
+	 * @param   \NotKinopoisk\Models\Country[]  $countries         Массив стран производства
+	 * @param   \NotKinopoisk\Models\Genre[]    $genres            Массив жанров фильма
+	 * @param   float|null                      $ratingKinopoisk   Рейтинг на Кинопоиске
+	 * @param   float|null                      $ratingImbd        Рейтинг на IMDb
+	 * @param   int|null                        $year              Год выпуска фильма
+	 * @param   ContentType                     $type              Тип контента (фильм, сериал и т.д.)
+	 * @param   string                          $posterUrl         URL постера фильма
+	 * @param   string                          $posterUrlPreview  URL превью постера фильма
 	 *
 	 * @example
 	 * ```php
-	 * $collection = new FilmCollection(
-	 *     items: [$film1, $film2, $film3],
-	 *     total: 150,
-	 *     totalPages: 5
+	 * $item = new FilmCollectionItem(
+	 *     kinopoiskId: 301,
+	 *     nameRu: 'Матрица',
+	 *     nameEn: 'The Matrix',
+	 *     nameOriginal: 'The Matrix',
+	 *     countries: [new Country('США')],
+	 *     genres: [new Genre('боевик')],
+	 *     ratingKinopoisk: 8.7,
+	 *     ratingImbd: 8.7,
+	 *     year: 1999,
+	 *     type: ContentType::FILM,
+	 *     posterUrl: 'https://example.com/poster.jpg',
+	 *     posterUrlPreview: 'https://example.com/poster_small.jpg'
 	 * );
 	 * ```
 	 */
 	public function __construct(
-		public readonly array $items,
-		public readonly int   $total,
-		public readonly int   $totalPages,
+		public readonly int         $kinopoiskId,
+		public readonly ?string     $imdbId,
+		public readonly ?string     $nameRu,
+		public readonly ?string     $nameEn,
+		public readonly ?string     $nameOriginal,
+		public readonly array       $countries,
+		public readonly array       $genres,
+		public readonly ?float      $ratingKinopoisk,
+		public readonly ?float      $ratingImbd,
+		public readonly ?int        $year,
+		public readonly ContentType $type,
+		public readonly string      $posterUrl,
+		public readonly string      $posterUrlPreview,
 	) {}
 
 	/**
-	 * Создает экземпляр коллекции фильмов из массива данных API
+	 * Создает экземпляр элемента коллекции из массива данных API
 	 *
-	 * Статический метод для удобного создания объекта FilmCollection из данных,
-	 * полученных от Kinopoisk API. Автоматически обрабатывает различные форматы
-	 * ответов API и создает объекты Film для каждого элемента.
+	 * Статический метод для удобного создания объекта FilmCollectionItem из данных,
+	 * полученных от Kinopoisk API. Автоматически обрабатывает nullable поля
+	 * и устанавливает значения по умолчанию.
 	 *
-	 * @param   array  $data  Массив данных коллекции от API
+	 * @param   array  $data  Массив данных элемента коллекции от API
 	 *
-	 * @return self Новый экземпляр коллекции фильмов
+	 * @return self Новый экземпляр элемента коллекции
 	 *
 	 * @throws \InvalidArgumentException Если данные имеют неверный формат
 	 *
 	 * @example
 	 * ```php
 	 * $apiData = [
-	 *     'items' => [
-	 *         ['kinopoiskId' => 301, 'nameRu' => 'Матрица', ...],
-	 *         ['kinopoiskId' => 302, 'nameRu' => 'Матрица: Перезагрузка', ...]
-	 *     ],
-	 *     'total' => 150,
-	 *     'totalPages' => 5
+	 *     'kinopoiskId' => 301,
+	 *     'nameRu' => 'Матрица',
+	 *     'nameEn' => 'The Matrix',
+	 *     'nameOriginal' => 'The Matrix',
+	 *     'countries' => [['country' => 'США']],
+	 *     'genres' => [['genre' => 'боевик']],
+	 *     'ratingKinopoisk' => 8.7,
+	 *     'ratingImbd' => 8.7,
+	 *     'year' => 1999,
+	 *     'type' => 'FILM',
+	 *     'posterUrl' => 'https://example.com/poster.jpg',
+	 *     'posterUrlPreview' => 'https://example.com/poster_small.jpg'
 	 * ];
 	 *
-	 * $collection = FilmCollection::fromArray($apiData);
+	 * $item = FilmCollectionItem::fromArray($apiData);
 	 * ```
 	 */
 	public static function fromArray(array $data): self {
 		return new self(
-			items     : array_map(fn ($filmData) => FilmCollectionItem::fromArray($filmData), $data['items']),
-			total     : $data['total'] ?? $data['searchFilmsCountResult'] ?? 0,
-			totalPages: $data['totalPages'] ?? $data['pagesCount'] ?? 1,
+			kinopoiskId    : $data['kinopoiskId'],
+			imdbId         : $data['imdbId'] ?? NULL,
+			nameRu         : $data['nameRu'] ?? NULL,
+			nameEn         : $data['nameEn'] ?? NULL,
+			nameOriginal   : $data['nameOriginal'] ?? NULL,
+			countries      : $data['countries'] ? array_map(fn ($country) => Country::fromArray($country), $data['countries']) : [],
+			genres         : $data['genres'] ? array_map(fn ($genre) => Genre::fromArray($genre), $data['genres']) : [],
+			ratingKinopoisk: $data['ratingKinopoisk'] ?? NULL,
+			ratingImbd     : $data['ratingImbd'] ?? NULL,
+			year           : $data['year'] ?? NULL,
+			type           : ContentType::from($data['type']),
+			posterUrl      : $data['posterUrl'], posterUrlPreview: $data['posterUrlPreview'],
 		);
 	}
 
 	/**
-	 * Получает количество фильмов в текущей коллекции
+	 * Получает отображаемое название фильма
 	 *
-	 * Возвращает количество фильмов на текущей странице/в текущем результате.
-	 * Для получения общего количества фильмов используйте свойство $total.
+	 * Возвращает наиболее подходящее название для отображения пользователю.
+	 * Приоритет: русское название → английское название → оригинальное название → "Без названия"
 	 *
-	 * @return int Количество фильмов в коллекции
+	 * @return string Отображаемое название фильма
 	 *
 	 * @example
 	 * ```php
-	 * $collection = FilmCollection::fromArray($apiData);
-	 * echo "На этой странице: {$collection->getCount()} фильмов\n";
-	 * echo "Всего найдено: {$collection->total} фильмов\n";
+	 * echo $item->getDisplayName(); // "Матрица" или "The Matrix" или "Без названия"
 	 * ```
 	 */
-	public function getCount(): int {
-		return count($this->items);
+	public function getDisplayName(): string {
+		return $this->nameRu ?? $this->nameEn ?? $this->nameOriginal ?? 'Без названия';
 	}
 
 	/**
-	 * Проверяет, пуста ли коллекция
+	 * Получает основной рейтинг фильма
 	 *
-	 * Возвращает true, если в коллекции нет фильмов, и false в противном случае.
+	 * Возвращает наиболее значимый рейтинг из доступных.
+	 * Приоритет: рейтинг Кинопоиска → рейтинг IMDb
 	 *
-	 * @return bool true если коллекция пуста, false если содержит фильмы
+	 * @return float|null Основной рейтинг или null если рейтинги отсутствуют
 	 *
 	 * @example
 	 * ```php
-	 * if ($collection->isEmpty()) {
-	 *     echo "Фильмы не найдены\n";
+	 * $rating = $item->getMainRating();
+	 * if ($rating !== null) {
+	 *     echo "Рейтинг: {$rating}";
 	 * } else {
-	 *     echo "Найдено фильмов: {$collection->getCount()}\n";
+	 *     echo "Рейтинг не указан";
 	 * }
 	 * ```
 	 */
-	public function isEmpty(): bool {
-		return empty($this->items);
+	public function getMainRating(): ?float {
+		return $this->ratingKinopoisk ?? $this->ratingImbd;
 	}
 
 	/**
-	 * Получает первый фильм из коллекции
+	 * Проверяет, является ли контент сериалом
 	 *
-	 * Возвращает первый элемент массива фильмов или null, если коллекция пуста.
+	 * Определяет тип контента на основе поля type. Возвращает true для
+	 * сериалов и телешоу.
 	 *
-	 * @return \NotKinopoisk\Models\FilmCollectionItem|null Первый фильм или null
+	 * @return bool true если это сериал, false если фильм
 	 *
 	 * @example
 	 * ```php
-	 * $firstFilm = $collection->getFirst();
-	 * if ($firstFilm !== null) {
-	 *     echo "Первый фильм: {$firstFilm->getDisplayName()}\n";
+	 * if ($item->isSerial()) {
+	 *     echo "Это сериал";
+	 * } else {
+	 *     echo "Это фильм";
 	 * }
 	 * ```
 	 */
-	public function getFirst(): ?FilmCollectionItem {
-		return $this->items[0] ?? NULL;
+	public function isSerial(): bool {
+		return $this->type->isSeries();
 	}
 
 	/**
-	 * Получает последний фильм из коллекции
+	 * Получает список стран в виде строки
 	 *
-	 * Возвращает последний элемент массива фильмов или null, если коллекция пуста.
+	 * Возвращает названия стран, разделенные запятыми.
 	 *
-	 * @return \NotKinopoisk\Models\FilmCollectionItem|null Последний фильм или null
+	 * @return string Список стран или пустая строка
 	 *
 	 * @example
 	 * ```php
-	 * $lastFilm = $collection->getLast();
-	 * if ($lastFilm !== null) {
-	 *     echo "Последний фильм: {$lastFilm->getDisplayName()}\n";
-	 * }
+	 * echo "Страны: {$item->getCountriesString()}"; // "США, Великобритания"
 	 * ```
 	 */
-	public function getLast(): ?FilmCollectionItem {
-		return $this->items[count($this->items) - 1] ?? NULL;
+	public function getCountriesString(): string {
+		if (empty($this->countries)) {
+			return '';
+		}
+
+		$countryNames = array_map('strval', $this->countries);
+
+		return implode(', ', array_filter($countryNames));
 	}
 
-}
+	/**
+	 * Получает список жанров в виде строки
+	 *
+	 * Возвращает названия жанров, разделенные запятыми.
+	 *
+	 * @return string Список жанров или пустая строка
+	 *
+	 * @example
+	 * ```php
+	 * echo "Жанры: {$item->getGenresString()}"; // "боевик, фантастика"
+	 * ```
+	 */
+	public function getGenresString(): string {
+		if (empty($this->genres)) {
+			return '';
+		}
+
+		$genreNames = array_map('strval', $this->genres);
+
+		return implode(', ', array_filter($genreNames));
+	}
+
+} 
