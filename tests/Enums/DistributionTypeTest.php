@@ -125,12 +125,16 @@ class DistributionTypeTest extends TestCase
     public function testAllEnumValues(): void
     {
         $expectedValues = [
+            'ALL',
             'CINEMA',
             'DVD',
             'BLURAY',
             'DIGITAL',
             'TV',
-            'STREAMING'
+            'STREAMING',
+            'COUNTRY_SPECIFIC',
+            'PREMIERE',
+            'WORLD_PREMIER'
         ];
 
         $actualValues = array_map(fn($case) => $case->value, DistributionType::cases());

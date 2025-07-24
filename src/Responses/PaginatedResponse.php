@@ -74,22 +74,22 @@ class PaginatedResponse extends DefaultResponse {
 	 * @param   int  $currentPage  Номер текущей страницы
 	 * @param   int  $totalPages   Общее количество страниц
 	 *
-	 * @throws KpValidationException При некорректных значениях
+	 * @throws KpValidationException При неверных параметрах пагинации
 	 */
-	private function validatePaginationParameters(int $currentPage, int $totalPages): void {
+	protected function validatePaginationParameters(int $currentPage, int $totalPages): void {
 		if ($currentPage < 1) {
 			throw new KpValidationException(
 				message: "Номер текущей страницы должен быть больше 0, получен: {$currentPage}",
 			);
 		}
 
-		if ($totalPages < 1) {
+		if ($totalPages < 0) {
 			throw new KpValidationException(
-				message: "Общее количество страниц должно быть больше 0, получено: {$totalPages}",
+				message: "Общее количество страниц должно быть неотрицательным, получено: {$totalPages}",
 			);
 		}
 
-		if ($currentPage > $totalPages) {
+		if ($totalPages > 0 && $currentPage > $totalPages) {
 			throw new KpValidationException(
 				message: "Номер текущей страницы ({$currentPage}) не может превышать общее количество страниц ({$totalPages})",
 			);
@@ -135,7 +135,7 @@ class PaginatedResponse extends DefaultResponse {
 				total      : (int) $data['total'],
 				items      : $items,
 				currentPage: (int) ($data['current_page'] ?? $data['page'] ?? 1),
-				totalPages : (int) $data['total_pages'],
+				totalPages : (int) ($data['totalPages'] ?? 1), // Fallback to 1 if not provided
 			);
 		} catch (\TypeError|\ValueError $e) {
 			throw new KpValidationException(
@@ -152,14 +152,17 @@ class PaginatedResponse extends DefaultResponse {
 	}
 
 	/**
-	 * Валидирует структуру данных API
+	 * Валидирует данные API для создания пагинированного ответа
 	 *
-	 * @param   array  $data  Данные для валидации
+	 * Проверяет наличие обязательных полей в данных API.
+	 * Выбрасывает исключение, если данные не соответствуют ожидаемому формату.
 	 *
-	 * @throws KpValidationException При отсутствии обязательных ключей
+	 * @param   array  $data  Данные от API
+	 *
+	 * @throws \NotKinopoisk\Exception\KpValidationException Если данные невалидны
 	 */
 	protected static function validateApiData(array $data): void {
-		$requiredKeys = ['total', 'total_pages', 'items'];
+		$requiredKeys = ['total', 'items'];
 		$missingKeys  = array_diff($requiredKeys, array_keys($data));
 
 		if (!empty($missingKeys)) {

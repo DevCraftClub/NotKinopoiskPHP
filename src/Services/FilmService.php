@@ -32,6 +32,8 @@ use NotKinopoisk\Responses\BudgetResponse;
 use NotKinopoisk\Responses\DefaultResponse;
 use NotKinopoisk\Responses\KeywordSearchResponse;
 use NotKinopoisk\Responses\PaginatedResponse;
+use NotKinopoisk\Responses\ReviewResponse;
+use NotKinopoisk\Responses\SequelPrequelResponse;
 
 /**
  * Сервис для работы с фильмами в Kinopoisk API
@@ -81,7 +83,7 @@ class FilmService extends AbstractService {
 	 * Вызывает родительский конструктор для настройки базовой конфигурации.
 	 *
 	 * @see AbstractService::__construct() Родительский конструктор
-	 * @see ApiVersion::V22 Используемая версия API
+	 * @see ApiVersion::V2_2 Используемая версия API
 	 *
 	 * @param   Client  $client  HTTP-клиент для выполнения запросов к API
 	 *
@@ -92,7 +94,7 @@ class FilmService extends AbstractService {
 	 * ```
 	 */
 	public function __construct(Client $client) {
-		parent::__construct($client, ApiVersion::V22);
+		parent::__construct($client, ApiVersion::V2_2);
 	}
 
 	/**
@@ -410,12 +412,12 @@ class FilmService extends AbstractService {
 	 * @param   int                              $page   Номер страницы для пагинации
 	 * @param   \NotKinopoisk\Enums\ReviewOrder  $order  Порядок сортировки отзывов
 	 *
-	 * @return \NotKinopoisk\Responses\PaginatedResponse Массив отзывов
+	 * @return \NotKinopoisk\Responses\ReviewResponse Массив отзывов
 	 * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
 	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
+	 * @throws \NotKinopoisk\Exception\KpValidationException
 	 * @throws \NotKinopoisk\Exception\RateLimitException
 	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
-	 * @throws \NotKinopoisk\Exception\KpValidationException
 	 * @example
 	 * ```php
 	 * // Получение последних отзывов
@@ -430,13 +432,13 @@ class FilmService extends AbstractService {
 	 * }
 	 * ```
 	 */
-	public function getReviews(int $id, int $page = 1, ReviewOrder $order = ReviewOrder::DATE_DESC): PaginatedResponse {
+	public function getReviews(int $id, int $page = 1, ReviewOrder $order = ReviewOrder::DATE_DESC): ReviewResponse {
 		$data = $this->get($this->buildUri("films/{$id}/reviews"), [
 			'page'  => $page,
 			'order' => $order->value,
 		]);
 
-		$response              = PaginatedResponse::fromArray($data, Review::class);
+		$response              = ReviewResponse::fromArray($data, Review::class);
 		$response->currentPage = $page;
 
 		return $response;
@@ -471,9 +473,10 @@ class FilmService extends AbstractService {
 	 * ```
 	 */
 	public function getExternalSources(int $id, int $page = 1): PaginatedResponse {
-		$data = $this->get($this->buildUri("films/{$id}/external_sources"), [
+		$data               = $this->get($this->buildUri("films/{$id}/external_sources"), [
 			'page' => $page,
 		]);
+		$data['totalPages'] = ceil($data['total'] / 50);
 
 		$response              = PaginatedResponse::fromArray($data, ExternalSource::class);
 		$response->currentPage = $page;
@@ -484,14 +487,14 @@ class FilmService extends AbstractService {
 	/**
 	 * Получает сиквелы и приквелы фильма
 	 *
-	 * READ операция - извлекает информацию о связанных фильмах:
-	 * сиквелах, приквелах, ремейках и других частях франшизы.
+	 * Извлекает информацию о связанных фильмах (сиквелы, приквелы, ремейки).
+	 * Возвращает массив связанных фильмов с указанием типа связи.
 	 *
 	 * @api /api/v2.1/films/{id}/sequels_and_prequels
 	 *
 	 * @param   int  $id  Уникальный идентификатор фильма в Кинопоиске
 	 *
-	 * @return \NotKinopoisk\Responses\DefaultResponse Массив связанных фильмов
+	 * @return \NotKinopoisk\Responses\SequelPrequelResponse Массив связанных фильмов
 	 *
 	 * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
 	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
@@ -501,16 +504,14 @@ class FilmService extends AbstractService {
 	 * @example
 	 * ```php
 	 * $sequels = $filmService->getSequelsAndPrequels(301);
-	 * foreach ($sequels as $film) {
-	 *     echo "Связанный фильм: {$film->getDisplayName()}\n";
-	 *     echo "Тип связи: {$film->relationType}\n";
+	 * foreach ($sequels->items as $sequel) {
+	 *     echo "{$sequel->getDisplayName()} - {$sequel->relationType->value}\n";
 	 * }
 	 * ```
 	 */
-	public function getSequelsAndPrequels(int $id): DefaultResponse {
-		$data = $this->get($this->buildUri("films/{$id}/sequels_and_prequels", ApiVersion::V21));
-
-		return DefaultResponse::fromArray($data, RelatedFilm::class);
+	public function getSequelsAndPrequels(int $id): SequelPrequelResponse {
+		$data = $this->get($this->buildUri("films/{$id}/sequels_and_prequels", ApiVersion::V2_1));
+		return SequelPrequelResponse::fromArray($data, RelatedFilm::class);
 	}
 
 	/**
@@ -547,7 +548,7 @@ class FilmService extends AbstractService {
 			'page'    => $page,
 		];
 
-		$data = $this->get($this->buildUri('films/search-by-keyword', ApiVersion::V21), $filters);
+		$data = $this->get($this->buildUri('films/search-by-keyword', ApiVersion::V2_1), $filters);
 
 		$response              = KeywordSearchResponse::fromArray($data, FilmSearchResult::class);
 		$response->currentPage = $page;

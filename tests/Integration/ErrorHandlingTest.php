@@ -23,7 +23,7 @@ class ErrorHandlingTest extends TestCase
     {
         $client = new Client();
         $this->expectException(ResourceNotFoundException::class);
-        $client->films->getById(9999999); // Несуществующий фильм (меньше 10000000)
+        $client->films->getById(9999999); // Несуществующий фильм
     }
 
     // RateLimit тест не реализован, чтобы не нарушать правила API

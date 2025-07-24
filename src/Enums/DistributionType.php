@@ -26,6 +26,9 @@ namespace NotKinopoisk\Enums;
  */
 enum DistributionType: string {
 
+	/** Все типы проката */
+	case ALL = 'ALL';
+
 	/** Кинотеатральный прокат */
 	case CINEMA = 'CINEMA';
 
@@ -43,6 +46,15 @@ enum DistributionType: string {
 
 	/** Стриминговый прокат */
 	case STREAMING = 'STREAMING';
+
+	/** Страновой прокат */
+	case COUNTRY_SPECIFIC = 'COUNTRY_SPECIFIC';
+
+	/** Премьерный прокат */
+	case PREMIERE = 'PREMIERE';
+
+	/** Мировая премьера */
+	case WORLD_PREMIER = 'WORLD_PREMIER';
 
 	/**
 	 * Проверяет, является ли прокат кинотеатральным
@@ -105,12 +117,16 @@ enum DistributionType: string {
 	 */
 	public function getDisplayName(): string {
 		return match ($this) {
-			self::CINEMA    => 'Кинотеатральный прокат',
-			self::DVD       => 'DVD прокат',
-			self::BLURAY    => 'Blu-ray прокат',
-			self::DIGITAL   => 'Цифровой прокат',
-			self::TV        => 'Телевизионный прокат',
-			self::STREAMING => 'Стриминговый прокат',
+			self::ALL              => 'Все типы проката',
+			self::CINEMA           => 'Кинотеатральный прокат',
+			self::DVD              => 'DVD прокат',
+			self::BLURAY           => 'Blu-ray прокат',
+			self::DIGITAL          => 'Цифровой прокат',
+			self::TV               => 'Телевизионный прокат',
+			self::STREAMING        => 'Стриминговый прокат',
+			self::COUNTRY_SPECIFIC => 'Страновой прокат',
+			self::PREMIERE         => 'Премьерный прокат',
+			self::WORLD_PREMIER    => 'Мировая премьера',
 		};
 	}
 

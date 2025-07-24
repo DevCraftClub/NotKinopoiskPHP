@@ -34,9 +34,9 @@ namespace NotKinopoisk\Enums;
  */
 enum ApiVersion: string {
 
-	case V1  = 'v1.0';
-	case V21 = 'v2.1';
-	case V22 = 'v2.2';
+	case V1   = 'v1';
+	case V2_1 = 'v2.1';
+	case V2_2 = 'v2.2';
 
 	/**
 	 * Получает массив всех доступных версий API
@@ -71,8 +71,8 @@ enum ApiVersion: string {
 		if ($values === NULL) {
 			$values = [
 				self::V1,
-				self::V21,
-				self::V22,
+				self::V2_1,
+				self::V2_2,
 			];
 		}
 

@@ -17,7 +17,6 @@ use NotKinopoisk\Exception\ResourceNotFoundException;
 use NotKinopoisk\Services\FilmService;
 use NotKinopoisk\Services\MediaService;
 use NotKinopoisk\Services\PersonService;
-use NotKinopoisk\Services\StaffService;
 use NotKinopoisk\Services\UserService;
 
 /**
@@ -34,12 +33,11 @@ use NotKinopoisk\Services\UserService;
  * - Управление HTTP клиентом
  *
  * @package NotKinopoisk
+ * @api     https://kinopoiskapiunofficial.tech
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
  * @version 1.0.0
- * @see     \NotKinopoisk\Services\PersonService
- * @see     \NotKinopoisk\Services\HttpClient
  * @api     https://kinopoiskapiunofficial.tech
  * @link    https://kinopoiskapiunofficial.tech/documentation/api
  *
@@ -68,12 +66,6 @@ class Client {
 	 * @var \NotKinopoisk\Services\PersonService
 	 */
 	public readonly PersonService $persons;
-	/**
-	 * Сервис для работы с персоналом фильмов
-	 *
-	 * @var \NotKinopoisk\Services\StaffService
-	 */
-	public readonly StaffService $staff;
 	/**
 	 * Сервис для работы с пользовательскими данными
 	 *
@@ -138,13 +130,13 @@ class Client {
 		// Автоматически загружаем .env файл, если он существует
 		$this->_loadDotenv();
 
-		$envApiKey     = getenv('KINOPOISK_API_KEY');
+		$envApiKey     = $_ENV['KINOPOISK_API_KEY'] ?? getenv('KINOPOISK_API_KEY');
 		$this->_apiKey = $apiKey ?? ($envApiKey !== FALSE ? $envApiKey : NULL);
 		if (!$this->_apiKey) {
 			throw new InvalidArgumentException('API ключ не передан и не найден в переменной окружения KINOPOISK_API_KEY');
 		}
 
-		$baseUrl = getenv('KINOPOISK_API_BASE_URL');
+		$baseUrl = $_ENV['KINOPOISK_API_BASE_URL'] ?? getenv('KINOPOISK_API_BASE_URL');
 		if ($baseUrl !== FALSE) {
 			$this->_baseUrl = $baseUrl;
 		}
@@ -164,7 +156,6 @@ class Client {
 		// Инициализация сервисов
 		$this->films   = new FilmService($this);
 		$this->persons = new PersonService($this);
-		$this->staff   = new StaffService($this);
 		$this->users   = new UserService($this);
 		$this->media   = new MediaService($this);
 	}
@@ -288,22 +279,17 @@ class Client {
 			}
 			$statusCode = $response->getStatusCode();
 
-			switch ($statusCode) {
-				case 401:
-					throw new InvalidApiKeyException('Неверный или отсутствующий API ключ');
-				case 402:
-					throw new RateLimitException('Превышен лимит запросов (дневной или общий)');
-				case 404:
-					throw new ResourceNotFoundException('Запрашиваемый ресурс не найден');
-				case 429:
-					throw new RateLimitException('Слишком много запросов. Превышен лимит запросов в секунду');
-				default:
-					throw new ApiException(
-						'HTTP ошибка ' . $statusCode . ': ' . $e->getMessage(),
-						$statusCode,
-						$e,
-					);
-			}
+			throw match ($statusCode) {
+				401     => new InvalidApiKeyException('Неверный или отсутствующий API ключ'),
+				402     => new RateLimitException('Превышен лимит запросов (дневной или общий)'),
+				404     => new ResourceNotFoundException('Запрашиваемый ресурс не найден'),
+				429     => new RateLimitException('Слишком много запросов. Превышен лимит запросов в секунду'),
+				default => new ApiException(
+					'HTTP ошибка ' . $statusCode . ': ' . $e->getMessage(),
+					$statusCode,
+					$e,
+				),
+			};
 		}
 
 		throw new ApiException('Ошибка сети: ' . $e->getMessage(), 0, $e);

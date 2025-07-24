@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Services;
 
+use NotKinopoisk\Enums\ApiVersion;
 use NotKinopoisk\Models\MediaPost;
+use NotKinopoisk\Responses\DefaultResponse;
 use NotKinopoisk\Responses\PaginatedResponse;
 
 /**

@@ -18,7 +18,7 @@ class MediaServiceTest extends TestCase
 
     public function testGetPosts(): void
     {
-        $posts = self::$client->media->getByFilmId(301);
-        $this->assertIsArray($posts);
+        $posts = self::$client->media->getPosts();
+        $this->assertIsArray($posts->items);
     }
 } 

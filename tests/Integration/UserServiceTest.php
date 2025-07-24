@@ -18,12 +18,17 @@ class UserServiceTest extends TestCase
 
     public function testGetApiKeyInfo(): void
     {
-        $apiKey = getenv('KINOPOISK_API_KEY');
-        if ($apiKey === false) {
-            $this->markTestSkipped('API ключ не найден в переменных окружения');
-        }
+        $apiKey = $_ENV['KINOPOISK_API_KEY'] ?? getenv('KINOPOISK_API_KEY');
         $info = self::$client->users->getApiKeyInfo($apiKey);
         $this->assertNotEmpty($info->accountType);
         $this->assertGreaterThanOrEqual(0, $info->totalQuota->used);
+    }
+
+    public function testGetVotes(): void
+    {
+        // Используем тестовый ID пользователя
+        $votes = self::$client->users->getVotes(1);
+        $this->assertInstanceOf(\NotKinopoisk\Responses\PaginatedResponse::class, $votes);
+        $this->assertIsArray($votes->items);
     }
 } 

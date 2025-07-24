@@ -39,115 +39,7 @@ use NotKinopoisk\Models\Staff;
  * $staffArray = $staffResponse->toArray();
  * ```
  */
-class MovieStaffResponse implements ResponseInterface {
-
-	/**
-	 * Конструктор ответа со списком сотрудников
-	 *
-	 * Создает новый экземпляр ответа с массивом объектов сотрудников.
-	 * Принимает готовый массив объектов Staff, полученный после валидации и преобразования.
-	 *
-	 * @param \NotKinopoisk\Models\Staff[] $staff Массив объектов сотрудников фильма
-	 *
-	 * @example
-	 * ```php
-	 * $staffObjects = [new Staff(...), new Staff(...)];
-	 * $response = new MovieStaffResponse($staffObjects);
-	 * ```
-	 */
-	public function __construct(public array $staff) {}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * Создает экземпляр ответа из массива данных API с валидацией целевого класса.
-	 * Выполняет проверку существования и совместимости указанного класса,
-	 * затем преобразует каждый элемент массива staff в объект указанного класса.
-	 *
-	 * @param array  $data Массив данных от API, должен содержать ключ 'staff' с массивом данных сотрудников
-	 * @param string $cls  Полное имя класса для преобразования элементов (обычно Staff::class)
-	 *
-	 * @return MovieStaffResponse Новый экземпляр с преобразованными данными о сотрудниках
-	 *
-	 * @throws \NotKinopoisk\Exception\KpValidationException Если указанный класс не существует
-	 * @throws \NotKinopoisk\Exception\KpValidationException Если класс не имеет статического метода fromArray
-	 * @throws \NotKinopoisk\Exception\KpValidationException Если метод fromArray не является статическим
-	 *
-	 * @example
-	 * ```php
-	 * $apiData = [
-	 *     'staff' => [
-	 *         ['nameRu' => 'Иван Иванов', 'professionKey' => 'ACTOR'],
-	 *         ['nameRu' => 'Петр Петров', 'professionKey' => 'DIRECTOR']
-	 *     ]
-	 * ];
-	 * $response = MovieStaffResponse::fromArray($apiData, Staff::class);
-	 * ```
-	 */
-	public static function fromArray(array $data, string $cls): MovieStaffResponse {
-		self::checkClass($cls);
-		return new self(array_map(fn(array $itemData) => $cls::fromArray($itemData), $data['staff']?? []));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * Проверяет существование класса и наличие статического метода fromArray.
-	 * Выполняет полную валидацию указанного класса для использования в преобразовании
-	 * элементов ответа, включая проверку статичности метода через рефлексию.
-	 *
-	 * @param string $cls Полное имя класса для проверки
-	 *
-	 * @return void
-	 *
-	 * @throws \NotKinopoisk\Exception\KpValidationException Если указанный класс не существует
-	 * @throws \NotKinopoisk\Exception\KpValidationException Если класс не имеет статического метода fromArray
-	 * @throws \NotKinopoisk\Exception\KpValidationException Если метод fromArray не является статическим
-	 * @throws \ReflectionException При ошибке создания объекта рефлексии
-	 *
-	 * @example
-	 * ```php
-	 * MovieStaffResponse::checkClass(Staff::class); // Успешная проверка
-	 * MovieStaffResponse::checkClass('NonExistentClass'); // Исключение
-	 * ```
-	 */
-	public static function checkClass(string $cls): void {
-		if (!class_exists($cls)) {
-			throw new KpValidationException("Указанный класс не существует: {$cls}");
-		}
-
-		if (!method_exists($cls, 'fromArray')) {
-			throw new KpValidationException("Класс {$cls} не имеет статического метода fromArray");
-		}
-
-		$reflection = new \ReflectionMethod($cls, 'fromArray');
-		if (!$reflection->isStatic()) {
-			throw new KpValidationException("Метод fromArray в классе {$cls} должен быть статическим");
-		}
-	}
-
-	/**
-	 * Преобразует объект ответа в массив данных
-	 *
-	 * Конвертирует каждый объект Staff в массив с помощью метода toArray(),
-	 * создавая полное представление данных о сотрудниках в виде массива.
-	 * Полезен для сериализации, кэширования или передачи данных.
-	 *
-	 * @return array Массив массивов, представляющих данные каждого сотрудника
-	 *
-	 * @example
-	 * ```php
-	 * $staffResponse = MovieStaffResponse::fromArray($apiData, Staff::class);
-	 * $arrayData = $staffResponse->toArray();
-	 * // [
-	 * //     ['nameRu' => 'Иван Иванов', 'professionKey' => 'ACTOR', ...],
-	 * //     ['nameRu' => 'Петр Петров', 'professionKey' => 'DIRECTOR', ...]
-	 * // ]
-	 * ```
-	 */
-	public function toArray(): array {
-		return array_map(fn(Staff $staff) => $staff->toArray(), $this->staff);
-	}
+class MovieStaffResponse extends SimpleResponse {
 
 	/**
 	 * Получает список актеров из съемочной команды
@@ -166,7 +58,7 @@ class MovieStaffResponse implements ResponseInterface {
 	 * ```
 	 */
 	public function getActors(): array {
-		return array_filter($this->staff, static fn(Staff $staff) => $staff->professionKey->isActor());
+		return array_filter($this->items, static fn(Staff $staff) => $staff->professionKey->isActor());
 	}
 
 	/**
@@ -186,7 +78,7 @@ class MovieStaffResponse implements ResponseInterface {
 	 * ```
 	 */
 	public function getWriters(): array {
-        return array_filter($this->staff, static fn(Staff $staff) => $staff->professionKey->isWriter());
+        return array_filter($this->items, static fn(Staff $staff) => $staff->professionKey->isWriter());
     }
 
 	/**
@@ -206,7 +98,7 @@ class MovieStaffResponse implements ResponseInterface {
 	 * ```
 	 */
 	public function getDirectors(): array {
-        return array_filter($this->staff, static fn(Staff $staff) => $staff->professionKey->isDirector());
+        return array_filter($this->items, static fn(Staff $staff) => $staff->professionKey->isDirector());
     }
 
 	/**
@@ -226,7 +118,7 @@ class MovieStaffResponse implements ResponseInterface {
 	 * ```
 	 */
 	public function getProducers(): array {
-		return array_filter($this->staff, static fn(Staff $staff) => $staff->professionKey->isProducer());
+		return array_filter($this->items, static fn(Staff $staff) => $staff->professionKey->isProducer());
 	}
 
 	/**
@@ -246,7 +138,7 @@ class MovieStaffResponse implements ResponseInterface {
 	 * ```
 	 */
 	public function getCompositors(): array {
-		return array_filter($this->staff, static fn(Staff $staff) => $staff->professionKey->isComposer());
+		return array_filter($this->items, static fn(Staff $staff) => $staff->professionKey->isComposer());
 	}
 
 	/**
@@ -266,7 +158,7 @@ class MovieStaffResponse implements ResponseInterface {
 	 * ```
 	 */
 	public function getEditors(): array {
-		return array_filter($this->staff, static fn(Staff $staff) => $staff->professionKey->isEditor());
+		return array_filter($this->items, static fn(Staff $staff) => $staff->professionKey->isEditor());
 	}
 
 	/**
@@ -286,7 +178,7 @@ class MovieStaffResponse implements ResponseInterface {
 	 * ```
 	 */
 	public function getDesigners(): array {
-		return array_filter($this->staff, static fn(Staff $staff) => $staff->professionKey->isDesigner());
+		return array_filter($this->items, static fn(Staff $staff) => $staff->professionKey->isDesigner());
 	}
 
 }

@@ -155,20 +155,17 @@ class DefaultResponse implements ResponseInterface {
 	 * @throws KpValidationException Если данные имеют неверный формат
 	 */
 	private static function validateApiData(array $data): void {
-		if (!array_key_exists('total', $data)) {
-			throw new KpValidationException('Отсутствует обязательное поле "total" в данных API');
-		}
-
 		if (!array_key_exists('items', $data)) {
 			throw new KpValidationException('Отсутствует обязательное поле "items" в данных API');
 		}
 
-		if (!is_int($data['total']) || $data['total'] < 0) {
-			throw new KpValidationException('Поле "total" должно быть неотрицательным целым числом');
-		}
-
 		if (!is_array($data['items'])) {
 			throw new KpValidationException('Поле "items" должно быть массивом');
+		}
+
+		// total может отсутствовать, в этом случае используем count(items)
+		if (array_key_exists('total', $data) && (!is_int($data['total']) || $data['total'] < 0)) {
+			throw new KpValidationException('Поле "total" должно быть неотрицательным целым числом');
 		}
 	}
 

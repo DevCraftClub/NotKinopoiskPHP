@@ -48,44 +48,31 @@ use NotKinopoisk\Interfaces\ModelInterface;
 class BoxOffice implements ModelInterface {
 
 	/**
-	 * Конструктор модели кассовых сборов
+	 * Конструктор класса
 	 *
-	 * Создает новый экземпляр кассовых сборов со всеми необходимыми данными.
-	 * Все свойства являются readonly для обеспечения неизменяемости объекта.
-	 *
-	 * @param   BoxOfficeType  $type      Тип данных (BUDGET, RUS, USA, WORLD)
-	 * @param   int            $amount    Сумма в долларах США
-	 * @param   string         $currency  Валюта (обычно USD)
-	 * @param   string         $symbol    Символ валюты ($)
-	 *
-	 * @example
-	 * ```php
-	 * $boxOffice = new BoxOffice(
-	 *     type: BoxOfficeType::BUDGET,
-	 *     amount: 100000000,
-	 *     currency: 'USD',
-	 *     symbol: '$'
-	 * );
-	 * ```
+	 * @param   \NotKinopoisk\Enums\BoxOfficeType  $type      Тип кассовых сборов (бюджет, сборы и т.д.)
+	 * @param   int                                 $amount    Сумма в минимальных единицах валюты
+	 * @param   string|null                         $currency  Код валюты (USD, EUR, RUB и т.д.)
+	 * @param   string                              $symbol    Символ валюты для отображения
 	 */
 	public function __construct(
 		public readonly BoxOfficeType $type,
 		public readonly int           $amount,
-		public readonly string        $currency,
+		public readonly ?string       $currency,
 		public readonly string        $symbol,
 	) {}
 
 	/**
-	 * Создает экземпляр кассовых сборов из массива данных API
+	 * Создает объект кассовых сборов из массива данных API
 	 *
-	 * Статический метод для удобного создания объекта BoxOffice из данных,
-	 * полученных от Kinopoisk API.
+	 * Преобразует массив данных, полученный от API, в объект BoxOffice.
+	 * Автоматически обрабатывает все необходимые поля и преобразования типов.
 	 *
-	 * @param   array  $data  Массив данных кассовых сборов от API
+	 * @param   array  $data  Массив данных от API
 	 *
-	 * @return self Новый экземпляр кассовых сборов
+	 * @return static Новый объект кассовых сборов
 	 *
-	 * @throws \InvalidArgumentException Если данные имеют неверный формат
+	 * @throws \ValueError Если тип кассовых сборов не поддерживается
 	 *
 	 * @example
 	 * ```php
@@ -103,7 +90,7 @@ class BoxOffice implements ModelInterface {
 		return new self(
 			type    : BoxOfficeType::from($data['type']),
 			amount  : $data['amount'],
-			currency: $data['currency'],
+			currency: $data['currency'] ?? null,
 			symbol  : $data['symbol'],
 		);
 	}

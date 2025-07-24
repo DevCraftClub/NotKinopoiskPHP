@@ -39,8 +39,15 @@ class ClientTest extends TestCase
         
         $this->assertInstanceOf(\NotKinopoisk\Services\FilmService::class, $client->films);
         $this->assertInstanceOf(\NotKinopoisk\Services\PersonService::class, $client->persons);
-        $this->assertInstanceOf(\NotKinopoisk\Services\StaffService::class, $client->staff);
         $this->assertInstanceOf(\NotKinopoisk\Services\UserService::class, $client->users);
         $this->assertInstanceOf(\NotKinopoisk\Services\MediaService::class, $client->media);
+    }
+
+    public function testSetBaseUrl(): void
+    {
+        $client = new Client('test-api-key');
+        $client->setBaseUrl('https://test-api.example.com');
+        
+        $this->assertEquals('https://test-api.example.com', $client->getBaseUrl());
     }
 } 

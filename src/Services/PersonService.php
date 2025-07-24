@@ -6,7 +6,6 @@ namespace NotKinopoisk\Services;
 
 use NotKinopoisk\Models\Person;
 use NotKinopoisk\Models\PersonByNameResult;
-use NotKinopoisk\Models\PersonSearchResult;
 use NotKinopoisk\Models\Staff;
 use NotKinopoisk\Responses\MovieStaffResponse;
 use NotKinopoisk\Responses\PaginatedResponse;
@@ -30,7 +29,6 @@ use NotKinopoisk\Responses\PaginatedResponse;
  * @author  Maxim Harder <dev@devcraft.club>
  * @version 1.0.0
  * @see     \NotKinopoisk\Models\Person
- * @see     \NotKinopoisk\Models\PersonSearchResult
  * @see     \NotKinopoisk\Services\HttpClient
  *
  * @example
@@ -56,7 +54,7 @@ class PersonService extends AbstractService {
 	 *
 	 * @param   string  $name  Имя или часть имени для поиска
 	 *
-	 * @return \NotKinopoisk\Models\PersonSearchResult Результат поиска персон
+	 * @return PaginatedResponse Результат поиска персон
 	 *
 	 * @throws \NotKinopoisk\Exception\ApiException При ошибках API
 	 *
@@ -71,13 +69,13 @@ class PersonService extends AbstractService {
 	 * ```
 	 */
 	public function searchByName(string $name, int $page = 1): PaginatedResponse {
-		$data = $this->get($this->buildUri("persons"), [
+		$data               = $this->get($this->buildUri("persons"), [
 			'name' => $name,
 		]);
+		$data['totalPages'] = 2;
 
 		$response              = PaginatedResponse::fromArray($data, PersonByNameResult::class);
 		$response->currentPage = $page;
-		$response->totalPages  = 2;
 
 		return $response;
 	}
