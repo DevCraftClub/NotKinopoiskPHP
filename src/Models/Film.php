@@ -369,7 +369,7 @@ class Film implements ModelInterface {
 		$hours   = floor($this->filmLength / 60);
 		$minutes = $this->filmLength % 60;
 
-		return sprintf('%02d:%02d:00', $hours, $minutes);
+		return sprintf('%0d:%02d:00', $hours, $minutes);
 	}
 
 	/**
