@@ -1,6 +1,6 @@
 <?php
 
-namespace NotKinopoisk\Responses;
+namespace NotKinopoisk\Interfaces;
 
 /**
  * Интерфейс для объектов ответов Kinopoisk API
