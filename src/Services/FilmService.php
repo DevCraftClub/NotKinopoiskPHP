@@ -205,6 +205,8 @@ class FilmService extends AbstractService {
 	 * READ операция - извлекает информацию о прокате фильма в различных странах,
 	 * включая даты премьер и ограничения по возрасту.
 	 *
+	 * @api /api/v2.2/films/{id}/distributions
+	 *
 	 * @param   int  $id  Уникальный идентификатор фильма в Кинопоиске
 	 *
 	 * @return \NotKinopoisk\Responses\DefaultResponse Массив данных о прокате
@@ -233,6 +235,8 @@ class FilmService extends AbstractService {
 	 *
 	 * READ операция - извлекает финансовую информацию о фильме:
 	 * бюджет, сборы в разных странах, рентабельность.
+	 *
+	 * @api /api/v2.2/films/{id}/box_office
 	 *
 	 * @param   int  $id  Уникальный идентификатор фильма в Кинопоиске
 	 *
@@ -263,6 +267,8 @@ class FilmService extends AbstractService {
 	 * READ операция - извлекает информацию о наградах, полученных фильмом
 	 * на различных фестивалях и церемониях.
 	 *
+	 * @api /api/v2.2/films/{id}/awards
+	 *
 	 * @param   int  $id  Уникальный идентификатор фильма в Кинопоиске
 	 *
 	 * @return \NotKinopoisk\Responses\DefaultResponse Массив наград фильма
@@ -291,6 +297,8 @@ class FilmService extends AbstractService {
 	 *
 	 * READ операция - извлекает трейлеры, тизеры и другие видео материалы,
 	 * связанные с фильмом.
+	 *
+	 * @api /api/v2.2/films/{id}/videos
 	 *
 	 * @param   int  $id  Уникальный идентификатор фильма в Кинопоиске
 	 *
@@ -321,6 +329,8 @@ class FilmService extends AbstractService {
 	 * READ операция - извлекает список фильмов, похожих на указанный,
 	 * на основе жанров, актеров и других критериев.
 	 *
+	 * @api /api/v2.2/films/{id}/similars
+	 *
 	 * @param   int  $id  Уникальный идентификатор фильма в Кинопоиске
 	 *
 	 * @return \NotKinopoisk\Responses\DefaultResponse Массив похожих фильмов
@@ -349,6 +359,8 @@ class FilmService extends AbstractService {
 	 *
 	 * READ операция - извлекает различные изображения, связанные с фильмом:
 	 * кадры, постеры, обложки, промо-материалы.
+	 *
+	 * @api /api/v2.2/films/{id}/images
 	 *
 	 * @param   int        $id    Уникальный идентификатор фильма в Кинопоиске
 	 * @param   ImageType  $type  Тип изображений
@@ -380,8 +392,9 @@ class FilmService extends AbstractService {
 			'page' => $page,
 		]);
 
-		$response = PaginatedResponse::fromArray($data, Image::class);
+		$response              = PaginatedResponse::fromArray($data, Image::class);
 		$response->currentPage = $page;
+
 		return $response;
 	}
 
@@ -391,12 +404,13 @@ class FilmService extends AbstractService {
 	 * READ операция - извлекает пользовательские отзывы и рецензии
 	 * на фильм с возможностью сортировки и пагинации.
 	 *
+	 * @api /api/v2.2/films/{id}/reviews
+	 *
 	 * @param   int                              $id     Уникальный идентификатор фильма в Кинопоиске
 	 * @param   int                              $page   Номер страницы для пагинации
 	 * @param   \NotKinopoisk\Enums\ReviewOrder  $order  Порядок сортировки отзывов
 	 *
 	 * @return \NotKinopoisk\Responses\PaginatedResponse Массив отзывов
-	 *
 	 * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
 	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
 	 * @throws \NotKinopoisk\Exception\RateLimitException
@@ -422,8 +436,9 @@ class FilmService extends AbstractService {
 			'order' => $order->value,
 		]);
 
-		$response = PaginatedResponse::fromArray($data, Review::class);
+		$response              = PaginatedResponse::fromArray($data, Review::class);
 		$response->currentPage = $page;
+
 		return $response;
 	}
 
@@ -432,6 +447,8 @@ class FilmService extends AbstractService {
 	 *
 	 * READ операция - извлекает отзывы и рецензии на фильм из внешних
 	 * источников (другие сайты, блоги, СМИ).
+	 *
+	 * @api /api/v2.2/films/{id}/external_sources
 	 *
 	 * @param   int  $id    Уникальный идентификатор фильма в Кинопоиске
 	 * @param   int  $page  Номер страницы для пагинации
@@ -458,8 +475,9 @@ class FilmService extends AbstractService {
 			'page' => $page,
 		]);
 
-		$response = PaginatedResponse::fromArray($data, ExternalSource::class);
+		$response              = PaginatedResponse::fromArray($data, ExternalSource::class);
 		$response->currentPage = $page;
+
 		return $response;
 	}
 
@@ -468,6 +486,8 @@ class FilmService extends AbstractService {
 	 *
 	 * READ операция - извлекает информацию о связанных фильмах:
 	 * сиквелах, приквелах, ремейках и других частях франшизы.
+	 *
+	 * @api /api/v2.1/films/{id}/sequels_and_prequels
 	 *
 	 * @param   int  $id  Уникальный идентификатор фильма в Кинопоиске
 	 *
@@ -489,14 +509,17 @@ class FilmService extends AbstractService {
 	 */
 	public function getSequelsAndPrequels(int $id): DefaultResponse {
 		$data = $this->get($this->buildUri("films/{$id}/sequels_and_prequels", ApiVersion::V21));
+
 		return DefaultResponse::fromArray($data, RelatedFilm::class);
 	}
 
 	/**
 	 * Поиск фильмов по ключевым словам
 	 *
-	 * CREATE операция - создает поисковый запрос по ключевым словам.
+	 * Создает поисковый запрос по ключевым словам.
 	 * Возвращает коллекцию фильмов, соответствующих поисковому запросу.
+	 *
+	 * @api /api/v2.1/films/search-by-keyword
 	 *
 	 * @param   string  $keyword  Ключевые слова для поиска
 	 * @param   int     $page     Номер страницы для пагинации
@@ -526,45 +549,7 @@ class FilmService extends AbstractService {
 
 		$data = $this->get($this->buildUri('films/search-by-keyword', ApiVersion::V21), $filters);
 
-		$response = KeywordSearchResponse::fromArray($data, FilmSearchResult::class);
-		$response->currentPage = $page;
-		return $response;
-	}
-
-	/**
-	 * Получает коллекции фильмов
-	 *
-	 * READ операция - извлекает предустановленные коллекции фильмов:
-	 * популярные, топ-250, новинки и другие подборки.
-	 *
-	 * @param   CollectionType  $type  Тип коллекции
-	 * @param   int             $page  Номер страницы для пагинации
-	 *
-	 * @return \NotKinopoisk\Responses\PaginatedResponse Коллекция фильмов
-	 *
-	 * @throws \NotKinopoisk\Exception\ApiException При ошибках API
-	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
-	 * @throws \NotKinopoisk\Exception\KpValidationException
-	 * @throws \NotKinopoisk\Exception\RateLimitException
-	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException
-	 * @example
-	 * ```php
-	 * // Получение топ-250 фильмов
-	 * $top250 = $filmService->getCollections('TOP_250_MOVIES');
-	 *
-	 * // Получение популярных сериалов
-	 * $popularSeries = $filmService->getCollections('TOP_POPULAR_SERIES');
-	 *
-	 * echo "В коллекции: {$top250->getCount()} фильмов\n";
-	 * ```
-	 */
-	public function getCollections(CollectionType $type = CollectionType::TOP_POPULAR_ALL, int $page = 1): PaginatedResponse {
-		$data = $this->get($this->buildUri("films/collections"), [
-			'type' => $type->value,
-			'page' => $page,
-		]);
-
-		$response = PaginatedResponse::fromArray($data, FilmCollection::class);
+		$response              = KeywordSearchResponse::fromArray($data, FilmSearchResult::class);
 		$response->currentPage = $page;
 
 		return $response;
@@ -575,6 +560,9 @@ class FilmService extends AbstractService {
 	 *
 	 * READ операция - извлекает информацию о премьерах фильмов
 	 * в указанном году и месяце.
+	 *
+	 * @api /api/v2.1/films/search-by-keyword
+	 *
 	 *
 	 * @param   int                        $year   Год премьер
 	 * @param   \NotKinopoisk\Enums\Month  $month  Месяц премьер
@@ -609,8 +597,9 @@ class FilmService extends AbstractService {
 	 * READ операция - извлекает доступные фильтры для поиска фильмов:
 	 * жанры, страны, годы и другие параметры.
 	 *
-	 * @return \NotKinopoisk\Models\Filters Объект с доступными фильтрами
+	 * @api /api/v2.2/films/filters
 	 *
+	 * @return \NotKinopoisk\Models\Filters Объект с доступными фильтрами
 	 * @throws \NotKinopoisk\Exception\ApiException При ошибках API
 	 *
 	 * @example
@@ -640,10 +629,11 @@ class FilmService extends AbstractService {
 	 * READ операция - извлекает список популярных фильмов
 	 * с возможностью пагинации.
 	 *
+	 * @api /api/v2.2/films/collections
+	 *
 	 * @param   int  $page  Номер страницы для пагинации
 	 *
 	 * @return \NotKinopoisk\Responses\PaginatedResponse Коллекция популярных фильмов
-	 *
 	 * @throws \NotKinopoisk\Exception\ApiException|\NotKinopoisk\Exception\KpValidationException При ошибках API
 	 *
 	 * @example
@@ -661,10 +651,52 @@ class FilmService extends AbstractService {
 	}
 
 	/**
+	 * Получает коллекции фильмов
+	 *
+	 * READ операция - извлекает предустановленные коллекции фильмов:
+	 * популярные, топ-250, новинки и другие подборки.
+	 *
+	 * @api /api/v2.2/films/collections
+	 *
+	 * @param   CollectionType  $type  Тип коллекции
+	 * @param   int             $page  Номер страницы для пагинации
+	 *
+	 * @return \NotKinopoisk\Responses\PaginatedResponse Коллекция фильмов
+	 * @throws \NotKinopoisk\Exception\ApiException При ошибках API
+	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
+	 * @throws \NotKinopoisk\Exception\KpValidationException
+	 * @throws \NotKinopoisk\Exception\RateLimitException
+	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException
+	 * @example
+	 * ```php
+	 * // Получение топ-250 фильмов
+	 * $top250 = $filmService->getCollections('TOP_250_MOVIES');
+	 *
+	 * // Получение популярных сериалов
+	 * $popularSeries = $filmService->getCollections('TOP_POPULAR_SERIES');
+	 *
+	 * echo "В коллекции: {$top250->getCount()} фильмов\n";
+	 * ```
+	 */
+	public function getCollections(CollectionType $type = CollectionType::TOP_POPULAR_ALL, int $page = 1): PaginatedResponse {
+		$data = $this->get($this->buildUri("films/collections"), [
+			'type' => $type->value,
+			'page' => $page,
+		]);
+
+		$response              = PaginatedResponse::fromArray($data, FilmCollection::class);
+		$response->currentPage = $page;
+
+		return $response;
+	}
+
+	/**
 	 * Получает топ-250 фильмов
 	 *
 	 * READ операция - извлекает список топ-250 фильмов по версии Кинопоиска
 	 * с возможностью пагинации.
+	 *
+	 * @api /api/v2.2/films/collections
 	 *
 	 * @param   int  $page  Номер страницы для пагинации
 	 *
@@ -683,36 +715,75 @@ class FilmService extends AbstractService {
 	 * ```
 	 */
 	public function getTop250(int $page = 1): PaginatedResponse {
-
 		return $this->getCollections(CollectionType::TOP_250_MOVIES, $page);
 	}
 
-
 	/**
-	 * @api /api/v2.2/films
+	 * Поиск фильмов по фильтрам через Kinopoisk API
 	 *
-	 * @param   array|null                       $country
-	 * @param   array|null                       $genre
-	 * @param   \NotKinopoisk\Enums\FilmOrder    $order
-	 * @param   \NotKinopoisk\Enums\ContentType  $type
-	 * @param   float                             $ratingFrom
-	 * @param   float                             $ratingTo
-	 * @param   int                              $yearFrom
-	 * @param   int                              $yearTo
-	 * @param   string|null                      $imdbId
-	 * @param   string|null                      $keyword
-	 * @param   int                              $page
+	 * Выполняет поиск фильмов с возможностью применения различных фильтров:
+	 * страны, жанры, рейтинг, год выпуска, тип контента и другие параметры.
+	 * Возвращает пагинированный результат с коллекцией найденных фильмов.
 	 *
-	 * @return \NotKinopoisk\Responses\PaginatedResponse
-	 * @throws \NotKinopoisk\Exception\KpValidationException
+	 * Метод выполняет валидацию входных параметров и генерирует исключения
+	 * при некорректных значениях. Поддерживает множественный выбор стран
+	 * и жанров через массивы объектов.
+	 *
+	 * @api     /api/v2.2/films
+	 * @since   1.0.0
+	 *
+	 * @see     \NotKinopoisk\Models\FilmCollection
+	 * @see     \NotKinopoisk\Enums\FilmOrder
+	 * @see     \NotKinopoisk\Enums\ContentType
+	 * @see     \NotKinopoisk\Responses\PaginatedResponse
+	 *
+	 * @param   array|null                       $country     Массив объектов стран для фильтрации или null для всех стран
+	 * @param   array|null                       $genre       Массив объектов жанров для фильтрации или null для всех жанров
+	 * @param   \NotKinopoisk\Enums\FilmOrder    $order       Порядок сортировки результатов (по умолчанию RATING)
+	 * @param   \NotKinopoisk\Enums\ContentType  $type        Тип контента для фильтрации (по умолчанию ALL)
+	 * @param   float                            $ratingFrom  Минимальный рейтинг фильмов (от 0 до 10, по умолчанию 0)
+	 * @param   float                            $ratingTo    Максимальный рейтинг фильмов (от 0 до 10, по умолчанию 10)
+	 * @param   int                              $yearFrom    Начальный год выпуска (по умолчанию 1000)
+	 * @param   int                              $yearTo      Конечный год выпуска (по умолчанию 3000)
+	 * @param   string|null                      $imdbId      Идентификатор IMDb для поиска конкретного фильма или null
+	 * @param   string|null                      $keyword     Ключевое слово для поиска в названии или null
+	 * @param   int                              $page        Номер страницы результатов (начиная с 1, по умолчанию 1)
+	 *
+	 * @return  \NotKinopoisk\Responses\PaginatedResponse  Пагинированный ответ с коллекцией фильмов
+	 *
+	 * @throws  \NotKinopoisk\Exception\KpValidationException  При некорректных значениях параметров:
+	 *                                                         - ratingFrom меньше 0
+	 *                                                         - ratingTo больше 10
+	 *                                                         - page меньше 1
+	 *
+	 * @example
+	 * ```php
+	 * // Поиск российских драм с высоким рейтингом
+	 * $response = $service->searchFilmsByFilter(
+	 *     country: [$russiaCountry],
+	 *     genre: [$dramaGenre],
+	 *     ratingFrom: 7.0,
+	 *     yearFrom: 2000,
+	 *     order: FilmOrder::RATING
+	 * );
+	 *
+	 * // Поиск по ключевому слову
+	 * $response = $service->searchFilmsByFilter(
+	 *     keyword: 'Матрица',
+	 *     type: ContentType::FILM
+	 * );
+	 *
+	 * // Пагинация результатов
+	 * $secondPage = $service->searchFilmsByFilter(page: 2);
+	 * ```
 	 */
 	public function searchFilmsByFilter(
 		?array      $country = NULL,
 		?array      $genre = NULL,
 		FilmOrder   $order = FilmOrder::RATING,
 		ContentType $type = ContentType::ALL,
-		float        $ratingFrom = 0,
-		float        $ratingTo = 10,
+		float       $ratingFrom = 0,
+		float       $ratingTo = 10,
 		int         $yearFrom = 1000,
 		int         $yearTo = 3000,
 		?string     $imdbId = NULL,

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NotKinopoisk\Services;
 
 use NotKinopoisk\Models\MediaPost;
+use NotKinopoisk\Responses\PaginatedResponse;
 
 /**
  * Сервис для работы с медиа контентом в Kinopoisk API
@@ -14,8 +15,9 @@ use NotKinopoisk\Models\MediaPost;
  *
  * Основные возможности:
  * - Получение медиа постов о фильмах
- * - Работа с новостями и статьями
- * - Фильтрация по типам контента
+ * - Наследование функциональности от AbstractService
+ * - Использование API версии v1 по умолчанию
+ * - Доступ к HTTP-клиенту для выполнения запросов
  *
  * @package NotKinopoisk\Services
  * @since   1.0.0
@@ -42,34 +44,58 @@ use NotKinopoisk\Models\MediaPost;
 class MediaService extends AbstractService {
 
 	/**
-	 * Получает медиа посты о фильме
+	 * Получает список медиа-постов с поддержкой пагинации
 	 *
-	 * READ операция - извлекает новости, статьи, интервью и другие
-	 * медиа материалы, связанные с указанным фильмом.
+	 * Загружает страницу медиа-постов (новости, статьи, интервью и другой контент)
+	 * связанных с текущим фильмом или сериалом. Поддерживает постраничную навигацию
+	 * для обработки больших объемов медиа-контента.
 	 *
-	 * @param   int  $filmId  Уникальный идентификатор фильма в Кинопоиске
+	 * @api /api/v1/media_posts
 	 *
-	 * @return \NotKinopoisk\Models\MediaPost[] Массив медиа постов
+	 * @see \NotKinopoisk\Models\MediaPost Структура объекта медиа-поста
+	 * @see \NotKinopoisk\Responses\PaginatedResponse Детали пагинированного ответа
 	 *
-	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
-	 * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
+	 * @param   int  $page  Номер страницы для загрузки (начиная с 1, по умолчанию первая страница)
+	 *
+	 * @return PaginatedResponse Пагинированный ответ содержащий коллекцию медиа-постов с метаданными навигации
+	 *
+	 * @throws \NotKinopoisk\Exception\ApiException При общих ошибках API или проблемах сети
+	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException Если API ключ недействителен, заблокирован или отсутствует
+	 * @throws \NotKinopoisk\Exception\KpValidationException При некорректном номере страницы или других параметрах валидации
+	 * @throws \NotKinopoisk\Exception\RateLimitException При превышении лимитов запросов (дневных или общих)
+	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если запрашиваемая страница или ресурс не найден
 	 *
 	 * @example
 	 * ```php
-	 * $posts = $mediaService->getByFilmId(301);
+	 * // Получение первой страницы медиа-постов
+	 * $posts = $mediaService->getPosts();
 	 *
-	 * foreach ($posts as $post) {
+	 * foreach ($posts->items as $post) {
 	 *     echo "Заголовок: {$post->title}\n";
 	 *     echo "Описание: {$post->description}\n";
 	 *     echo "URL: {$post->url}\n";
-	 *     echo "Дата: {$post->date}\n";
+	 *     echo "Дата публикации: {$post->publishedAt}\n";
+	 *     echo "Изображение: {$post->imageUrl}\n";
+	 *     echo "---\n";
 	 * }
+	 *
+	 * // Пагинация
+	 * if ($posts->hasNextPage()) {
+	 *     $nextPagePosts = $mediaService->getPosts($posts->getNextPage());
+	 * }
+	 *
+	 * // Получение конкретной страницы
+	 * $secondPagePosts = $mediaService->getPosts(2);
+	 * echo "Страница {$secondPagePosts->currentPage} из {$secondPagePosts->totalPages}";
 	 * ```
 	 */
-	public function getByFilmId(int $filmId): array {
-		$data = $this->get($this->buildV1Uri("media_posts"), ['filmId' => $filmId]);
+	public function getPosts(int $page = 1): PaginatedResponse {
+		$data = $this->get($this->buildUri("media_posts"), ['page' => $page]);
 
-		return array_map(fn ($postData) => MediaPost::fromArray($postData), $data['items']);
+		$response              = PaginatedResponse::fromArray($data, MediaPost::class);
+		$response->currentPage = $page;
+
+		return $response;
 	}
 
 }

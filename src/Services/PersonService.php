@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace NotKinopoisk\Services;
 
 use NotKinopoisk\Models\Person;
+use NotKinopoisk\Models\PersonByNameResult;
 use NotKinopoisk\Models\PersonSearchResult;
+use NotKinopoisk\Models\Staff;
+use NotKinopoisk\Responses\MovieStaffResponse;
+use NotKinopoisk\Responses\PaginatedResponse;
 
 /**
  * Сервис для работы с персонами в Kinopoisk API
@@ -28,8 +32,6 @@ use NotKinopoisk\Models\PersonSearchResult;
  * @see     \NotKinopoisk\Models\Person
  * @see     \NotKinopoisk\Models\PersonSearchResult
  * @see     \NotKinopoisk\Services\HttpClient
- * @api     /api/v1/persons, /api/v1/persons/{id}
- * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/persons
  *
  * @example
  * ```php
@@ -50,6 +52,8 @@ class PersonService extends AbstractService {
 	 * CREATE операция - создает поисковый запрос для поиска персон
 	 * по имени или части имени. Возвращает список найденных персон.
 	 *
+	 * @api /api/v1/persons
+	 *
 	 * @param   string  $name  Имя или часть имени для поиска
 	 *
 	 * @return \NotKinopoisk\Models\PersonSearchResult Результат поиска персон
@@ -66,19 +70,25 @@ class PersonService extends AbstractService {
 	 * }
 	 * ```
 	 */
-	public function searchByName(string $name): PersonSearchResult {
-		$data = $this->get($this->buildV1Uri("persons"), [
+	public function searchByName(string $name, int $page = 1): PaginatedResponse {
+		$data = $this->get($this->buildUri("persons"), [
 			'name' => $name,
 		]);
 
-		return PersonSearchResult::fromArray($data);
+		$response              = PaginatedResponse::fromArray($data, PersonByNameResult::class);
+		$response->currentPage = $page;
+		$response->totalPages  = 2;
+
+		return $response;
 	}
 
 	/**
 	 * Получает детальную информацию о персоне по ID
 	 *
-	 * READ операция - извлекает полную информацию о персоне из API.
+	 * Извлекает полную информацию о персоне из API.
 	 * Включает биографию, фильмографию, награды и другие данные.
+	 *
+	 * @api /api/v1/staff/{id}
 	 *
 	 * @param   int  $id  Уникальный идентификатор персоны в Кинопоиске
 	 *
@@ -99,6 +109,57 @@ class PersonService extends AbstractService {
 		$data = $this->get($this->buildUri("staff/{$id}"));
 
 		return Person::fromArray($data);
+	}
+
+	/**
+	 * Получает персонал фильма (актеры, режиссеры и другие участники)
+	 *
+	 * Извлекает полную информацию о персонале, участвовавшем в создании фильма.
+	 * Включает актеров, режиссеров, сценаристов, продюсеров, операторов и других
+	 * участников съемочного процесса.
+	 *
+	 * Метод автоматически преобразует массив данных от API в массив объектов Staff,
+	 * предоставляя удобный интерфейс для работы с информацией о персонале.
+	 *
+	 * @api    /api/v1/staff
+	 *
+	 * @param   int  $filmId  Уникальный идентификатор фильма в Кинопоиске
+	 *
+	 * @return \NotKinopoisk\Responses\MovieStaffResponse Массив объектов персонала фильма
+	 *
+	 * @throws \NotKinopoisk\Exception\ApiException При общих ошибках API
+	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException При неверном или недействительном API ключе
+	 * @throws \NotKinopoisk\Exception\KpValidationException
+	 * @throws \NotKinopoisk\Exception\RateLimitException При превышении лимита запросов
+	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException При отсутствии фильма с указанным ID
+	 * @example
+	 * ```php
+	 * // Получение персонала фильма "Матрица" (ID: 301)
+	 * $staff = $personService->getFilmStaff(301);
+	 *
+	 * echo "Всего участников: " . count($staff) . "\n";
+	 *
+	 * foreach ($staff as $person) {
+	 *     echo "{$person->getDisplayName()} - {$person->professionText}";
+	 *
+	 *     if ($person->description) {
+	 *         echo " ({$person->description})";
+	 *     }
+	 *     echo "\n";
+	 * }
+	 *
+	 * // Фильтрация по типу профессии
+	 * $actors = array_filter($staff, fn($person) => $person->isActor());
+	 * $directors = array_filter($staff, fn($person) => $person->isDirector());
+	 *
+	 * echo "Актеров: " . count($actors) . "\n";
+	 * echo "Режиссеров: " . count($directors) . "\n";
+	 * ```
+	 */
+	public function getFilmStaff(int $filmId): MovieStaffResponse {
+		$data = $this->get($this->buildUri("staff"), ['filmId' => $filmId]);
+
+		return MovieStaffResponse::fromArray($data, Staff::class);
 	}
 
 }
