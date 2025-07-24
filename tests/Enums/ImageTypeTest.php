@@ -206,9 +206,7 @@ class ImageTypeTest extends TestCase
         ];
 
         foreach ($nonMainTypes as $type) {
-            if (!in_array($type, [ImageType::POSTER])) { // POSTER является и основным, и промо
-                $this->assertFalse($type->isMain());
-            }
+            $this->assertFalse($type->isMain());
         }
     }
 

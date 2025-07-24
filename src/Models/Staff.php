@@ -113,7 +113,7 @@ class Staff implements ModelInterface {
 	 * $staff = Staff::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			staffId       : $data['staffId'],
 			nameRu        : $data['nameRu'] ?? NULL,

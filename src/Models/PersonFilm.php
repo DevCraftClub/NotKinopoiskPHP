@@ -111,7 +111,7 @@ class PersonFilm implements ModelInterface {
 	 * $film = PersonFilm::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			filmId       : $data['filmId'],
 			nameRu       : $data['nameRu'] ?? NULL,

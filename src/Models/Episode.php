@@ -103,7 +103,7 @@ class Episode implements ModelInterface {
 	 * $episode = Episode::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			seasonNumber : $data['seasonNumber'],
 			episodeNumber: $data['episodeNumber'],

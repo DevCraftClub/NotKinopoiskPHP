@@ -62,7 +62,7 @@ class MediaPost implements ModelInterface {
 	 * $post = MediaPost::fromArray($postData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			kinopoiskId: $data['kinopoiskId'],
 			imageUrl   : $data['imageUrl'],

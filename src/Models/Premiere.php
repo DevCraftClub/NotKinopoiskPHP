@@ -119,7 +119,7 @@ class Premiere implements ModelInterface {
 	 * $premiere = Premiere::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			kinopoiskId     : $data['kinopoiskId'],
 			nameRu          : $data['nameRu'] ?? NULL,

@@ -86,7 +86,7 @@ class BoxOffice implements ModelInterface {
 	 * $boxOffice = BoxOffice::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			type    : BoxOfficeType::from($data['type']),
 			amount  : $data['amount'],

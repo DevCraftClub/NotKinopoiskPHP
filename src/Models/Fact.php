@@ -96,7 +96,7 @@ class Fact implements ModelInterface {
 	 * $fact = Fact::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			text   : $data['text'],
 			type   : FactType::from($data['type']),

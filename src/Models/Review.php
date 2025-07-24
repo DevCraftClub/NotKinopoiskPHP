@@ -110,7 +110,7 @@ class Review implements ModelInterface {
 	 * $review = Review::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			kinopoiskId   : $data['kinopoiskId'],
 			type          : ReviewType::from($data['type']),

@@ -30,6 +30,22 @@ use NotKinopoisk\Models\RelatedFilm;
 final class SequelPrequelResponse extends SimpleResponse {
 
 	/**
+	 * {@inheritdoc}
+	 *
+	 * @param   array   $data
+	 * @param   string  $cls
+	 *
+	 * @return \NotKinopoisk\Responses\SequelPrequelResponse
+	 * @throws \NotKinopoisk\Exception\KpValidationException
+	 */
+	public static function fromArray(array $data, string $cls): self {
+		$result = parent::fromArray($data, $cls);
+		return new self(
+			$result->items
+		);
+	}
+
+	/**
 	 * Получает объединённый и отсортированный список приквелов и сиквелов
 	 *
 	 * Объединяет фильмы-приквелы и сиквелы в один массив и сортирует
@@ -60,12 +76,8 @@ final class SequelPrequelResponse extends SimpleResponse {
 				return [];
 			}
 
-			// ksort модифицирует массив in-place и возвращает bool
-			if (!ksort($combined)) {
-				throw new KpValidationException(
-					message: 'Ошибка при сортировке объединённого списка фильмов',
-				);
-			}
+			// Сортируем массив по ключам
+			ksort($combined);
 
 			return $combined;
 		} catch (KpValidationException $e) {
@@ -201,9 +213,6 @@ final class SequelPrequelResponse extends SimpleResponse {
 				RelationType::SIMILAR => $this->getSimilar(),
 				RelationType::UNKNOWN => array_filter($this->items,
 					static fn (RelatedFilm $item): bool => $item->relationType === RelationType::UNKNOWN),
-				default               => throw new KpValidationException(
-					message: "Неподдерживаемый тип отношения: {$type->value}",
-				)
 			};
 		} catch (KpValidationException $e) {
 			throw $e;

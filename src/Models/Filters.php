@@ -97,7 +97,7 @@ class Filters implements ModelInterface {
 	 * $filters = Filters::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			genres   : array_map(fn ($genre) => Genre::fromArray($genre), $data['genres']),
 			countries: array_map(fn ($country) => Country::fromArray($country), $data['countries']),
@@ -120,8 +120,8 @@ class Filters implements ModelInterface {
 	 */
 	public function toArray(): array {
 		return [
-			'genres'    => array_map(fn ($genre) => $genre instanceof Genre ? $genre->toArray() : $genre, $this->genres),
-			'countries' => array_map(fn ($country) => $country instanceof Country ? $country->toArray() : $country, $this->countries),
+			'genres'    => array_map(fn ($genre) => $genre->toArray(), $this->genres),
+			'countries' => array_map(fn ($country) => $country->toArray(), $this->countries),
 		];
 	}
 

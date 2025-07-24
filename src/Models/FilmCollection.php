@@ -129,7 +129,7 @@ class FilmCollection implements ModelInterface {
 	 * $item = FilmCollectionItem::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			kinopoiskId    : $data['kinopoiskId'],
 			imdbId         : $data['imdbId'] ?? NULL,
@@ -271,8 +271,8 @@ class FilmCollection implements ModelInterface {
 			'nameRu'           => $this->nameRu,
 			'nameEn'           => $this->nameEn,
 			'nameOriginal'     => $this->nameOriginal,
-			'countries'        => array_map(fn ($country) => $country instanceof Country ? $country->toArray() : $country, $this->countries),
-			'genres'           => array_map(fn ($genre) => $genre instanceof Genre ? $genre->toArray() : $genre, $this->genres),
+			'countries'        => array_map(fn ($country) => $country->toArray(), $this->countries),
+			'genres'           => array_map(fn ($genre) => $genre->toArray(), $this->genres),
 			'ratingKinopoisk'  => $this->ratingKinopoisk,
 			'ratingImbd'       => $this->ratingImbd,
 			'year'             => $this->year,

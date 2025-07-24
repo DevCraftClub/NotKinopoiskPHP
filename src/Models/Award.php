@@ -100,7 +100,7 @@ class Award implements ModelInterface {
 	 * $award = Award::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			name          : $data['name'],
 			win           : $data['win'],

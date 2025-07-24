@@ -111,7 +111,7 @@ class PersonSpouse implements ModelInterface {
 	 * $spouse = PersonSpouse::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			personId      : $data['personId'],
 			name          : $data['name'] ?? NULL,

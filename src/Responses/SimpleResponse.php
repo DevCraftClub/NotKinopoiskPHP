@@ -11,10 +11,10 @@ class SimpleResponse implements ResponseInterface {
 	/**
 	 * @inheritDoc
 	 */
-	public static function fromArray(array $data, string $cls): static {
+	public static function fromArray(array $data, string $cls): object {
 		self::checkClass($cls);
 
-		return new static(array_map(
+		return new self(array_map(
 			static fn (array $itemData): object => $cls::fromArray($itemData),
 			$data
 		));

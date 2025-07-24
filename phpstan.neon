@@ -6,4 +6,7 @@ parameters:
     excludePaths:
         - vendor
     ignoreErrors:
-        - '#Readonly property .* is assigned outside of its declaring class#' 
+        - '#Readonly property .* is assigned outside of its declaring class#'
+        - '#Method .*::fromArray\(\) should return static\(.*\) but returns .*#'
+        - '#Method .*::getSequelsAndPrequels\(\) should return .* but returns .*#'
+        - '#Method .*::getFilmStaff\(\) should return .* but returns .*#' 

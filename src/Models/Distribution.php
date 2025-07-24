@@ -104,7 +104,7 @@ class Distribution implements ModelInterface {
 	 * $distribution = Distribution::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			type     : DistributionType::from($data['type']),
 			subType  : $data['subType'] ?? NULL,

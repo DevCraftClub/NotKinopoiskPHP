@@ -132,7 +132,7 @@ class FilmSearchResult implements ModelInterface {
 	 * $searchResult = FilmSearchResult::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			filmId           : $data['filmId'],
 			nameRu          : $data['nameRu'] ?? NULL,

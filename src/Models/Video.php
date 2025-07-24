@@ -86,7 +86,7 @@ class Video implements ModelInterface {
 	 * $video = Video::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			url : $data['url'],
 			name: $data['name'],

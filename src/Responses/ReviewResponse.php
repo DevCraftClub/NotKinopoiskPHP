@@ -17,7 +17,7 @@ class ReviewResponse extends PaginatedResponse {
 		parent::__construct($total, $items, $currentPage, $totalPages);
 	}
 
-	public static function fromArray(array $data, string $cls): static {
+	public static function fromArray(array $data, string $cls): self {
 		parent::checkClass($cls);
 
 		return new self(

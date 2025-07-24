@@ -99,7 +99,7 @@ class Genre implements ModelInterface {
 	 * $genre = Genre::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			genre: $data['genre'],
 			id   : $data['id'] ?? NULL,

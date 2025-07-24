@@ -18,90 +18,119 @@ use NotKinopoisk\Exception\KpValidationException;
  */
 class BudgetResponse extends DefaultResponse {
 
-	/**
-	 * Вычисляет общий доход от всех источников поступлений
-	 *
-	 * Суммирует суммы всех элементов бюджета, которые являются источниками
-	 * дохода (доходные статьи). Использует функциональный подход с array_reduce
-	 * для более эффективного и читаемого кода.
-	 *
-	 * @return int Общая сумма дохода в указанной валюте
-	 *
-	 * @throws \NotKinopoisk\Exception\KpValidationException Если элементы не содержат корректных данных
-	 *
-	 * @example
-	 * ```php
-	 * $budgetResponse = BudgetResponse::fromArray($apiData, BoxOffice::class);
-	 * $totalRevenue = $budgetResponse->getTotalRevenue();
-	 * echo __('Общий доход: :amount', ['amount' => $totalRevenue]);
-	 * ```
-	 */
-	public function getTotalRevenue(): int {
-		try {
-			return array_reduce(
-				array: $this->items,
-				callback: static fn(int $total, object $box): int =>
-				$box->type->isRevenue() ? $total + $box->amount : $total,
-				initial: 0
-			);
-		} catch (\TypeError $e) {
-			throw new KpValidationException(
-				'Ошибка при вычислении общего дохода: некорректная структура данных',
-				previous: $e
-			);
-		} catch (\Error $e) {
-			throw new KpValidationException(
-				"Критическая ошибка при обработке элементов бюджета: {$e->getMessage()}",
-				previous: $e
-			);
-		}
+    /**
+     * Создает экземпляр BudgetResponse из массива данных
+     *
+     * Фабричный метод для создания объекта BudgetResponse на основе данных,
+     * полученных от API. Использует родительский метод для первичной обработки
+     * данных, а затем создает специализированный экземпляр BudgetResponse
+     * с сохранением всех свойств базового ответа.
+     *
+     * @param array  $data Массив данных от API, содержащий информацию о бюджете
+     * @param string $cls  Имя класса для элементов коллекции (обычно BoxOffice::class)
+     *
+     * @return BudgetResponse Новый экземпляр BudgetResponse с данными о бюджете
+     *
+     * @throws \NotKinopoisk\Exception\KpValidationException Если данные имеют некорректную структуру
+     *
+     * @example
+     * ```php
+     * $apiData = ['total' => 5, 'items' => [...]];
+     * $budgetResponse = BudgetResponse::fromArray($apiData, BoxOffice::class);
+     * ```
+     */
+    public static function fromArray(array $data, string $cls): self {
+        $result = parent::fromArray($data, $cls);
+        return new self(
+            total: $result->total,
+            items: $result->items,
+        );
+    }
 
-	}
-	/**
-	 * Получает детализированную информацию о доходах по типам
-	 *
-	 * Возвращает массив с разбивкой доходов по типам источников
-	 * для более детального анализа финансовых показателей.
-	 *
-	 * @return array<string, int> Ассоциативный массив типов доходов и их сумм
-	 *
-	 * @example
-	 * ```php
-	 * $revenueBreakdown = $budgetResponse->getRevenueBreakdown();
-	 * foreach ($revenueBreakdown as $type => $amount) {
-	 *     echo __('Доход от :type: :amount', ['type' => $type, 'amount' => $amount]);
-	 * }
-	 * ```
-	 */
-	public function getRevenueBreakdown(): array {
-		$breakdown = [];
+    /**
+     * Вычисляет общий доход от всех источников поступлений
+     *
+     * Суммирует суммы всех элементов бюджета, которые являются источниками
+     * дохода (доходные статьи). Использует функциональный подход с array_reduce
+     * для более эффективного и читаемого кода.
+     *
+     * @return int Общая сумма дохода в указанной валюте
+     *
+     * @throws \NotKinopoisk\Exception\KpValidationException Если элементы не содержат корректных данных
+     *
+     * @example
+     * ```php
+     * $budgetResponse = BudgetResponse::fromArray($apiData, BoxOffice::class);
+     * $totalRevenue = $budgetResponse->getTotalRevenue();
+     * echo __('Общий доход: :amount', ['amount' => $totalRevenue]);
+     * ```
+     */
+    public function getTotalRevenue(): int {
+        try {
+            return array_reduce(
+                array: $this->items,
+                callback: static fn(int $total, object $box): int =>
+                $box->type->isRevenue() ? $total + $box->amount : $total,
+                initial: 0
+            );
+        } catch (\TypeError $e) {
+            throw new KpValidationException(
+                'Ошибка при вычислении общего дохода: некорректная структура данных',
+                previous: $e
+            );
+        } catch (\Error $e) {
+            throw new KpValidationException(
+                "Критическая ошибка при обработке элементов бюджета: {$e->getMessage()}",
+                previous: $e
+            );
+        }
 
-		foreach ($this->items as $box) {
-			if ($box->type->isRevenue()) {
-				$typeName = match($box->type) {
-					BoxOfficeType::RUS => 'Россия',
-					BoxOfficeType::USA => 'США',
-					BoxOfficeType::WORLD => 'Мировые сборы',
-					default => 'Неизвестный тип'
-				};
+    }
+    /**
+     * Получает детализированную информацию о доходах по типам
+     *
+     * Возвращает массив с разбивкой доходов по типам источников
+     * для более детального анализа финансовых показателей.
+     *
+     * @return array<string, int> Ассоциативный массив типов доходов и их сумм
+     *
+     * @example
+     * ```php
+     * $revenueBreakdown = $budgetResponse->getRevenueBreakdown();
+     * foreach ($revenueBreakdown as $type => $amount) {
+     *     echo __('Доход от :type: :amount', ['type' => $type, 'amount' => $amount]);
+     * }
+     * ```
+     */
+    public function getRevenueBreakdown(): array {
+        $breakdown = [];
 
-				$breakdown[$typeName] = ($breakdown[$typeName] ?? 0) + $box->amount;
-			}
-		}
+        foreach ($this->items as $box) {
+            if ($box->type->isRevenue()) {
+                $typeName = match($box->type) {
+                    BoxOfficeType::RUS => 'Россия',
+                    BoxOfficeType::USA => 'США',
+                    BoxOfficeType::WORLD => 'Мировые сборы',
+                    default => 'Неизвестный тип'
+                };
 
-		return $breakdown;
-	}
+                $breakdown[$typeName] = ($breakdown[$typeName] ?? 0) + $box->amount;
+            }
+        }
 
-	/**
-	 * Получает количество доходных статей
-	 *
-	 * @return int Количество элементов с доходными статьями
-	 */
-	public function getRevenueItemsCount(): int {
-		return count(array_filter(
-			$this->items,
-			static fn(object $box): bool => $box->type->isRevenue()
-		));
-	}
+        return $breakdown;
+    }
+
+    /**
+     * Получает количество доходных статей
+     *
+     * @return int Количество элементов с доходными статьями
+     */
+    public function getRevenueItemsCount(): int {
+        return count(array_filter(
+            $this->items,
+            static fn(object $box): bool => $box->type->isRevenue()
+        ));
+    }
 
 }

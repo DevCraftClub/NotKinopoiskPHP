@@ -99,7 +99,7 @@ class ApiKeyQouta implements ModelInterface {
 	 * $unlimitedQuota = ApiKeyQouta::fromArray($unlimitedData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			value: $data['value'],
 			used : $data['used'],

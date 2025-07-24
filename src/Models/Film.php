@@ -194,7 +194,7 @@ class Film implements ModelInterface {
 	 * $film = Film::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			kinopoiskId               : $data['kinopoiskId'],
 			kinopoiskHDId             : $data['kinopoiskHDId'] ?? NULL,
@@ -471,8 +471,8 @@ class Film implements ModelInterface {
 			'hasImax'                    => $this->hasImax,
 			'has3D'                      => $this->has3D,
 			'lastSync'                   => $this->lastSync,
-			'countries'                  => array_map(fn ($country) => $country instanceof Country ? $country->toArray() : $country, $this->countries),
-			'genres'                     => array_map(fn ($genre) => $genre instanceof Genre ? $genre->toArray() : $genre, $this->genres),
+			'countries'                  => array_map(fn ($country) => $country->toArray(), $this->countries),
+			'genres'                     => array_map(fn ($genre) => $genre->toArray(), $this->genres),
 			'startYear'                  => $this->startYear,
 			'endYear'                    => $this->endYear,
 			'serial'                     => $this->serial,

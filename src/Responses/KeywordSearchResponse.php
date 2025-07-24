@@ -18,7 +18,6 @@ use NotKinopoisk\Exception\KpValidationException;
  * - Проверка логической согласованности данных
  *
  * @package NotKinopoisk\Responses
- * @extends PaginatedResponse
  * @since   1.0.0
  * @see     \NotKinopoisk\Responses\PaginatedResponse
  * @see     \NotKinopoisk\Services\FilmService::searchByKeyword()
@@ -141,7 +140,7 @@ class KeywordSearchResponse extends PaginatedResponse {
 	 * $response = KeywordSearchResponse::fromArray($apiResponse, Film::class);
 	 * ```
 	 */
-	public static function fromArray(array $data, string $cls): static {
+	public static function fromArray(array $data, string $cls): self {
 		parent::checkClass($cls);
 
 		try {

@@ -107,7 +107,7 @@ class ExternalSource implements ModelInterface {
 	 * $externalSource = ExternalSource::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			url           : $data['url'],
 			platform      : $data['platform'],

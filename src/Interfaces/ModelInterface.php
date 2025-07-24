@@ -50,7 +50,7 @@ interface ModelInterface {
 	 *
 	 * @param   array  $data  Массив данных от API, содержащий все необходимые поля для модели
 	 *
-	 * @return static Новый экземпляр класса-реализации с данными из массива
+	 * @return self Новый экземпляр класса-реализации с данными из массива
 	 *
 	 * @throws \InvalidArgumentException Если обязательные поля отсутствуют в массиве данных
 	 * @throws \InvalidArgumentException Если данные имеют неверный тип или формат
@@ -65,7 +65,7 @@ interface ModelInterface {
 	 * $model = ConcreteModel::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static;
+	public static function fromArray(array $data): object;
 	/**
 	 * Преобразует объект модели в массив
 	 *

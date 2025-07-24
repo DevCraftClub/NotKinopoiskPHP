@@ -94,7 +94,7 @@ class ApiKeyInfo implements ModelInterface{
 	 * $apiKeyInfo = ApiKeyInfo::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			totalQuota : ApiKeyQouta::fromArray($data['totalQuota']),
 			dailyQuota : ApiKeyQouta::fromArray($data['dailyQuota']),

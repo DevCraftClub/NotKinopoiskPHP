@@ -48,7 +48,7 @@ class RelatedFilm implements ModelInterface {
 	 *
 	 * @param   array  $data  Массив данных от API
 	 *
-	 * @return self Экземпляр модели
+	 * @return RelatedFilm Экземпляр модели
 	 *
 	 * @throws \InvalidArgumentException При некорректных данных
 	 *
@@ -66,7 +66,7 @@ class RelatedFilm implements ModelInterface {
 	 * $film = RelatedFilm::fromArray($filmData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			filmId          : $data['filmId'],
 			nameRu          : $data['nameRu'] ?? NULL,

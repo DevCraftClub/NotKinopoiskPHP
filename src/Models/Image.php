@@ -82,7 +82,7 @@ class Image implements ModelInterface {
 	 * $image = Image::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			imageUrl  : $data['imageUrl'],
 			previewUrl: $data['previewUrl'],

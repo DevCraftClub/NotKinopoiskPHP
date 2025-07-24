@@ -129,7 +129,7 @@ class DefaultResponse implements ResponseInterface {
 	 * // $response->items будет содержать массив объектов Film
 	 * ```
 	 */
-	public static function fromArray(array $data, string $cls): static {
+	public static function fromArray(array $data, string $cls): self {
 		self::validateApiData($data);
 		self::checkClass($cls);
 
@@ -141,7 +141,7 @@ class DefaultResponse implements ResponseInterface {
 			),
 		};
 
-		return new static(
+		return new self(
 			total: $data['total'],
 			items: $items,
 		);

@@ -2,9 +2,6 @@
 
 namespace NotKinopoisk\Responses;
 
-use NotKinopoisk\Enums\ProfessionKey;
-use NotKinopoisk\Exception\KpValidationException;
-use NotKinopoisk\Interfaces\ResponseInterface;
 use NotKinopoisk\Models\Staff;
 
 /**
@@ -42,6 +39,22 @@ use NotKinopoisk\Models\Staff;
 class MovieStaffResponse extends SimpleResponse {
 
 	/**
+	 * {@inheritdoc}
+	 *
+	 * @param   array   $data
+	 * @param   string  $cls
+	 *
+	 * @return \NotKinopoisk\Responses\MovieStaffResponse
+	 * @throws \NotKinopoisk\Exception\KpValidationException
+	 */
+	public static function fromArray(array $data, string $cls): self {
+		$result = parent::fromArray($data, $cls);
+		return new self(
+			$result->items
+		);
+	}
+
+	/**
 	 * Получает список актеров из съемочной команды
 	 *
 	 * Фильтрует массив сотрудников, возвращая только тех, кто является актерами.
@@ -58,7 +71,7 @@ class MovieStaffResponse extends SimpleResponse {
 	 * ```
 	 */
 	public function getActors(): array {
-		return array_filter($this->items, static fn(Staff $staff) => $staff->professionKey->isActor());
+		return array_filter($this->items, static fn (Staff $staff) => $staff->professionKey->isActor());
 	}
 
 	/**
@@ -78,8 +91,8 @@ class MovieStaffResponse extends SimpleResponse {
 	 * ```
 	 */
 	public function getWriters(): array {
-        return array_filter($this->items, static fn(Staff $staff) => $staff->professionKey->isWriter());
-    }
+		return array_filter($this->items, static fn (Staff $staff) => $staff->professionKey->isWriter());
+	}
 
 	/**
 	 * Получает список режиссеров из съемочной команды
@@ -98,8 +111,8 @@ class MovieStaffResponse extends SimpleResponse {
 	 * ```
 	 */
 	public function getDirectors(): array {
-        return array_filter($this->items, static fn(Staff $staff) => $staff->professionKey->isDirector());
-    }
+		return array_filter($this->items, static fn (Staff $staff) => $staff->professionKey->isDirector());
+	}
 
 	/**
 	 * Получает список продюсеров из съемочной команды
@@ -118,7 +131,7 @@ class MovieStaffResponse extends SimpleResponse {
 	 * ```
 	 */
 	public function getProducers(): array {
-		return array_filter($this->items, static fn(Staff $staff) => $staff->professionKey->isProducer());
+		return array_filter($this->items, static fn (Staff $staff) => $staff->professionKey->isProducer());
 	}
 
 	/**
@@ -138,7 +151,7 @@ class MovieStaffResponse extends SimpleResponse {
 	 * ```
 	 */
 	public function getCompositors(): array {
-		return array_filter($this->items, static fn(Staff $staff) => $staff->professionKey->isComposer());
+		return array_filter($this->items, static fn (Staff $staff) => $staff->professionKey->isComposer());
 	}
 
 	/**
@@ -158,7 +171,7 @@ class MovieStaffResponse extends SimpleResponse {
 	 * ```
 	 */
 	public function getEditors(): array {
-		return array_filter($this->items, static fn(Staff $staff) => $staff->professionKey->isEditor());
+		return array_filter($this->items, static fn (Staff $staff) => $staff->professionKey->isEditor());
 	}
 
 	/**
@@ -178,7 +191,7 @@ class MovieStaffResponse extends SimpleResponse {
 	 * ```
 	 */
 	public function getDesigners(): array {
-		return array_filter($this->items, static fn(Staff $staff) => $staff->professionKey->isDesigner());
+		return array_filter($this->items, static fn (Staff $staff) => $staff->professionKey->isDesigner());
 	}
 
 }

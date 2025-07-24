@@ -157,7 +157,7 @@ class Person implements ModelInterface {
 	 * $person = Person::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		$spouses = [];
 		if (isset($data['spouses']) && is_array($data['spouses'])) {
 			$spouses = array_map(fn ($spouseData) => PersonSpouse::fromArray($spouseData), $data['spouses']);
@@ -236,11 +236,11 @@ class Person implements ModelInterface {
 			'age'        => $this->age,
 			'birthplace' => $this->birthplace,
 			'deathplace' => $this->deathplace,
-			'spouses'    => array_map(fn ($spouse) => $spouse instanceof PersonSpouse ? $spouse->toArray() : $spouse, $this->spouses),
+			'spouses'    => array_map(fn ($spouse) => $spouse->toArray(), $this->spouses),
 			'hasAwards'  => $this->hasAwards,
 			'profession' => $this->profession,
 			'facts'      => $this->facts,
-			'films'      => array_map(fn ($film) => $film instanceof PersonFilm ? $film->toArray() : $film, $this->films),
+			'films'      => array_map(fn ($film) => $film->toArray(), $this->films),
 			'biography'  => $this->biography,
 			'births'     => $this->births,
 			'deaths'     => $this->deaths,

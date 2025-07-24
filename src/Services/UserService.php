@@ -76,15 +76,23 @@ class UserService extends AbstractService {
 	/**
 	 * Получает оценки пользователя
 	 *
-	 * @return DefaultResponse Массив оценок пользователя
-	 * @api /api/v1/kp_users/{id}/votes
+	 * Извлекает список оценок, которые пользователь поставил фильмам.
+	 * Возвращает пагинированный список с информацией о фильмах и оценках.
+	 *
+	 * @param   int  $userId  ID пользователя
+	 * @param   int  $page    Номер страницы для пагинации
+	 *
+	 * @return \NotKinopoisk\Responses\PaginatedResponse Пагинированный список оценок пользователя
 	 *
 	 * @throws \NotKinopoisk\Exception\ApiException При ошибках API
+	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если пользователь не найден
 	 *
 	 * @example
 	 * ```php
-	 * $votes = $userService->getVotes();
-	 * foreach ($votes as $vote) {
+	 * $votes = $userService->getVotes(12345, 1);
+	 * echo "Всего оценок: {$votes->total}\n";
+	 * 
+	 * foreach ($votes->items as $vote) {
 	 *     echo "Фильм: {$vote->filmName}, Оценка: {$vote->rating}\n";
 	 * }
 	 * ```

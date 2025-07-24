@@ -94,7 +94,7 @@ class Country implements ModelInterface {
 	 * $country = Country::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			country: $data['country'],
 			id     : $data['id'] ?? NULL,

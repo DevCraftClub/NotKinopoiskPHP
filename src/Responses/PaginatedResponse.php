@@ -121,7 +121,7 @@ class PaginatedResponse extends DefaultResponse {
 	 * $response = PaginatedResponse::fromArray($apiData, Film::class);
 	 * ```
 	 */
-	public static function fromArray(array $data, string $cls): static {
+	public static function fromArray(array $data, string $cls): self {
 		static::validateApiData($data);
 		parent::checkClass($cls);
 
@@ -131,7 +131,7 @@ class PaginatedResponse extends DefaultResponse {
 				array   : $data['items'] ?? [],
 			);
 
-			return new static(
+			return new self(
 				total      : (int) $data['total'],
 				items      : $items,
 				currentPage: (int) ($data['current_page'] ?? $data['page'] ?? 1),

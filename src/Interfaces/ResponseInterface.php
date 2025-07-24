@@ -32,14 +32,14 @@ interface ResponseInterface {
 	 * @param   array   $data  Массив данных от API, содержащий структуру ответа
 	 * @param   string  $cls   Полное имя класса для преобразования элементов массива
 	 *
-	 * @return static Новый экземпляр класса-реализации с преобразованными данными
+	 * @return self Новый экземпляр класса-реализации с преобразованными данными
 	 *
 	 * @throws \NotKinopoisk\Exception\KpValidationException Если указанный класс не существует
 	 * @throws \NotKinopoisk\Exception\KpValidationException Если класс не имеет метода fromArray
 	 * @throws \NotKinopoisk\Exception\KpValidationException Если данные имеют неверный формат
 	 *
 	 */
-	public static function fromArray(array $data, string $cls): self;
+	public static function fromArray(array $data, string $cls): object;
 
 	/**
 	 * Проверяет существование и совместимость класса

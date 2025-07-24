@@ -91,7 +91,7 @@ class Season implements ModelInterface {
 	 * $season = Season::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): static {
+	public static function fromArray(array $data): self {
 		return new self(
 			number  : $data['number'],
 			episodes: array_map(fn ($episodeData) => Episode::fromArray($episodeData), $data['episodes']),
