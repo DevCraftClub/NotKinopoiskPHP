@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Interfaces\ModelInterface;
+
 /**
  * Модель награды из Kinopoisk API
  *
@@ -36,7 +38,7 @@ namespace NotKinopoisk\Models;
  * echo "Победитель: " . ($award->win ? 'Да' : 'Нет');
  * ```
  */
-class Award {
+class Award implements ModelInterface {
 
 	/**
 	 * Конструктор модели награды
@@ -98,7 +100,7 @@ class Award {
 	 * $award = Award::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			name          : $data['name'],
 			win           : $data['win'],
@@ -107,6 +109,31 @@ class Award {
 			year          : $data['year'],
 			persons       : $data['persons'] ?? [],
 		);
+	}
+
+	/**
+	 * Преобразует объект награды в массив
+	 *
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
+	 *
+	 * @return array Массив с данными награды
+	 *
+	 * @example
+	 * ```php
+	 * $awardArray = $award->toArray();
+	 * echo json_encode($awardArray); // JSON представление награды
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'name' => $this->name,
+			'win' => $this->win,
+			'imageUrl' => $this->imageUrl,
+			'nominationName' => $this->nominationName,
+			'year' => $this->year,
+			'persons' => $this->persons,
+		];
 	}
 
 }

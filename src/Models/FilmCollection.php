@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NotKinopoisk\Models;
 
 use NotKinopoisk\Enums\ContentType;
+use NotKinopoisk\Interfaces\ModelInterface;
 
 /**
  * Модель элемента коллекции фильмов из Kinopoisk API
@@ -38,7 +39,7 @@ use NotKinopoisk\Enums\ContentType;
  * echo "Рейтинг: {$item->ratingKinopoisk}\n";
  * ```
  */
-class FilmCollection {
+class FilmCollection implements ModelInterface {
 
 	/**
 	 * Конструктор элемента коллекции фильмов
@@ -128,7 +129,7 @@ class FilmCollection {
 	 * $item = FilmCollectionItem::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			kinopoiskId    : $data['kinopoiskId'],
 			imdbId         : $data['imdbId'] ?? NULL,
@@ -247,6 +248,38 @@ class FilmCollection {
 		$genreNames = array_map('strval', $this->genres);
 
 		return implode(', ', array_filter($genreNames));
+	}
+
+	/**
+	 * Преобразует объект элемента коллекции фильмов в массив
+	 *
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
+	 *
+	 * @return array Массив с данными элемента коллекции
+	 *
+	 * @example
+	 * ```php
+	 * $itemArray = $item->toArray();
+	 * echo json_encode($itemArray); // JSON представление элемента коллекции
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'kinopoiskId'      => $this->kinopoiskId,
+			'imdbId'           => $this->imdbId,
+			'nameRu'           => $this->nameRu,
+			'nameEn'           => $this->nameEn,
+			'nameOriginal'     => $this->nameOriginal,
+			'countries'        => array_map(fn ($country) => $country instanceof Country ? $country->toArray() : $country, $this->countries),
+			'genres'           => array_map(fn ($genre) => $genre instanceof Genre ? $genre->toArray() : $genre, $this->genres),
+			'ratingKinopoisk'  => $this->ratingKinopoisk,
+			'ratingImbd'       => $this->ratingImbd,
+			'year'             => $this->year,
+			'type'             => $this->type->value,
+			'posterUrl'        => $this->posterUrl,
+			'posterUrlPreview' => $this->posterUrlPreview,
+		];
 	}
 
 } 

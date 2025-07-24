@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Interfaces\ModelInterface;
+
 /**
  * Модель внешнего источника из Kinopoisk API
  *
@@ -35,7 +37,7 @@ namespace NotKinopoisk\Models;
  * echo "Рейтинг: {$externalSource->positiveRating}/{$externalSource->negativeRating}";
  * ```
  */
-class ExternalSource {
+class ExternalSource implements ModelInterface {
 
 	/**
 	 * Конструктор модели внешнего источника
@@ -105,7 +107,7 @@ class ExternalSource {
 	 * $externalSource = ExternalSource::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			url           : $data['url'],
 			platform      : $data['platform'],
@@ -116,6 +118,33 @@ class ExternalSource {
 			title         : $data['title'] ?? NULL,
 			description   : $data['description'] ?? NULL,
 		);
+	}
+
+	/**
+	 * Преобразует объект внешнего источника в массив
+	 *
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
+	 *
+	 * @return array Массив с данными внешнего источника
+	 *
+	 * @example
+	 * ```php
+	 * $externalSourceArray = $externalSource->toArray();
+	 * echo json_encode($externalSourceArray); // JSON представление внешнего источника
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'url'            => $this->url,
+			'platform'       => $this->platform,
+			'logoUrl'        => $this->logoUrl,
+			'positiveRating' => $this->positiveRating,
+			'negativeRating' => $this->negativeRating,
+			'author'         => $this->author,
+			'title'          => $this->title,
+			'description'    => $this->description,
+		];
 	}
 
 }

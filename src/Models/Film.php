@@ -6,6 +6,7 @@ namespace NotKinopoisk\Models;
 
 use NotKinopoisk\Enums\ContentType;
 use NotKinopoisk\Enums\ProductionStatus;
+use NotKinopoisk\Interfaces\ModelInterface;
 
 /**
  * Модель фильма из Kinopoisk API
@@ -47,7 +48,7 @@ use NotKinopoisk\Enums\ProductionStatus;
  * $rating = $film->getMainRating(); // 8.7
  * ```
  */
-class Film {
+class Film implements ModelInterface {
 
 	/**
 	 * Конструктор модели фильма
@@ -193,7 +194,7 @@ class Film {
 	 * $film = Film::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			kinopoiskId               : $data['kinopoiskId'],
 			kinopoiskHDId             : $data['kinopoiskHDId'] ?? NULL,
@@ -414,6 +415,70 @@ class Film {
 		}
 
 		return "$hoursStr $minutesStr";
+	}
+
+	/**
+	 * Преобразует объект фильма в массив
+	 *
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
+	 *
+	 * @return array Массив с данными фильма
+	 *
+	 * @example
+	 * ```php
+	 * $filmArray = $film->toArray();
+	 * echo json_encode($filmArray); // JSON представление фильма
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'kinopoiskId'                => $this->kinopoiskId,
+			'kinopoiskHDId'              => $this->kinopoiskHDId,
+			'imdbId'                     => $this->imdbId,
+			'nameRu'                     => $this->nameRu,
+			'nameEn'                     => $this->nameEn,
+			'nameOriginal'               => $this->nameOriginal,
+			'posterUrl'                  => $this->posterUrl,
+			'posterUrlPreview'           => $this->posterUrlPreview,
+			'coverUrl'                   => $this->coverUrl,
+			'logoUrl'                    => $this->logoUrl,
+			'reviewsCount'               => $this->reviewsCount,
+			'ratingGoodReview'           => $this->ratingGoodReview,
+			'ratingGoodReviewVoteCount'  => $this->ratingGoodReviewVoteCount,
+			'ratingKinopoisk'            => $this->ratingKinopoisk,
+			'ratingKinopoiskVoteCount'   => $this->ratingKinopoiskVoteCount,
+			'ratingImdb'                 => $this->ratingImdb,
+			'ratingImdbVoteCount'        => $this->ratingImdbVoteCount,
+			'ratingFilmCritics'          => $this->ratingFilmCritics,
+			'ratingFilmCriticsVoteCount' => $this->ratingFilmCriticsVoteCount,
+			'ratingAwait'                => $this->ratingAwait,
+			'ratingAwaitCount'           => $this->ratingAwaitCount,
+			'ratingRfCritics'            => $this->ratingRfCritics,
+			'ratingRfCriticsVoteCount'   => $this->ratingRfCriticsVoteCount,
+			'webUrl'                     => $this->webUrl,
+			'year'                       => $this->year,
+			'filmLength'                  => $this->filmLength,
+			'slogan'                     => $this->slogan,
+			'description'                => $this->description,
+			'shortDescription'           => $this->shortDescription,
+			'editorAnnotation'           => $this->editorAnnotation,
+			'isTicketsAvailable'         => $this->isTicketsAvailable,
+			'productionStatus'           => $this->productionStatus?->value,
+			'type'                       => $this->type->value,
+			'ratingMpaa'                 => $this->ratingMpaa,
+			'ratingAgeLimits'            => $this->ratingAgeLimits,
+			'hasImax'                    => $this->hasImax,
+			'has3D'                      => $this->has3D,
+			'lastSync'                   => $this->lastSync,
+			'countries'                  => array_map(fn ($country) => $country instanceof Country ? $country->toArray() : $country, $this->countries),
+			'genres'                     => array_map(fn ($genre) => $genre instanceof Genre ? $genre->toArray() : $genre, $this->genres),
+			'startYear'                  => $this->startYear,
+			'endYear'                    => $this->endYear,
+			'serial'                     => $this->serial,
+			'shortFilm'                  => $this->shortFilm,
+			'completed'                  => $this->completed,
+		];
 	}
 
 }

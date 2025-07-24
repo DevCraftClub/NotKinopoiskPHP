@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Interfaces\ModelInterface;
+
 /**
  * Модель персоны из Kinopoisk API
  *
@@ -42,7 +44,7 @@ namespace NotKinopoisk\Models;
  * }
  * ```
  */
-class Person {
+class Person implements ModelInterface {
 
 	/**
 	 * Конструктор модели персоны
@@ -65,7 +67,7 @@ class Person {
 	 * @param   int|null                             $hasAwards   Наличие наград
 	 * @param   string|null                          $profession  Профессия персоны
 	 * @param   string|null                          $facts       Интересные факты
-	 * @param   \NotKinopoisk\Models\PersonFilm[]    $films        Массив информации о фильмах
+	 * @param   \NotKinopoisk\Models\PersonFilm[]    $films       Массив информации о фильмах
 	 * @param   string|null                          $biography   Биография персоны
 	 * @param   string|null                          $births      Информация о рождении
 	 * @param   string|null                          $deaths      Информация о смерти
@@ -155,7 +157,7 @@ class Person {
 	 * $person = Person::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		$spouses = [];
 		if (isset($data['spouses']) && is_array($data['spouses'])) {
 			$spouses = array_map(fn ($spouseData) => PersonSpouse::fromArray($spouseData), $data['spouses']);
@@ -205,6 +207,45 @@ class Person {
 	 */
 	public function getDisplayName(): string {
 		return $this->nameRu ?? $this->nameEn ?? 'Неизвестно';
+	}
+
+	/**
+	 * Преобразует объект персоны в массив
+	 *
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
+	 *
+	 * @return array Массив с данными персоны
+	 *
+	 * @example
+	 * ```php
+	 * $personArray = $person->toArray();
+	 * echo json_encode($personArray); // JSON представление персоны
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'personId'   => $this->personId,
+			'nameRu'     => $this->nameRu,
+			'nameEn'     => $this->nameEn,
+			'sex'        => $this->sex,
+			'posterUrl'  => $this->posterUrl,
+			'growth'     => $this->growth,
+			'birthday'   => $this->birthday,
+			'death'      => $this->death,
+			'age'        => $this->age,
+			'birthplace' => $this->birthplace,
+			'deathplace' => $this->deathplace,
+			'spouses'    => array_map(fn ($spouse) => $spouse instanceof PersonSpouse ? $spouse->toArray() : $spouse, $this->spouses),
+			'hasAwards'  => $this->hasAwards,
+			'profession' => $this->profession,
+			'facts'      => $this->facts,
+			'films'      => array_map(fn ($film) => $film instanceof PersonFilm ? $film->toArray() : $film, $this->films),
+			'biography'  => $this->biography,
+			'births'     => $this->births,
+			'deaths'     => $this->deaths,
+			'total'      => $this->total,
+		];
 	}
 
 }

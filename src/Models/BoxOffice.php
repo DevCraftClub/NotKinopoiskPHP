@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NotKinopoisk\Models;
 
 use NotKinopoisk\Enums\BoxOfficeType;
+use NotKinopoisk\Interfaces\ModelInterface;
 
 /**
  * Модель кассовых сборов из Kinopoisk API
@@ -44,7 +45,7 @@ use NotKinopoisk\Enums\BoxOfficeType;
  * }
  * ```
  */
-class BoxOffice {
+class BoxOffice implements ModelInterface {
 
 	/**
 	 * Конструктор модели кассовых сборов
@@ -98,7 +99,7 @@ class BoxOffice {
 	 * $boxOffice = BoxOffice::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			type    : BoxOfficeType::from($data['type']),
 			amount  : $data['amount'],
@@ -159,6 +160,29 @@ class BoxOffice {
 	 */
 	public function isRevenue(): bool {
 		return $this->type->isRevenue();
+	}
+
+	/**
+	 * Преобразует объект кассовых сборов в массив
+	 *
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
+	 *
+	 * @return array Массив с данными кассовых сборов
+	 *
+	 * @example
+	 * ```php
+	 * $boxOfficeArray = $boxOffice->toArray();
+	 * echo json_encode($boxOfficeArray); // JSON представление кассовых сборов
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'type'     => $this->type->value,
+			'amount'   => $this->amount,
+			'currency' => $this->currency,
+			'symbol'   => $this->symbol,
+		];
 	}
 
 }

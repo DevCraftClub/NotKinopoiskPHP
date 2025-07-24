@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NotKinopoisk\Models;
 
 use NotKinopoisk\Enums\ContentType;
+use NotKinopoisk\Interfaces\ModelInterface;
 
 /**
  * Модель пользовательского голоса
@@ -19,7 +20,7 @@ use NotKinopoisk\Enums\ContentType;
  * @version 1.0.0
  * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/kp_users/get_api_v1_kp_users__id__votes
  */
-class UserVote {
+class UserVote implements ModelInterface {
 
 	/**
 	 * Конструктор модели пользовательского голоса
@@ -83,7 +84,7 @@ class UserVote {
 	 * $vote = UserVote::fromArray($voteData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			kinopoiskId     : $data['kinopoiskId'],
 			nameRu          : $data['nameRu'] ?? NULL,
@@ -117,6 +118,52 @@ class UserVote {
 	 */
 	public function getDisplayName(): string {
 		return $this->nameRu ?? $this->nameEn ?? $this->nameOriginal ?? 'Без названия';
+	}
+
+	/**
+	 * Преобразует объект пользовательского голоса в массив
+	 *
+	 * Возвращает массив со всеми свойствами пользовательского голоса, включая
+	 * преобразованные в массивы объекты стран и жанров.
+	 *
+	 * @return array Массив данных пользовательского голоса
+	 *
+	 * @example
+	 * ```php
+	 * $array = $vote->toArray();
+	 * // [
+	 * //     'kinopoiskId' => 301,
+	 * //     'nameRu' => 'Матрица',
+	 * //     'nameEn' => 'The Matrix',
+	 * //     'nameOriginal' => 'The Matrix',
+	 * //     'countries' => [['country' => 'США']],
+	 * //     'genres' => [['genre' => 'боевик']],
+	 * //     'ratingKinopoisk' => 8.5,
+	 * //     'ratingImbd' => 8.7,
+	 * //     'year' => '1999',
+	 * //     'type' => 'FILM',
+	 * //     'posterUrl' => 'https://example.com/poster.jpg',
+	 * //     'posterUrlPreview' => 'https://example.com/poster_small.jpg',
+	 * //     'userRating' => 9
+	 * // ]
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'kinopoiskId'      => $this->kinopoiskId,
+			'nameRu'           => $this->nameRu,
+			'nameEn'           => $this->nameEn,
+			'nameOriginal'     => $this->nameOriginal,
+			'countries'        => array_map(fn ($country) => $country->toArray(), $this->countries),
+			'genres'           => array_map(fn ($genre) => $genre->toArray(), $this->genres),
+			'ratingKinopoisk'  => $this->ratingKinopoisk,
+			'ratingImbd'       => $this->ratingImbd,
+			'year'             => $this->year,
+			'type'             => $this->type->value,
+			'posterUrl'        => $this->posterUrl,
+			'posterUrlPreview' => $this->posterUrlPreview,
+			'userRating'       => $this->userRating,
+		];
 	}
 
 }

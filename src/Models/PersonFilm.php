@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NotKinopoisk\Models;
 
 use NotKinopoisk\Enums\ProfessionKey;
+use NotKinopoisk\Interfaces\ModelInterface;
 
 /**
  * Модель фильма персоны из Kinopoisk API
@@ -19,6 +20,7 @@ use NotKinopoisk\Enums\ProfessionKey;
  * - Удобные методы для работы с названиями фильмов
  *
  * @package NotKinopoisk\Models
+ * @api     /api/v1/persons/{id}
  * @since   1.0.0
  *
  * @author  Maxim Harder <dev@devcraft.club>
@@ -26,7 +28,6 @@ use NotKinopoisk\Enums\ProfessionKey;
  * @see     \NotKinopoisk\Models\Person
  * @see     \NotKinopoisk\Services\PersonService
  * @see     \NotKinopoisk\Enums\ProfessionKey
- * @api     /api/v1/persons/{id}
  * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/persons/get_api_v1_persons__id_
  *
  * @example
@@ -43,7 +44,7 @@ use NotKinopoisk\Enums\ProfessionKey;
  * }
  * ```
  */
-class PersonFilm {
+class PersonFilm implements ModelInterface {
 
 	/**
 	 * Конструктор модели фильма персоны
@@ -110,7 +111,7 @@ class PersonFilm {
 	 * $film = PersonFilm::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			filmId       : $data['filmId'],
 			nameRu       : $data['nameRu'] ?? NULL,
@@ -355,6 +356,32 @@ class PersonFilm {
 	 */
 	public function getProfessionCategory(): string {
 		return $this->professionKey->getCategory();
+	}
+
+	/**
+	 * Преобразует объект фильма персоны в массив
+	 *
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
+	 *
+	 * @return array Массив с данными фильма персоны
+	 *
+	 * @example
+	 * ```php
+	 * $filmArray = $film->toArray();
+	 * echo json_encode($filmArray); // JSON представление фильма персоны
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'filmId'        => $this->filmId,
+			'nameRu'        => $this->nameRu,
+			'nameEn'        => $this->nameEn,
+			'rating'        => $this->rating,
+			'general'       => $this->general,
+			'description'   => $this->description,
+			'professionKey' => $this->professionKey->value,
+		];
 	}
 
 } 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NotKinopoisk\Models;
 
 use NotKinopoisk\Enums\AccountType;
+use NotKinopoisk\Interfaces\ModelInterface;
 
 /**
  * Модель информации об API ключе из Kinopoisk API
@@ -93,7 +94,7 @@ class ApiKeyInfo implements ModelInterface{
 	 * $apiKeyInfo = ApiKeyInfo::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			totalQuota : ApiKeyQouta::fromArray($data['totalQuota']),
 			dailyQuota : ApiKeyQouta::fromArray($data['dailyQuota']),
@@ -154,6 +155,32 @@ class ApiKeyInfo implements ModelInterface{
 	 */
 	public function getRemainingDailyQuota(): int {
 		return $this->dailyQuota->getRemainingQuota();
+	}
+
+	/**
+	 * Преобразует объект информации об API ключе в массив
+	 *
+	 * Возвращает массив со всеми свойствами информации об API ключе, включая
+	 * преобразованные в массивы объекты квот.
+	 *
+	 * @return array Массив данных информации об API ключе
+	 *
+	 * @example
+	 * ```php
+	 * $array = $apiKeyInfo->toArray();
+	 * // [
+	 * //     'totalQuota' => ['total' => 1000, 'used' => 150],
+	 * //     'dailyQuota' => ['total' => 100, 'used' => 25],
+	 * //     'accountType' => 'FREE'
+	 * // ]
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'totalQuota'  => $this->totalQuota->toArray(),
+			'dailyQuota'  => $this->dailyQuota->toArray(),
+			'accountType' => $this->accountType->value,
+		];
 	}
 
 }

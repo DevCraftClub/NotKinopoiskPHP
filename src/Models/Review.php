@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NotKinopoisk\Models;
 
 use NotKinopoisk\Enums\ReviewType;
+use NotKinopoisk\Interfaces\ModelInterface;
 
 /**
  * Модель рецензии из Kinopoisk API
@@ -39,7 +40,7 @@ use NotKinopoisk\Enums\ReviewType;
  * echo "Рейтинг: {$review->positiveRating}/{$review->negativeRating}";
  * ```
  */
-class Review {
+class Review implements ModelInterface {
 
 	/**
 	 * Конструктор модели рецензии
@@ -109,7 +110,7 @@ class Review {
 	 * $review = Review::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			kinopoiskId   : $data['kinopoiskId'],
 			type          : ReviewType::from($data['type']),
@@ -120,6 +121,33 @@ class Review {
 			title         : $data['title'] ?? NULL,
 			description   : $data['description'],
 		);
+	}
+
+	/**
+	 * Преобразует объект рецензии в массив
+	 *
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
+	 *
+	 * @return array Массив с данными рецензии
+	 *
+	 * @example
+	 * ```php
+	 * $reviewArray = $review->toArray();
+	 * echo json_encode($reviewArray); // JSON представление рецензии
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'kinopoiskId'    => $this->kinopoiskId,
+			'type'           => $this->type->value,
+			'date'           => $this->date,
+			'positiveRating' => $this->positiveRating,
+			'negativeRating' => $this->negativeRating,
+			'author'         => $this->author,
+			'title'          => $this->title,
+			'description'    => $this->description,
+		];
 	}
 
 }

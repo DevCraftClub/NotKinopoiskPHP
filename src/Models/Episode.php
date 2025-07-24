@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Interfaces\ModelInterface;
+
 /**
  * Модель эпизода сериала из Kinopoisk API
  *
@@ -38,7 +40,7 @@ namespace NotKinopoisk\Models;
  * }
  * ```
  */
-class Episode {
+class Episode implements ModelInterface {
 
 	/**
 	 * Конструктор модели эпизода
@@ -101,7 +103,7 @@ class Episode {
 	 * $episode = Episode::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			seasonNumber : $data['seasonNumber'],
 			episodeNumber: $data['episodeNumber'],
@@ -127,6 +129,31 @@ class Episode {
 	 */
 	public function getDisplayName(): string {
 		return $this->nameRu ?? $this->nameEn ?? "Эпизод {$this->episodeNumber}";
+	}
+
+	/**
+	 * Преобразует объект эпизода в массив
+	 *
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
+	 *
+	 * @return array Массив с данными эпизода
+	 *
+	 * @example
+	 * ```php
+	 * $episodeArray = $episode->toArray();
+	 * echo json_encode($episodeArray); // JSON представление эпизода
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'seasonNumber' => $this->seasonNumber,
+			'episodeNumber' => $this->episodeNumber,
+			'nameRu' => $this->nameRu,
+			'nameEn' => $this->nameEn,
+			'synopsis' => $this->synopsis,
+			'releaseDate' => $this->releaseDate,
+		];
 	}
 
 }

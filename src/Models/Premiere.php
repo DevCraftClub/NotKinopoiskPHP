@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Interfaces\ModelInterface;
+
 /**
  * Модель премьеры из Kinopoisk API
  *
@@ -38,7 +40,7 @@ namespace NotKinopoisk\Models;
  * echo "Премьера в России: {$premiere->premiereRu}";
  * ```
  */
-class Premiere {
+class Premiere implements ModelInterface {
 
 	/**
 	 * Конструктор модели премьеры
@@ -117,7 +119,7 @@ class Premiere {
 	 * $premiere = Premiere::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			kinopoiskId     : $data['kinopoiskId'],
 			nameRu          : $data['nameRu'] ?? NULL,
@@ -147,6 +149,46 @@ class Premiere {
 	 */
 	public function getDisplayName(): string {
 		return $this->nameRu ?? $this->nameEn ?? 'Без названия';
+	}
+
+	/**
+	 * Преобразует объект премьеры в массив
+	 *
+	 * Возвращает массив со всеми свойствами премьеры, включая
+	 * преобразованные в массивы объекты стран и жанров.
+	 *
+	 * @return array Массив данных премьеры
+	 *
+	 * @example
+	 * ```php
+	 * $array = $premiere->toArray();
+	 * // [
+	 * //     'kinopoiskId' => 12345,
+	 * //     'nameRu' => 'Новый фильм',
+	 * //     'nameEn' => 'New Movie',
+	 * //     'year' => 2023,
+	 * //     'posterUrl' => 'https://...',
+	 * //     'posterUrlPreview' => 'https://...',
+	 * //     'countries' => [['country' => 'США'], ['country' => 'Великобритания']],
+	 * //     'genres' => [['genre' => 'Боевик'], ['genre' => 'Драма']],
+	 * //     'duration' => 120,
+	 * //     'premiereRu' => '2023-12-01'
+	 * // ]
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'kinopoiskId'      => $this->kinopoiskId,
+			'nameRu'           => $this->nameRu,
+			'nameEn'           => $this->nameEn,
+			'year'             => $this->year,
+			'posterUrl'        => $this->posterUrl,
+			'posterUrlPreview' => $this->posterUrlPreview,
+			'countries'        => array_map(fn ($country) => $country->toArray(), $this->countries),
+			'genres'           => array_map(fn ($genre) => $genre->toArray(), $this->genres),
+			'duration'         => $this->duration,
+			'premiereRu'       => $this->premiereRu,
+		];
 	}
 
 }

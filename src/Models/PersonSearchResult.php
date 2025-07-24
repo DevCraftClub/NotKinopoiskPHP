@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Interfaces\ModelInterface;
+
 /**
  * Модель результата поиска персон из Kinopoisk API
  *
@@ -39,7 +41,7 @@ namespace NotKinopoisk\Models;
  * }
  * ```
  */
-class PersonSearchResult {
+class PersonSearchResult implements ModelInterface {
 
 	/**
 	 * Конструктор модели результатов поиска персон
@@ -89,7 +91,7 @@ class PersonSearchResult {
 	 * $searchResult = PersonSearchResult::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			items: array_map(fn ($personData) => Person::fromArray($personData), $data['items']),
 			total: $data['total'],
@@ -130,6 +132,33 @@ class PersonSearchResult {
 	 */
 	public function isEmpty(): bool {
 		return empty($this->items);
+	}
+
+	/**
+	 * Преобразует объект результатов поиска в массив
+	 *
+	 * Возвращает массив со всеми свойствами результатов поиска, включая
+	 * преобразованные в массивы объекты персон.
+	 *
+	 * @return array Массив данных результатов поиска
+	 *
+	 * @example
+	 * ```php
+	 * $array = $searchResult->toArray();
+	 * // [
+	 * //     'items' => [
+	 * //         ['kinopoiskId' => 123, 'nameRu' => 'Актер 1', ...],
+	 * //         ['kinopoiskId' => 456, 'nameRu' => 'Актер 2', ...]
+	 * //     ],
+	 * //     'total' => 150
+	 * // ]
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'items' => array_map(fn ($person) => $person->toArray(), $this->items),
+			'total' => $this->total,
+		];
 	}
 
 }

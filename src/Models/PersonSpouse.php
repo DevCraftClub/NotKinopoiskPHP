@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Interfaces\ModelInterface;
+
 /**
  * Модель супруга персоны из Kinopoisk API
  *
@@ -38,7 +40,7 @@ namespace NotKinopoisk\Models;
  * echo $spouse->getChildrenInfo();
  * ```
  */
-class PersonSpouse {
+class PersonSpouse implements ModelInterface {
 
 	/**
 	 * Конструктор модели супруга
@@ -46,14 +48,14 @@ class PersonSpouse {
 	 * Создает новый экземпляр супруга со всеми необходимыми данными.
 	 * Все свойства являются readonly для обеспечения неизменяемости объекта.
 	 *
-	 * @param   int         $personId        Уникальный идентификатор супруга в Кинопоиске
-	 * @param   string|null $name            Имя супруга
-	 * @param   bool        $divorced        Статус развода
-	 * @param   string|null $divorcedReason  Причина развода (если применимо)
-	 * @param   string      $sex             Пол супруга
-	 * @param   int         $children        Количество детей
-	 * @param   string      $webUrl          URL страницы супруга на Кинопоиске
-	 * @param   string      $relation        Тип отношений (супруга, супруг и т.д.)
+	 * @param   int          $personId        Уникальный идентификатор супруга в Кинопоиске
+	 * @param   string|null  $name            Имя супруга
+	 * @param   bool         $divorced        Статус развода
+	 * @param   string|null  $divorcedReason  Причина развода (если применимо)
+	 * @param   string       $sex             Пол супруга
+	 * @param   int          $children        Количество детей
+	 * @param   string       $webUrl          URL страницы супруга на Кинопоиске
+	 * @param   string       $relation        Тип отношений (супруга, супруг и т.д.)
 	 *
 	 * @example
 	 * ```php
@@ -70,14 +72,14 @@ class PersonSpouse {
 	 * ```
 	 */
 	public function __construct(
-		public readonly int         $personId,
-		public readonly ?string     $name,
-		public readonly bool        $divorced,
-		public readonly ?string     $divorcedReason,
-		public readonly string      $sex,
-		public readonly int         $children,
-		public readonly string      $webUrl,
-		public readonly string      $relation,
+		public readonly int     $personId,
+		public readonly ?string $name,
+		public readonly bool    $divorced,
+		public readonly ?string $divorcedReason,
+		public readonly string  $sex,
+		public readonly int     $children,
+		public readonly string  $webUrl,
+		public readonly string  $relation,
 	) {}
 
 	/**
@@ -109,16 +111,16 @@ class PersonSpouse {
 	 * $spouse = PersonSpouse::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
-			personId       : $data['personId'],
-			name           : $data['name'] ?? null,
-			divorced       : $data['divorced'] ?? false,
-			divorcedReason : $data['divorcedReason'] ?? null,
-			sex            : $data['sex'],
-			children       : $data['children'] ?? 0,
-			webUrl         : $data['webUrl'],
-			relation       : $data['relation'],
+			personId      : $data['personId'],
+			name          : $data['name'] ?? NULL,
+			divorced      : $data['divorced'] ?? FALSE,
+			divorcedReason: $data['divorcedReason'] ?? NULL,
+			sex           : $data['sex'],
+			children      : $data['children'] ?? 0,
+			webUrl        : $data['webUrl'],
+			relation      : $data['relation'],
 		);
 	}
 
@@ -143,26 +145,6 @@ class PersonSpouse {
 	 */
 	public function isDivorced(): bool {
 		return $this->divorced;
-	}
-
-	/**
-	 * Проверяет, в браке ли супруг
-	 *
-	 * Возвращает true, если супруг в браке, и false если разведен.
-	 *
-	 * @return bool true если в браке, false если разведен
-	 *
-	 * @example
-	 * ```php
-	 * if ($spouse->isMarried()) {
-	 *     echo "В браке";
-	 * } else {
-	 *     echo "Разведен";
-	 * }
-	 * ```
-	 */
-	public function isMarried(): bool {
-		return !$this->divorced;
 	}
 
 	/**
@@ -218,6 +200,48 @@ class PersonSpouse {
 	}
 
 	/**
+	 * Получает полную информацию о браке
+	 *
+	 * Возвращает строку с полной информацией о браке, включая статус,
+	 * причину развода (если применимо) и количество детей.
+	 *
+	 * @return string Полная информация о браке
+	 *
+	 * @example
+	 * ```php
+	 * echo $spouse->getMarriageInfo();
+	 * // "В браке, 2 ребенка" или "Разведен (причина), 1 ребенок"
+	 * ```
+	 */
+	public function getMarriageInfo(): string {
+		$status   = $this->isMarried() ? 'В браке' : 'Разведен';
+		$reason   = $this->divorcedReason ? " ({$this->divorcedReason})" : '';
+		$children = $this->getChildrenInfo();
+
+		return "{$status}{$reason}, {$children}";
+	}
+
+	/**
+	 * Проверяет, в браке ли супруг
+	 *
+	 * Возвращает true, если супруг в браке, и false если разведен.
+	 *
+	 * @return bool true если в браке, false если разведен
+	 *
+	 * @example
+	 * ```php
+	 * if ($spouse->isMarried()) {
+	 *     echo "В браке";
+	 * } else {
+	 *     echo "Разведен";
+	 * }
+	 * ```
+	 */
+	public function isMarried(): bool {
+		return !$this->divorced;
+	}
+
+	/**
 	 * Получает информацию о детях в виде строки
 	 *
 	 * Возвращает строку с количеством детей или "Нет детей".
@@ -235,29 +259,35 @@ class PersonSpouse {
 		}
 
 		$word = $this->children === 1 ? 'ребенок' : ($this->children < 5 ? 'ребенка' : 'детей');
+
 		return "{$this->children} {$word}";
 	}
 
 	/**
-	 * Получает полную информацию о браке
+	 * Преобразует объект супруга в массив
 	 *
-	 * Возвращает строку с полной информацией о браке, включая статус,
-	 * причину развода (если применимо) и количество детей.
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
 	 *
-	 * @return string Полная информация о браке
+	 * @return array Массив с данными супруга
 	 *
 	 * @example
 	 * ```php
-	 * echo $spouse->getMarriageInfo();
-	 * // "В браке, 2 ребенка" или "Разведен (причина), 1 ребенок"
+	 * $spouseArray = $spouse->toArray();
+	 * echo json_encode($spouseArray); // JSON представление супруга
 	 * ```
 	 */
-	public function getMarriageInfo(): string {
-		$status = $this->isMarried() ? 'В браке' : 'Разведен';
-		$reason = $this->divorcedReason ? " ({$this->divorcedReason})" : '';
-		$children = $this->getChildrenInfo();
-
-		return "{$status}{$reason}, {$children}";
+	public function toArray(): array {
+		return [
+			'personId'       => $this->personId,
+			'name'           => $this->name,
+			'divorced'       => $this->divorced,
+			'divorcedReason' => $this->divorcedReason,
+			'sex'            => $this->sex,
+			'children'       => $this->children,
+			'webUrl'         => $this->webUrl,
+			'relation'       => $this->relation,
+		];
 	}
 
 } 

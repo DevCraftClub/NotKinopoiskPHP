@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Interfaces\ModelInterface;
+
 /**
  * Модель изображения из Kinopoisk API
  *
@@ -34,7 +36,7 @@ namespace NotKinopoisk\Models;
  * echo "Превью: {$image->previewUrl}";
  * ```
  */
-class Image {
+class Image implements ModelInterface {
 
 	/**
 	 * Конструктор модели изображения
@@ -80,11 +82,32 @@ class Image {
 	 * $image = Image::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			imageUrl  : $data['imageUrl'],
 			previewUrl: $data['previewUrl'],
 		);
+	}
+
+	/**
+	 * Преобразует объект изображения в массив
+	 *
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
+	 *
+	 * @return array Массив с данными изображения
+	 *
+	 * @example
+	 * ```php
+	 * $imageArray = $image->toArray();
+	 * echo json_encode($imageArray); // JSON представление изображения
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'imageUrl'   => $this->imageUrl,
+			'previewUrl' => $this->previewUrl,
+		];
 	}
 
 }

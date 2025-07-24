@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NotKinopoisk\Models;
 
 use NotKinopoisk\Enums\DistributionType;
+use NotKinopoisk\Interfaces\ModelInterface;
 
 /**
  * Модель данных о прокате фильма из Kinopoisk API
@@ -40,7 +41,7 @@ use NotKinopoisk\Enums\DistributionType;
  * echo "Компаний: " . count($distribution->companies);
  * ```
  */
-class Distribution {
+class Distribution implements ModelInterface {
 
 	/**
 	 * Конструктор модели проката
@@ -103,7 +104,7 @@ class Distribution {
 	 * $distribution = Distribution::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			type     : DistributionType::from($data['type']),
 			subType  : $data['subType'] ?? NULL,
@@ -112,6 +113,31 @@ class Distribution {
 			country  : isset($data['country']) ? Country::fromArray($data['country']) : NULL,
 			companies: $data['companies'] ?? [],
 		);
+	}
+
+	/**
+	 * Преобразует объект проката в массив
+	 *
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
+	 *
+	 * @return array Массив с данными проката
+	 *
+	 * @example
+	 * ```php
+	 * $distributionArray = $distribution->toArray();
+	 * echo json_encode($distributionArray); // JSON представление проката
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'type'      => $this->type->value,
+			'subType'   => $this->subType,
+			'date'      => $this->date,
+			'reRelease' => $this->reRelease,
+			'country'   => $this->country?->toArray(),
+			'companies' => $this->companies,
+		];
 	}
 
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NotKinopoisk\Models;
 
 use NotKinopoisk\Enums\RelationType;
+use NotKinopoisk\Interfaces\ModelInterface;
 
 /**
  * Модель связанного фильма
@@ -19,7 +20,7 @@ use NotKinopoisk\Enums\RelationType;
  * @version 1.0.0
  * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/films/get_api_v2_2_films__id__similars
  */
-class RelatedFilm {
+class RelatedFilm implements ModelInterface {
 
 	/**
 	 * Конструктор модели связанного фильма
@@ -65,7 +66,7 @@ class RelatedFilm {
 	 * $film = RelatedFilm::fromArray($filmData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			filmId          : $data['filmId'],
 			nameRu          : $data['nameRu'] ?? NULL,

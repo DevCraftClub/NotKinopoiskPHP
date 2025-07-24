@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Interfaces\ModelInterface;
+
 /**
  * Модель фильтров из Kinopoisk API
  *
@@ -40,7 +42,7 @@ namespace NotKinopoisk\Models;
  * }
  * ```
  */
-class Filters {
+class Filters implements ModelInterface {
 
 	/**
 	 * Конструктор модели фильтров
@@ -95,11 +97,32 @@ class Filters {
 	 * $filters = Filters::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			genres   : array_map(fn ($genre) => Genre::fromArray($genre), $data['genres']),
 			countries: array_map(fn ($country) => Country::fromArray($country), $data['countries']),
 		);
+	}
+
+	/**
+	 * Преобразует объект фильтров в массив
+	 *
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
+	 *
+	 * @return array Массив с данными фильтров
+	 *
+	 * @example
+	 * ```php
+	 * $filtersArray = $filters->toArray();
+	 * echo json_encode($filtersArray); // JSON представление фильтров
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'genres'    => array_map(fn ($genre) => $genre instanceof Genre ? $genre->toArray() : $genre, $this->genres),
+			'countries' => array_map(fn ($country) => $country instanceof Country ? $country->toArray() : $country, $this->countries),
+		];
 	}
 
 }

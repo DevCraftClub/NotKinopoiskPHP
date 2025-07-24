@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Interfaces\ModelInterface;
+
 /**
  * Модель страны из Kinopoisk API
  *
@@ -30,7 +32,7 @@ namespace NotKinopoisk\Models;
  * echo "Страна: {$country->country}";
  * ```
  */
-class Country {
+class Country implements ModelInterface {
 
 	/**
 	 * Конструктор модели страны
@@ -92,11 +94,32 @@ class Country {
 	 * $country = Country::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			country: $data['country'],
 			id     : $data['id'] ?? NULL,
 		);
+	}
+
+	/**
+	 * Преобразует объект страны в массив
+	 *
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
+	 *
+	 * @return array Массив с данными страны
+	 *
+	 * @example
+	 * ```php
+	 * $countryArray = $country->toArray();
+	 * echo json_encode($countryArray); // JSON представление страны
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'country' => $this->country,
+			'id'      => $this->id,
+		];
 	}
 
 }

@@ -27,6 +27,7 @@ class FilmCollectionItemTest extends TestCase
     {
         $item = new FilmCollection(
             kinopoiskId: 301,
+            imdbId: 'tt0133093',
             nameRu: 'Матрица',
             nameEn: 'The Matrix',
             nameOriginal: 'The Matrix',
@@ -136,6 +137,7 @@ class FilmCollectionItemTest extends TestCase
     public function testGetDisplayName(): void
     {
         $item = new FilmCollection(
+            imdbId: null,
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',
@@ -159,6 +161,7 @@ class FilmCollectionItemTest extends TestCase
     public function testGetDisplayNameWithEnglishName(): void
     {
         $item = new FilmCollection(
+            imdbId: null,
             kinopoiskId: 301,
             nameRu: null,
             nameEn: 'The Matrix',
@@ -182,6 +185,7 @@ class FilmCollectionItemTest extends TestCase
     public function testGetDisplayNameWithOriginalName(): void
     {
         $item = new FilmCollection(
+            imdbId: null,
             kinopoiskId: 301,
             nameRu: null,
             nameEn: null,
@@ -205,6 +209,7 @@ class FilmCollectionItemTest extends TestCase
     public function testGetDisplayNameWithNoName(): void
     {
         $item = new FilmCollection(
+            imdbId: null,
             kinopoiskId: 301,
             nameRu: null,
             nameEn: null,
@@ -228,6 +233,7 @@ class FilmCollectionItemTest extends TestCase
     public function testGetMainRating(): void
     {
         $item = new FilmCollection(
+            imdbId: null,
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',
@@ -251,6 +257,7 @@ class FilmCollectionItemTest extends TestCase
     public function testGetMainRatingWithImdbRating(): void
     {
         $item = new FilmCollection(
+            imdbId: null,
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',
@@ -274,6 +281,7 @@ class FilmCollectionItemTest extends TestCase
     public function testGetMainRatingWithNoRatings(): void
     {
         $item = new FilmCollection(
+            imdbId: null,
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',
@@ -297,6 +305,7 @@ class FilmCollectionItemTest extends TestCase
     public function testIsSerial(): void
     {
         $filmItem = new FilmCollection(
+            imdbId: null,
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',
@@ -312,6 +321,7 @@ class FilmCollectionItemTest extends TestCase
         );
 
         $seriesItem = new FilmCollection(
+            imdbId: null,
             kinopoiskId: 302,
             nameRu: 'Игра престолов',
             nameEn: 'Game of Thrones',
@@ -336,6 +346,7 @@ class FilmCollectionItemTest extends TestCase
     public function testGetCountriesString(): void
     {
         $item = new FilmCollection(
+            imdbId: null,
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',
@@ -362,6 +373,7 @@ class FilmCollectionItemTest extends TestCase
     public function testGetCountriesStringWithEmptyArray(): void
     {
         $item = new FilmCollection(
+            imdbId: null,
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',
@@ -385,6 +397,7 @@ class FilmCollectionItemTest extends TestCase
     public function testGetGenresString(): void
     {
         $item = new FilmCollection(
+            imdbId: null,
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',
@@ -411,6 +424,7 @@ class FilmCollectionItemTest extends TestCase
     public function testGetGenresStringWithEmptyArray(): void
     {
         $item = new FilmCollection(
+            imdbId: null,
             kinopoiskId: 301,
             nameRu: 'Матрица',
             nameEn: 'The Matrix',

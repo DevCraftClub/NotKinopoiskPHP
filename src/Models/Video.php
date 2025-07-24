@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NotKinopoisk\Models;
 
 use NotKinopoisk\Enums\VideoSite;
+use NotKinopoisk\Interfaces\ModelInterface;
 
 /**
  * Модель видео из Kinopoisk API
@@ -35,7 +36,7 @@ use NotKinopoisk\Enums\VideoSite;
  * echo "Платформа: {$video->site}";
  * ```
  */
-class Video {
+class Video implements ModelInterface {
 
 	/**
 	 * Конструктор модели видео
@@ -85,12 +86,34 @@ class Video {
 	 * $video = Video::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			url : $data['url'],
 			name: $data['name'],
 			site: VideoSite::from($data['site']),
 		);
+	}
+
+	/**
+	 * Преобразует объект видео в массив
+	 *
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
+	 *
+	 * @return array Массив с данными видео
+	 *
+	 * @example
+	 * ```php
+	 * $videoArray = $video->toArray();
+	 * echo json_encode($videoArray); // JSON представление видео
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'url'  => $this->url,
+			'name' => $this->name,
+			'site' => $this->site->value,
+		];
 	}
 
 }

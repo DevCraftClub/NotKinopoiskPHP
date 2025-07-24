@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Interfaces\ModelInterface;
+
 /**
  * Модель медиа-поста
  *
@@ -17,7 +19,7 @@ namespace NotKinopoisk\Models;
  * @version 1.0.0
  * @link    https://kinopoiskapiunofficial.tech/documentation/api/#/media_posts/get_api_v1_media_posts
  */
-class MediaPost {
+class MediaPost implements ModelInterface {
 
 	/**
 	 * Конструктор модели медиа-поста
@@ -60,7 +62,7 @@ class MediaPost {
 	 * $post = MediaPost::fromArray($postData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			kinopoiskId: $data['kinopoiskId'],
 			imageUrl   : $data['imageUrl'],
@@ -69,6 +71,31 @@ class MediaPost {
 			url        : $data['url'],
 			publishedAt: $data['publishedAt'],
 		);
+	}
+
+	/**
+	 * Преобразует объект медиа-поста в массив
+	 *
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
+	 *
+	 * @return array Массив с данными медиа-поста
+	 *
+	 * @example
+	 * ```php
+	 * $postArray = $post->toArray();
+	 * echo json_encode($postArray); // JSON представление медиа-поста
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'kinopoiskId' => $this->kinopoiskId,
+			'imageUrl'    => $this->imageUrl,
+			'title'       => $this->title,
+			'description' => $this->description,
+			'url'         => $this->url,
+			'publishedAt' => $this->publishedAt,
+		];
 	}
 
 }

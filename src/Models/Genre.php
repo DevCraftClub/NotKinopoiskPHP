@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Interfaces\ModelInterface;
+
 /**
  * Модель жанра из Kinopoisk API
  *
@@ -30,7 +32,7 @@ namespace NotKinopoisk\Models;
  * echo "Жанр: {$genre->genre}";
  * ```
  */
-class Genre {
+class Genre implements ModelInterface {
 
 	/**
 	 * Конструктор модели жанра
@@ -38,8 +40,8 @@ class Genre {
 	 * Создает новый экземпляр жанра с указанным названием.
 	 * Свойство является readonly для обеспечения неизменяемости объекта.
 	 *
-	 * @param   string  $genre  Название жанра
-	 * @param   int|null  $id    Уникальный идентификатор жанра в Кинопоиске
+	 * @param   string    $genre  Название жанра
+	 * @param   int|null  $id     Уникальный идентификатор жанра в Кинопоиске
 	 *
 	 * @example
 	 * ```php
@@ -97,11 +99,32 @@ class Genre {
 	 * $genre = Genre::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			genre: $data['genre'],
 			id   : $data['id'] ?? NULL,
 		);
+	}
+
+	/**
+	 * Преобразует объект жанра в массив
+	 *
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
+	 *
+	 * @return array Массив с данными жанра
+	 *
+	 * @example
+	 * ```php
+	 * $genreArray = $genre->toArray();
+	 * echo json_encode($genreArray); // JSON представление жанра
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'genre' => $this->genre,
+			'id'    => $this->id,
+		];
 	}
 
 }

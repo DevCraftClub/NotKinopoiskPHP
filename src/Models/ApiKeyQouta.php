@@ -2,6 +2,8 @@
 
 namespace NotKinopoisk\Models;
 
+use NotKinopoisk\Interfaces\ModelInterface;
+
 /**
  * Модель квоты API ключа из Kinopoisk API
  *
@@ -42,7 +44,7 @@ namespace NotKinopoisk\Models;
  * echo $unlimitedQuota->isQuotaExceeded(); // false
  * ```
  */
-class ApiKeyQouta {
+class ApiKeyQouta implements ModelInterface {
 
 	/**
 	 * Конструктор модели квоты API ключа
@@ -97,7 +99,7 @@ class ApiKeyQouta {
 	 * $unlimitedQuota = ApiKeyQouta::fromArray($unlimitedData);
 	 * ```
 	 */
-	public static function fromArray(array $data): ApiKeyQouta {
+	public static function fromArray(array $data): static {
 		return new self(
 			value: $data['value'],
 			used : $data['used'],
@@ -161,6 +163,29 @@ class ApiKeyQouta {
 	 */
 	public function getRemainingQuota(): int {
 		return $this->value - $this->used;
+	}
+
+	/**
+	 * Преобразует объект квоты API ключа в массив
+	 *
+	 * Возвращает массив со всеми свойствами квоты API ключа.
+	 *
+	 * @return array Массив данных квоты API ключа
+	 *
+	 * @example
+	 * ```php
+	 * $array = $quota->toArray();
+	 * // [
+	 * //     'value' => 1000,
+	 * //     'used' => 250
+	 * // ]
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'value' => $this->value,
+			'used'  => $this->used,
+		];
 	}
 
 }

@@ -26,6 +26,7 @@ class BoxOfficeTypeTest extends TestCase
         $this->assertEquals(BoxOfficeType::RUS, BoxOfficeType::from('RUS'));
         $this->assertEquals(BoxOfficeType::USA, BoxOfficeType::from('USA'));
         $this->assertEquals(BoxOfficeType::WORLD, BoxOfficeType::from('WORLD'));
+        $this->assertEquals(BoxOfficeType::MARKETING, BoxOfficeType::from('MARKETING'));
     }
 
     /**
@@ -37,6 +38,7 @@ class BoxOfficeTypeTest extends TestCase
         $this->assertEquals('RUS', BoxOfficeType::RUS->value);
         $this->assertEquals('USA', BoxOfficeType::USA->value);
         $this->assertEquals('WORLD', BoxOfficeType::WORLD->value);
+        $this->assertEquals('MARKETING', BoxOfficeType::MARKETING->value);
     }
 
     /**
@@ -48,6 +50,7 @@ class BoxOfficeTypeTest extends TestCase
         $this->assertFalse(BoxOfficeType::RUS->isBudget());
         $this->assertFalse(BoxOfficeType::USA->isBudget());
         $this->assertFalse(BoxOfficeType::WORLD->isBudget());
+        $this->assertFalse(BoxOfficeType::MARKETING->isBudget());
     }
 
     /**
@@ -59,6 +62,7 @@ class BoxOfficeTypeTest extends TestCase
         $this->assertTrue(BoxOfficeType::RUS->isRevenue());
         $this->assertTrue(BoxOfficeType::USA->isRevenue());
         $this->assertTrue(BoxOfficeType::WORLD->isRevenue());
+        $this->assertFalse(BoxOfficeType::MARKETING->isRevenue());
     }
 
     /**
@@ -70,6 +74,7 @@ class BoxOfficeTypeTest extends TestCase
         $this->assertEquals('Сборы в России', BoxOfficeType::RUS->getDisplayName());
         $this->assertEquals('Сборы в США', BoxOfficeType::USA->getDisplayName());
         $this->assertEquals('Мировые сборы', BoxOfficeType::WORLD->getDisplayName());
+        $this->assertEquals('Средства спущенные на маркетинг', BoxOfficeType::MARKETING->getDisplayName());
     }
 
     /**
@@ -105,7 +110,8 @@ class BoxOfficeTypeTest extends TestCase
             'BUDGET',
             'RUS',
             'USA',
-            'WORLD'
+            'WORLD',
+            'MARKETING'
         ];
 
         $actualValues = array_map(fn($case) => $case->value, BoxOfficeType::cases());

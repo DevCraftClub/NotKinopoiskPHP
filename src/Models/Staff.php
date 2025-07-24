@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NotKinopoisk\Models;
 
 use NotKinopoisk\Enums\ProfessionKey;
+use NotKinopoisk\Interfaces\ModelInterface;
 
 /**
  * Модель персонала фильма из Kinopoisk API
@@ -45,7 +46,7 @@ use NotKinopoisk\Enums\ProfessionKey;
  * }
  * ```
  */
-class Staff {
+class Staff implements ModelInterface {
 
 	/**
 	 * Конструктор модели персонала
@@ -112,7 +113,7 @@ class Staff {
 	 * $staff = Staff::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			staffId       : $data['staffId'],
 			nameRu        : $data['nameRu'] ?? NULL,
@@ -144,58 +145,81 @@ class Staff {
 	/**
 	 * Проверяет, является ли персонал актером
 	 *
-	 * Определяет, является ли участник съемочной группы актером
-	 * на основе ключа профессии.
+	 * Определяет, относится ли персонал к категории актеров.
 	 *
 	 * @return bool true если это актер, false в противном случае
 	 *
 	 * @example
 	 * ```php
 	 * if ($staff->isActor()) {
-	 *     echo "Роль: {$staff->description}";
+	 *     echo "Актер: {$staff->description}";
 	 * }
 	 * ```
 	 */
 	public function isActor(): bool {
-		return $this->professionKey === 'ACTOR';
+		return $this->professionKey->isActor();
 	}
 
 	/**
 	 * Проверяет, является ли персонал режиссером
 	 *
-	 * Определяет, является ли участник съемочной группы режиссером
-	 * на основе ключа профессии.
+	 * Определяет, относится ли персонал к категории режиссеров.
 	 *
 	 * @return bool true если это режиссер, false в противном случае
 	 *
 	 * @example
 	 * ```php
 	 * if ($staff->isDirector()) {
-	 *     echo "Режиссер: {$staff->getDisplayName()}";
+	 *     echo "Режиссер";
 	 * }
 	 * ```
 	 */
 	public function isDirector(): bool {
-		return $this->professionKey === 'DIRECTOR';
+		return $this->professionKey->isDirector();
 	}
 
 	/**
 	 * Проверяет, является ли персонал сценаристом
 	 *
-	 * Определяет, является ли участник съемочной группы сценаристом
-	 * на основе ключа профессии.
+	 * Определяет, относится ли персонал к категории сценаристов.
 	 *
 	 * @return bool true если это сценарист, false в противном случае
 	 *
 	 * @example
 	 * ```php
 	 * if ($staff->isWriter()) {
-	 *     echo "Сценарист: {$staff->getDisplayName()}";
+	 *     echo "Сценарист";
 	 * }
 	 * ```
 	 */
 	public function isWriter(): bool {
-		return $this->professionKey === 'WRITER';
+		return $this->professionKey->isWriter();
+	}
+
+	/**
+	 * Преобразует объект персонала в массив
+	 *
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
+	 *
+	 * @return array Массив с данными персонала
+	 *
+	 * @example
+	 * ```php
+	 * $staffArray = $staff->toArray();
+	 * echo json_encode($staffArray); // JSON представление персонала
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'staffId'        => $this->staffId,
+			'nameRu'         => $this->nameRu,
+			'nameEn'         => $this->nameEn,
+			'description'    => $this->description,
+			'posterUrl'      => $this->posterUrl,
+			'professionText' => $this->professionText,
+			'professionKey'  => $this->professionKey->value,
+		];
 	}
 
 }

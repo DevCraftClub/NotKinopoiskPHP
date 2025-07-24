@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NotKinopoisk\Models;
 
 use NotKinopoisk\Enums\FactType;
+use NotKinopoisk\Interfaces\ModelInterface;
 
 /**
  * Модель факта из Kinopoisk API
@@ -45,7 +46,7 @@ use NotKinopoisk\Enums\FactType;
  * }
  * ```
  */
-class Fact {
+class Fact implements ModelInterface {
 
 	/**
 	 * Конструктор модели факта
@@ -95,7 +96,7 @@ class Fact {
 	 * $fact = Fact::fromArray($apiData);
 	 * ```
 	 */
-	public static function fromArray(array $data): self {
+	public static function fromArray(array $data): static {
 		return new self(
 			text   : $data['text'],
 			type   : FactType::from($data['type']),
@@ -139,6 +140,28 @@ class Fact {
 	 */
 	public function isFact(): bool {
 		return $this->type->isFact();
+	}
+
+	/**
+	 * Преобразует объект факта в массив
+	 *
+	 * Возвращает все свойства объекта в виде ассоциативного массива.
+	 * Полезно для сериализации, логирования или передачи данных.
+	 *
+	 * @return array Массив с данными факта
+	 *
+	 * @example
+	 * ```php
+	 * $factArray = $fact->toArray();
+	 * echo json_encode($factArray); // JSON представление факта
+	 * ```
+	 */
+	public function toArray(): array {
+		return [
+			'text'    => $this->text,
+			'type'    => $this->type->value,
+			'spoiler' => $this->spoiler,
+		];
 	}
 
 }
