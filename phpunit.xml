@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache"
+         cacheResultFile=".phpunit.cache/test-results"
+         executionOrder="depends,defects"
+         beStrictAboutOutputDuringTests="false"
+         processIsolation="false"
+         stopOnDefect="false"
+         stopOnError="false"
+         stopOnFailure="false"
+         stopOnWarning="false"
+         stopOnIncomplete="false"
+         stopOnRisky="false"
+         stopOnSkipped="false"
+         failOnEmptyTestSuite="false"
+         failOnWarning="false"
+         failOnRisky="false"
+         extensionsDirectory="tools/phpunit.d"
+         defaultTestSuite=""
+         displayDetailsOnTestsThatTriggerDeprecations="false"
+         displayDetailsOnTestsThatTriggerErrors="false"
+         displayDetailsOnTestsThatTriggerNotices="false"
+         displayDetailsOnTestsThatTriggerWarnings="false"
+         registerMockObjectsFromTestArgumentsRecursively="false">
+  <testsuites>
+    <testsuite name="Enums">
+      <directory>tests/Enums</directory>
+    </testsuite>
+    <testsuite name="Models">
+      <directory>tests/Models</directory>
+    </testsuite>
+    <testsuite name="Unit">
+      <directory>tests</directory>
+    </testsuite>
+    <testsuite name="Integration">
+      <directory>tests/Integration</directory>
+    </testsuite>
+  </testsuites>
+
+  <coverage cacheDirectory=".phpunit.cache/code-coverage">
+    <include>
+      <directory suffix=".php">src</directory>
+    </include>
+    <exclude>
+      <directory>vendor</directory>
+      <directory>tests</directory>
+      <directory>examples</directory>
+    </exclude>
+    <report>
+      <html outputDirectory="coverage/html"/>
+      <clover outputFile="coverage/clover.xml"/>
+      <text outputFile="coverage/coverage.txt" showUncoveredFiles="false" showOnlySummary="false"/>
+    </report>
+  </coverage>
+
+  <php>
+    <env name="APP_ENV" value="testing"/>
+    <env name="CACHE_DRIVER" value="array"/>
+    <env name="SESSION_DRIVER" value="array"/>
+    <env name="QUEUE_DRIVER" value="sync"/>
+  </php>
+</phpunit> 

@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!--
+    PHP CodeSniffer configuration for NotKinopoisk project
+    
+    This configuration is designed to be compatible with PhpStorm settings:
+    - USE_TAB_CHARACTER = true (tabs for indentation)
+    - RIGHT_MARGIN = 150 (line length limit)
+    - FORCE_SHORT_DECLARATION_ARRAY_STYLE = true (short array syntax)
+    - ALIGN_* = true (aligned assignments and parameters)
+    - COMMA_AFTER_LAST_* = true (trailing commas)
+    
+    The configuration focuses on code quality and security rules
+    while ignoring formatting conflicts with PhpStorm settings.
+    
+    @author Maxim Harder <dev@devcraft.club>
+    @version 1.0.0
+-->
+<ruleset name="NotKinopoisk PHP CodeSniffer">
+    <description>PHP CodeSniffer rules for NotKinopoisk project (PhpStorm compatible)</description>
+
+    <file>src</file>
+    <file>tests</file>
+    <file>examples</file>
+
+    <exclude-pattern>vendor</exclude-pattern>
+
+    <!-- Line length settings (PhpStorm: RIGHT_MARGIN = 150) -->
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="150"/>
+            <property name="absoluteLineLimit" value="150"/>
+        </properties>
+    </rule>
+
+    <!-- PHP specific rules -->
+    <rule ref="Generic.Files.InlineHTML"/>
+    <rule ref="Generic.Files.OneClassPerFile"/>
+    <rule ref="Generic.Files.OneInterfacePerFile"/>
+    <rule ref="Generic.Files.OneTraitPerFile"/>
+    <rule ref="Generic.NamingConventions.ConstructorName"/>
+    <rule ref="Generic.NamingConventions.UpperCaseConstantName"/>
+    <rule ref="Generic.PHP.CharacterBeforePHPOpeningTag"/>
+    <!-- <rule ref="Generic.PHP.ClosingPHPTag"/> --> <!-- Allow files without closing tag -->
+    <rule ref="Generic.PHP.DeprecatedFunctions"/>
+    <rule ref="Generic.PHP.DisallowAlternativePHPTags"/>
+    <rule ref="Generic.PHP.DisallowShortOpenTag"/>
+    <rule ref="Generic.PHP.ForbiddenFunctions"/>
+    <rule ref="Generic.PHP.LowerCaseConstant"/>
+    <rule ref="Generic.PHP.LowerCaseKeyword"/>
+    <!-- <rule ref="Generic.PHP.LowerCaseType"/> --> <!-- Allow short type names (bool, int, etc.) -->
+    <rule ref="Generic.PHP.NoSilencedErrors"/>
+    <rule ref="Generic.PHP.SAPIUsage"/>
+
+    <!-- PHPDoc rules -->
+    <rule ref="Squiz.Commenting.DocCommentAlignment"/>
+    <!-- <rule ref="Squiz.Commenting.FunctionComment"/> --> <!-- Allow short type names in PHPDoc -->
+    <rule ref="Squiz.Commenting.ClassComment"/>
+    <rule ref="Squiz.Commenting.VariableComment"/>
+
+    <!-- Naming conventions -->
+    <rule ref="Squiz.NamingConventions.ValidVariableName"/>
+    <rule ref="Squiz.NamingConventions.ValidFunctionName"/>
+
+    <!-- Code quality -->
+    <rule ref="Generic.CodeAnalysis.EmptyStatement"/>
+    <rule ref="Generic.CodeAnalysis.ForLoopShouldBeWhileLoop"/>
+    <rule ref="Generic.CodeAnalysis.ForLoopWithTestFunctionCall"/>
+    <rule ref="Generic.CodeAnalysis.JumbledIncrementer"/>
+    <rule ref="Generic.CodeAnalysis.UnconditionalIfStatement"/>
+    <rule ref="Generic.CodeAnalysis.UnnecessaryFinalModifier"/>
+    <rule ref="Generic.CodeAnalysis.UnusedFunctionParameter"/>
+    <rule ref="Generic.CodeAnalysis.UselessOverridingMethod"/>
+
+    <!-- Security -->
+    <rule ref="Generic.PHP.DiscourageGoto"/>
+
+    <!-- Note: This configuration ignores formatting conflicts with PhpStorm settings -->
+    <!-- to focus on code quality and security rules instead -->
+
+</ruleset> 
