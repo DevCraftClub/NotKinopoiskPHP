@@ -3,6 +3,7 @@
 namespace NotKinopoisk\Responses;
 
 use NotKinopoisk\Exception\KpValidationException;
+use NotKinopoisk\Interfaces\ResponseInterface;
 
 /**
  * Базовый класс для ответов Kinopoisk API
@@ -22,7 +23,7 @@ use NotKinopoisk\Exception\KpValidationException;
  *
  * @author  Maxim Harder <dev@devcraft.club>
  * @version 1.0.0
- * @see     \NotKinopoisk\Responses\ResponseInterface
+ * @see     \NotKinopoisk\Interfaces\ResponseInterface
  * @see     \NotKinopoisk\Exception\KpValidationException
  *
  * @example
@@ -223,13 +224,12 @@ class DefaultResponse implements ResponseInterface {
 	/**
 	 * Преобразует ответ в массив
 	 *
-	 * @return array{total: int, items: array, count: int}
+	 * @return array{total: int, items: array}
 	 */
 	public function toArray(): array {
 		return [
 			'total' => $this->total,
-			'items' => $this->items,
-			'count' => $this->getCount(),
+			'items' => $this->items
 		];
 	}
 

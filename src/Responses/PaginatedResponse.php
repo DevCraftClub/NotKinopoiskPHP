@@ -158,7 +158,7 @@ class PaginatedResponse extends DefaultResponse {
 	 *
 	 * @throws KpValidationException При отсутствии обязательных ключей
 	 */
-	private static function validateApiData(array $data): void {
+	protected static function validateApiData(array $data): void {
 		$requiredKeys = ['total', 'total_pages', 'items'];
 		$missingKeys  = array_diff($requiredKeys, array_keys($data));
 
@@ -271,15 +271,50 @@ class PaginatedResponse extends DefaultResponse {
 		];
 	}
 
+	/**
+	 * Преобразует объект пагинированного ответа в массив
+	 *
+	 * Создает массив со всеми данными о пагинации и элементами результата.
+	 * Каждый элемент в массиве items также преобразуется в массив с помощью
+	 * вызова его метода toArray().
+	 *
+	 * @return array Массив с данными пагинации, содержащий:
+	 *               - total: общее количество элементов
+	 *               - items: массив элементов, преобразованных в массивы
+	 *               - current_page: текущая страница
+	 *               - total_pages: общее количество страниц
+	 *
+	 * @example
+	 * ```php
+	 * $paginatedResponse = new PaginatedResponse(
+	 *     items: [$film1, $film2],
+	 *     total: 150,
+	 *     currentPage: 1,
+	 *     totalPages: 15
+	 * );
+	 *
+	 * $array = $paginatedResponse->toArray();
+	 * // Результат:
+	 * // [
+	 * //     'total' => 150,
+	 * //     'items' => [
+	 * //         ['id' => 1, 'name' => 'Фильм 1', ...],
+	 * //         ['id' => 2, 'name' => 'Фильм 2', ...]
+	 * //     ],
+	 * //     'current_page' => 1,
+	 * //     'total_pages' => 15
+	 * // ]
+	 * ```
+	 */
 	public function toArray(): array {
 		return [
-			'total'       => $this->total,
-            'items'      => array_map(
-                callback: static fn (Film $film): array => $film->toArray(),
-                array   : $this->items,
-            ),
-            'current_page' => $this->currentPage,
-            'total_pages' => $this->totalPages,
+			'total'        => $this->total,
+			'items'        => array_map(
+				callback: static fn ($item): array => $item->toArray(),
+				array   : $this->items,
+			),
+			'current_page' => $this->currentPage,
+			'total_pages'  => $this->totalPages,
 		];
 	}
 

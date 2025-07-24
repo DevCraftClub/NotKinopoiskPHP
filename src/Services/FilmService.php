@@ -20,6 +20,7 @@ use NotKinopoisk\Models\ExternalSource;
 use NotKinopoisk\Models\Fact;
 use NotKinopoisk\Models\Film;
 use NotKinopoisk\Models\FilmCollection;
+use NotKinopoisk\Models\FilmSearchResult;
 use NotKinopoisk\Models\Filters;
 use NotKinopoisk\Models\Image;
 use NotKinopoisk\Models\Premiere;
@@ -29,6 +30,7 @@ use NotKinopoisk\Models\Season;
 use NotKinopoisk\Models\Video;
 use NotKinopoisk\Responses\BudgetResponse;
 use NotKinopoisk\Responses\DefaultResponse;
+use NotKinopoisk\Responses\KeywordSearchResponse;
 use NotKinopoisk\Responses\PaginatedResponse;
 
 /**
@@ -434,11 +436,13 @@ class FilmService extends AbstractService {
 	 * @param   int  $id    Уникальный идентификатор фильма в Кинопоиске
 	 * @param   int  $page  Номер страницы для пагинации
 	 *
-	 * @return \NotKinopoisk\Models\ExternalSource[] Массив внешних источников
+	 * @return \NotKinopoisk\Responses\PaginatedResponse Массив внешних источников
 	 *
-	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
 	 * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
-	 *
+	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
+	 * @throws \NotKinopoisk\Exception\RateLimitException
+	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
+	 * @throws \NotKinopoisk\Exception\KpValidationException
 	 * @example
 	 * ```php
 	 * $sources = $filmService->getExternalSources(301);
@@ -449,12 +453,14 @@ class FilmService extends AbstractService {
 	 * }
 	 * ```
 	 */
-	public function getExternalSources(int $id, int $page = 1): array {
+	public function getExternalSources(int $id, int $page = 1): PaginatedResponse {
 		$data = $this->get($this->buildUri("films/{$id}/external_sources"), [
 			'page' => $page,
 		]);
 
-		return array_map(fn ($sourceData) => ExternalSource::fromArray($sourceData), $data['items']);
+		$response = PaginatedResponse::fromArray($data, ExternalSource::class);
+		$response->currentPage = $page;
+		return $response;
 	}
 
 	/**
@@ -465,11 +471,13 @@ class FilmService extends AbstractService {
 	 *
 	 * @param   int  $id  Уникальный идентификатор фильма в Кинопоиске
 	 *
-	 * @return \NotKinopoisk\Models\RelatedFilm[] Массив связанных фильмов
+	 * @return \NotKinopoisk\Responses\DefaultResponse Массив связанных фильмов
 	 *
-	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
 	 * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
-	 *
+	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
+	 * @throws \NotKinopoisk\Exception\KpValidationException
+	 * @throws \NotKinopoisk\Exception\RateLimitException
+	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
 	 * @example
 	 * ```php
 	 * $sequels = $filmService->getSequelsAndPrequels(301);
@@ -479,10 +487,9 @@ class FilmService extends AbstractService {
 	 * }
 	 * ```
 	 */
-	public function getSequelsAndPrequels(int $id): array {
-		// Этот эндпоинт не существует в текущей версии API
-		// Возвращаем пустой массив
-		return [];
+	public function getSequelsAndPrequels(int $id): DefaultResponse {
+		$data = $this->get($this->buildUri("films/{$id}/sequels_and_prequels", ApiVersion::V21));
+		return DefaultResponse::fromArray($data, RelatedFilm::class);
 	}
 
 	/**
@@ -494,10 +501,13 @@ class FilmService extends AbstractService {
 	 * @param   string  $keyword  Ключевые слова для поиска
 	 * @param   int     $page     Номер страницы для пагинации
 	 *
-	 * @return \NotKinopoisk\Models\FilmCollection Коллекция найденных фильмов
+	 * @return \NotKinopoisk\Responses\KeywordSearchResponse Коллекция найденных фильмов
 	 *
 	 * @throws \NotKinopoisk\Exception\ApiException При ошибках API
-	 *
+	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
+	 * @throws \NotKinopoisk\Exception\KpValidationException
+	 * @throws \NotKinopoisk\Exception\RateLimitException
+	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException
 	 * @example
 	 * ```php
 	 * $results = $filmService->searchByKeyword('матрица');
@@ -508,16 +518,18 @@ class FilmService extends AbstractService {
 	 * }
 	 * ```
 	 */
-	public function searchByKeyword(string $keyword, int $page = 1): FilmCollection {
-		// Используем поиск по фильтрам с ключевым словом
+	public function searchByKeyword(string $keyword, int $page = 1): KeywordSearchResponse {
 		$filters = [
 			'keyword' => $keyword,
 			'page'    => $page,
 		];
 
-		return $this->searchByFilters($filters);
-	}
+		$data = $this->get($this->buildUri('films/search-by-keyword', ApiVersion::V21), $filters);
 
+		$response = KeywordSearchResponse::fromArray($data, FilmSearchResult::class);
+		$response->currentPage = $page;
+		return $response;
+	}
 
 	/**
 	 * Получает коллекции фильмов
@@ -528,10 +540,13 @@ class FilmService extends AbstractService {
 	 * @param   CollectionType  $type  Тип коллекции
 	 * @param   int             $page  Номер страницы для пагинации
 	 *
-	 * @return \NotKinopoisk\Models\FilmCollection Коллекция фильмов
+	 * @return \NotKinopoisk\Responses\PaginatedResponse Коллекция фильмов
 	 *
 	 * @throws \NotKinopoisk\Exception\ApiException При ошибках API
-	 *
+	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
+	 * @throws \NotKinopoisk\Exception\KpValidationException
+	 * @throws \NotKinopoisk\Exception\RateLimitException
+	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException
 	 * @example
 	 * ```php
 	 * // Получение топ-250 фильмов
@@ -543,13 +558,16 @@ class FilmService extends AbstractService {
 	 * echo "В коллекции: {$top250->getCount()} фильмов\n";
 	 * ```
 	 */
-	public function getCollections(CollectionType $type = CollectionType::TOP_POPULAR_ALL, int $page = 1): FilmCollection {
+	public function getCollections(CollectionType $type = CollectionType::TOP_POPULAR_ALL, int $page = 1): PaginatedResponse {
 		$data = $this->get($this->buildUri("films/collections"), [
 			'type' => $type->value,
 			'page' => $page,
 		]);
 
-		return FilmCollection::fromArray($data);
+		$response = PaginatedResponse::fromArray($data, FilmCollection::class);
+		$response->currentPage = $page;
+
+		return $response;
 	}
 
 	/**
@@ -561,10 +579,13 @@ class FilmService extends AbstractService {
 	 * @param   int                        $year   Год премьер
 	 * @param   \NotKinopoisk\Enums\Month  $month  Месяц премьер
 	 *
-	 * @return \NotKinopoisk\Models\Premiere[] Массив премьер
+	 * @return \NotKinopoisk\Responses\DefaultResponse Массив премьер
 	 *
 	 * @throws \NotKinopoisk\Exception\ApiException При ошибках API
-	 *
+	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
+	 * @throws \NotKinopoisk\Exception\KpValidationException
+	 * @throws \NotKinopoisk\Exception\RateLimitException
+	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException
 	 * @example
 	 * ```php
 	 * $premieres = $filmService->getPremieres(2024, Month::JUNE);
@@ -573,13 +594,13 @@ class FilmService extends AbstractService {
 	 * }
 	 * ```
 	 */
-	public function getPremieres(int $year, Month $month): array {
+	public function getPremieres(int $year, Month $month): DefaultResponse {
 		$data = $this->get($this->buildUri("films/premieres"), [
 			'year'  => $year,
 			'month' => $month->value,
 		]);
 
-		return array_map(fn ($premiereData) => Premiere::fromArray($premiereData), $data['items']);
+		return DefaultResponse::fromArray($data, Premiere::class);
 	}
 
 	/**
@@ -621,9 +642,9 @@ class FilmService extends AbstractService {
 	 *
 	 * @param   int  $page  Номер страницы для пагинации
 	 *
-	 * @return \NotKinopoisk\Models\FilmCollection Коллекция популярных фильмов
+	 * @return \NotKinopoisk\Responses\PaginatedResponse Коллекция популярных фильмов
 	 *
-	 * @throws \NotKinopoisk\Exception\ApiException При ошибках API
+	 * @throws \NotKinopoisk\Exception\ApiException|\NotKinopoisk\Exception\KpValidationException При ошибках API
 	 *
 	 * @example
 	 * ```php
@@ -635,13 +656,8 @@ class FilmService extends AbstractService {
 	 * }
 	 * ```
 	 */
-	public function getPopular(int $page = 1): FilmCollection {
-		$data = $this->get($this->buildUri("films/collections"), [
-			'type' => CollectionType::TOP_POPULAR_ALL->value,
-			'page' => $page,
-		]);
-
-		return FilmCollection::fromArray($data);
+	public function getPopular(int $page = 1): PaginatedResponse {
+		return $this->getCollections(CollectionType::TOP_POPULAR_ALL, $page);
 	}
 
 	/**
@@ -652,9 +668,9 @@ class FilmService extends AbstractService {
 	 *
 	 * @param   int  $page  Номер страницы для пагинации
 	 *
-	 * @return \NotKinopoisk\Models\FilmCollection Коллекция топ-250 фильмов
+	 * @return \NotKinopoisk\Responses\PaginatedResponse Коллекция топ-250 фильмов
 	 *
-	 * @throws \NotKinopoisk\Exception\ApiException При ошибках API
+	 * @throws \NotKinopoisk\Exception\ApiException|\NotKinopoisk\Exception\KpValidationException При ошибках API
 	 *
 	 * @example
 	 * ```php
@@ -666,45 +682,11 @@ class FilmService extends AbstractService {
 	 * }
 	 * ```
 	 */
-	public function getTop250(int $page = 1): FilmCollection {
-		$data = $this->get($this->buildUri("films/collections"), [
-			'type' => CollectionType::TOP_250_MOVIES->value,
-			'page' => $page,
-		]);
+	public function getTop250(int $page = 1): PaginatedResponse {
 
-		return FilmCollection::fromArray($data);
+		return $this->getCollections(CollectionType::TOP_250_MOVIES, $page);
 	}
 
-	/**
-	 * Получает топ-250 сериалов
-	 *
-	 * READ операция - извлекает список топ-250 сериалов по версии Кинопоиска
-	 * с возможностью пагинации.
-	 *
-	 * @param   int  $page  Номер страницы для пагинации
-	 *
-	 * @return \NotKinopoisk\Models\FilmCollection Коллекция топ-250 сериалов
-	 *
-	 * @throws \NotKinopoisk\Exception\ApiException При ошибках API
-	 *
-	 * @example
-	 * ```php
-	 * $top250Series = $filmService->getTop250Series();
-	 * echo "Топ-250 сериалов: {$top250Series->getCount()}\n";
-	 *
-	 * foreach ($top250Series->items as $series) {
-	 *     echo "- {$series->getDisplayName()} (рейтинг: {$series->ratingKinopoisk})\n";
-	 * }
-	 * ```
-	 */
-	public function getTop250Series(int $page = 1): PaginatedResponse {
-		$data = $this->get($this->buildUri("films/collections"), [
-			'type' => CollectionType::TOP_250_SERIES->value,
-			'page' => $page,
-		]);
-
-		return PaginatedResponse::fromArray($data, FilmCollection::class);
-	}
 
 	/**
 	 * @api /api/v2.2/films

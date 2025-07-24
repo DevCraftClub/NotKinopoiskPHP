@@ -140,26 +140,39 @@ abstract class AbstractService {
 	}
 
 	/**
-	 * Строит URI для API запроса версии 2.2
+	 * Строит URI для API запроса указанной версии
 	 *
-	 * Формирует полный URI для запросов к API версии 2.2, добавляя
-	 * соответствующий префикс к переданному пути.
+	 * Формирует полный URI для запросов к API, добавляя соответствующий
+	 * префикс версии к переданному пути конечной точки. Автоматически
+	 * использует версию API по умолчанию, если версия не указана явно.
 	 *
-	 * @param   string  $endpoint  Путь к ресурсу (без префикса /api/v2.2/)
+	 * @param   string       $endpoint     Путь к ресурсу API (без префикса /api/vX.X/)
+	 * @param   ApiVersion|null  $api_version  Версия API для использования; если null, используется $this->apiVersion
 	 *
-	 * @return string Полный URI для запроса к API v2.2
+	 * @return string Полный URI для запроса к указанной версии API
 	 *
 	 * @example
 	 * ```php
+	 * // Использование версии по умолчанию
 	 * $uri = $this->buildUri('films/301');
-	 * // Результат: '/api/v2.2/films/301'
+	 * // Результат: '/api/v2.2/films/301' (если $this->apiVersion = ApiVersion::V22)
 	 *
+	 * // Явное указание версии API
+	 * $uri = $this->buildUri('films/301', ApiVersion::V21);
+	 * // Результат: '/api/v2.1/films/301'
+	 *
+	 * // Автоматическое удаление ведущего слеша
 	 * $uri = $this->buildUri('/films/301');
 	 * // Результат: '/api/v2.2/films/301'
+	 *
+	 * // Работа с вложенными ресурсами
+	 * $uri = $this->buildUri('films/301/similars');
+	 * // Результат: '/api/v2.2/films/301/similars'
 	 * ```
 	 */
-	protected function buildUri(string $endpoint): string {
-		return "/api/{$this->apiVersion->value}/" . ltrim($endpoint, '/');
+	protected function buildUri(string $endpoint, ?ApiVersion $api_version = NULL): string {
+		$api_version??= $this->apiVersion;
+		return "/api/{$api_version->value}/" . ltrim($endpoint, '/');
 	}
 
 }
