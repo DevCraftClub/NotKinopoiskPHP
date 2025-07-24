@@ -56,7 +56,27 @@ interface ResponseInterface {
 	 * @throws \NotKinopoisk\Exception\KpValidationException Если класс не имеет статического метода fromArray
 	 */
 	public static function checkClass(string $cls): void;
-
+	/**
+	 * Преобразует объект в массив данных
+	 *
+	 * Метод возвращает массив, представляющий структуру объекта ответа,
+	 * который может быть использован для сериализации или передачи данных.
+	 * Полезен для отладки, логирования или создания JSON-представления ответа.
+	 *
+	 * @return array Массив данных, представляющий объект ответа
+	 *
+	 * @example
+	 * ```php
+	 * $response = SomeResponse::fromArray($apiData);
+	 * $array = $response->toArray();
+	 *
+	 * // Использование для сериализации
+	 * $json = json_encode($array);
+	 *
+	 * // Использование для логирования
+	 * $logger->info('Ответ API', $array);
+	 * ```
+	 */
 	public function toArray(): array;
 
 }
