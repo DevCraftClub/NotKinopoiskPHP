@@ -70,6 +70,11 @@ function checkApiKey() {
         echo "Использовано сегодня: " . $apiInfo->dailyQuota->used . "\n";
         echo "Осталось сегодня: " . $apiInfo->getRemainingDailyQuota() . "\n\n";
         
+        echo "⚠️  Напоминание:\n";
+        echo "• API структура обновлялась 16.10.2023\n";
+        echo "• Некоторые методы могут не возвращать актуальные данные\n";
+        echo "• НЕ путать с kinopoisk.dev\n\n";
+        
         return true;
         
     } catch (InvalidApiKeyException $e) {
@@ -100,6 +105,12 @@ function showLibraryInfo() {
     echo "• Поиск и фильтрация\n";
     echo "• Информация о персонах\n";
     echo "• Отзывы и рейтинги\n\n";
+    
+    echo "⚠️  Важные предостережения:\n";
+    echo "• API структура обновлялась 16.10.2023\n";
+    echo "• Некоторые методы могут не возвращать актуальные данные\n";
+    echo "• НЕ путать с kinopoisk.dev\n";
+    echo "• Работает с kinopoiskapiunofficial.tech\n\n";
     
     echo "🌐 Документация:\n";
     echo "• GitHub: https://github.com/your-repo\n";
