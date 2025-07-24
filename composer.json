@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "type": "library",
     "license": "MIT",
-    "homepage": "https://github.com/DevCraftClub/NotKinopoiskPHP",
+    "homepage": "https://devcraft.club/threads/kinopoiskapiunofficialtech-wrapper.462/",
     "repository": {
         "type": "git",
         "url": "https://github.com/DevCraftClub/NotKinopoiskPHP.git"
@@ -21,8 +21,8 @@
         "unofficial"
     ],
     "support": {
-        "issues": "https://github.com/DevCraftClub/NotKinopoiskPHP/issues",
-        "source": "https://github.com/DevCraftClub/NotKinopoiskPHP"
+            "issues": "https://github.com/DevCraftClub/NotKinopoiskPHP/issues",
+            "source": "https://github.com/DevCraftClub/NotKinopoiskPHP"
     },
     "authors": [
         {
@@ -45,8 +45,7 @@
     },
     "suggest": {
         "ext-openssl": "Для HTTPS соединений",
-        "ext-zlib": "Для сжатия данных",
-        "ext-intl": "Для интернационализации"
+        "ext-zlib": "Для сжатия данных"
     },
     "autoload": {
         "psr-4": {
