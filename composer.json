@@ -17,7 +17,8 @@
         "films",
         "movies",
         "series",
-        "tv-shows"
+        "tv-shows",
+        "unofficial"
     ],
     "support": {
         "issues": "https://github.com/DevCraftClub/NotKinopoiskPHP/issues",
