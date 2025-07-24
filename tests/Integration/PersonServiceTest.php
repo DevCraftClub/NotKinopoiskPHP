@@ -36,6 +36,6 @@ class PersonServiceTest extends TestCase
     public function testGetFilmStaff(): void
     {
         $staff = self::$client->persons->getFilmStaff(301); // Матрица
-        $this->assertIsArray($staff->staff);
+        $this->assertIsArray($staff->items);
     }
 } 

@@ -19,9 +19,9 @@ class PersonServiceStaffTest extends TestCase
     public function testGetFilmStaff(): void
     {
         $staff = self::$client->persons->getFilmStaff(301); // Матрица
-        $this->assertIsArray($staff->staff);
-        if (!empty($staff->staff)) {
-            $this->assertNotEmpty($staff->staff[0]->getDisplayName());
+        $this->assertIsArray($staff->items);
+        if (!empty($staff->items)) {
+            $this->assertNotEmpty($staff->items[0]->getDisplayName());
         }
     }
 } 

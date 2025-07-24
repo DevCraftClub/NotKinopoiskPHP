@@ -12,6 +12,7 @@ use NotKinopoisk\Enums\ImageType;
 use NotKinopoisk\Enums\Month;
 use NotKinopoisk\Enums\ReviewOrder;
 use NotKinopoisk\Responses\DefaultResponse;
+use NotKinopoisk\Responses\SequelPrequelResponse;
 use PHPUnit\Framework\TestCase;
 
 class FilmServiceTest extends TestCase
@@ -85,7 +86,7 @@ class FilmServiceTest extends TestCase
     {
         try {
             $sequels = self::$client->films->getSequelsAndPrequels(301);
-            $this->assertInstanceOf(DefaultResponse::class, $sequels);
+            $this->assertInstanceOf(SequelPrequelResponse::class, $sequels);
         } catch (\NotKinopoisk\Exception\ApiException $e) {
             // API может быть недоступен или возвращать ошибку
             $this->markTestSkipped('API недоступен: ' . $e->getMessage());
