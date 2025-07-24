@@ -236,7 +236,7 @@ try {
 
 Если у вас возникли вопросы или проблемы:
 
-1. Проверьте [Issues](https://github.com/your-repo/issues)
+1. Проверьте [Issues](https://github.com/DevCraftClub/NotKinopoiskPHP/issues)
 2. Создайте новый Issue с описанием проблемы
 3. Убедитесь, что API ключ корректный и активный
 4. Проверьте лимиты API

@@ -1,3 +1,7 @@
+[![GitHub](https://img.shields.io/badge/GitHub-DevCraftClub%2FNotKinopoiskPHP-blue?style=flat-square&logo=github)](https://github.com/DevCraftClub/NotKinopoiskPHP)
+[![PHP](https://img.shields.io/badge/PHP-8.3+-777BB4?style=flat-square&logo=php)](https://php.net)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+
 # NotKinopoiskPHP
 
 Современная PHP библиотека для работы с Kinopoisk API, написанная с использованием PHP 8.3+ и современных практик разработки.
@@ -6,7 +10,45 @@
 
 **NotKinopoiskPHP** - это полнофункциональная PHP библиотека для работы с Kinopoisk Unofficial API. Библиотека предоставляет удобный интерфейс для получения информации о фильмах, сериалах, персонах и других данных из базы Кинопоиска.
 
-> ⚠️ **Важно**: Данная библиотека работает с Kinopoisk Unofficial API (kinopoiskapiunofficial.tech), НЕ путать с kinopoisk.dev. Структура API последний раз обновлялась 16.10.2023, но данные актуальны.
+> ⚠️ **Важно**: Данная библиотека работает с Kinopoisk Unofficial API ([kinopoiskapiunofficial.tech](https://kinopoiskapiunofficial.tech)), НЕ путать с kinopoisk.dev. Структура API последний раз обновлялась 16.10.2023, но данные актуальны.
+
+## 📋 Минимальные требования
+
+### Системные требования
+
+- **PHP**: 8.3 или выше
+- **Composer**: 2.0 или выше
+- **Расширения PHP**:
+  - `curl` - для HTTP запросов
+  - `json` - для работы с JSON данными
+  - `mbstring` - для работы с многобайтовыми строками
+
+### Рекомендуемые расширения
+
+- `openssl` - для HTTPS соединений
+- `zlib` - для сжатия данных
+- `intl` - для интернационализации
+
+### Поддерживаемые платформы
+
+- **Linux** (Ubuntu 20.04+, CentOS 8+, Debian 11+)
+- **macOS** (10.15+)
+- **Windows** (10+, с WSL2 рекомендуется)
+
+### Проверка требований
+
+Для проверки соответствия требованиям выполните:
+
+```bash
+# Проверка версии PHP
+php --version
+
+# Проверка расширений PHP
+php -m | grep -E "(curl|json|mbstring|openssl)"
+
+# Проверка Composer
+composer --version
+```
 
 ### 🎯 Основные возможности:
 
@@ -17,14 +59,6 @@
 - **Медиа контент** - постеры, кадры, трейлеры, отзывы
 - **Типобезопасность** - строгая типизация с использованием PHP 8.3+ features
 - **Современная архитектура** - readonly свойства, enums, comprehensive документация
-
-### 🚀 Быстрый старт:
-
-```php
-$client = new NotKinopoisk\Client('your-api-key');
-$film = $client->films->getById(301); // Матрица
-echo $film->getDisplayName();
-```
 
 ### 📊 Статистика:
 
@@ -45,11 +79,15 @@ echo $film->getDisplayName();
 - **Тесты** - покрытие кода unit-тестами
 - **OpenAPI совместимость** - основан на официальной спецификации API
 
+---
+
 ## 📦 Установка
 
 ```bash
-composer require notkinopoisk/php
+composer require devcraftclub/kinopoiskapiunofficialtech
 ```
+
+---
 
 ## 🔧 Конфигурация
 
@@ -64,6 +102,8 @@ cp .env.example .env
 ```env
 KINOPOISK_API_KEY=your_api_key_here
 ```
+
+---
 
 ## 🎯 Быстрый старт
 
@@ -101,229 +141,33 @@ $top250 = $client->films()->getCollections(CollectionType::TOP_250_MOVIES);
 echo "Фильмов в топ-250: {$top250->getCount()}\n";
 ```
 
+---
+
 ## 📚 Enums
 
-Библиотека использует типизированные enums для обеспечения типобезопасности:
+Библиотека использует типизированные enums для обеспечения типобезопасности. Подробная документация по всем перечислениям доступна в [документации по enums](src/Enums/README.md) и [примерах использования](examples/enums_usage.php).
 
-### ContentType
-
-```php
-use NotKinopoisk\Enums\ContentType;
-
-$film = $client->films()->getById(301);
-if ($film->type === ContentType::FILM) {
-    echo "Это фильм";
-} elseif ($film->type === ContentType::SERIES) {
-    echo "Это сериал";
-}
-
-// Проверка типа
-if ($film->type->isFilm()) {
-    echo "Фильм";
-}
-
-// Получение отображаемого названия
-echo $film->type->getDisplayName(); // "Фильм" или "Сериал"
-```
-
-### ReviewType
-
-```php
-use NotKinopoisk\Enums\ReviewType;
-
-$reviews = $client->films()->getReviews(301);
-foreach ($reviews as $review) {
-    if ($review->type === ReviewType::POSITIVE) {
-        echo "Положительная рецензия";
-    } elseif ($review->type === ReviewType::NEGATIVE) {
-        echo "Отрицательная рецензия";
-    }
-}
-```
-
-### FactType
-
-```php
-use NotKinopoisk\Enums\FactType;
-
-$facts = $client->films()->getFacts(301);
-foreach ($facts as $fact) {
-    if ($fact->type === FactType::BLOOPER) {
-        echo "Ошибка в фильме: {$fact->text}";
-    } elseif ($fact->type === FactType::FACT) {
-        echo "Интересный факт: {$fact->text}";
-    }
-}
-```
-
-### BoxOfficeType
-
-```php
-use NotKinopoisk\Enums\BoxOfficeType;
-
-$boxOffice = $client->films()->getBoxOffice(301);
-foreach ($boxOffice as $item) {
-    if ($item->type->isBudget()) {
-        echo "Бюджет: {$item->getFormattedAmount()}";
-    } elseif ($item->type->isRevenue()) {
-        echo "Сборы: {$item->getFormattedAmount()}";
-    }
-}
-```
-
-### AccountType
-
-```php
-use NotKinopoisk\Enums\AccountType;
-
-$apiKeyInfo = $client->user()->getApiKeyInfo();
-if ($apiKeyInfo->accountType->isUnlimited()) {
-    echo "Безлимитный аккаунт!";
-} elseif ($apiKeyInfo->accountType->isFree()) {
-    echo "Бесплатный аккаунт";
-}
-```
-
-### ImageType
-
-```php
-use NotKinopoisk\Enums\ImageType;
-
-// Получение постеров
-$posters = $client->films()->getImages(301, ImageType::POSTER);
-
-// Получение кадров из фильма
-$stills = $client->films()->getImages(301, ImageType::STILL);
-
-// Получение фонов
-$backgrounds = $client->films()->getImages(301, ImageType::BACKGROUND);
-```
-
-### CollectionType
-
-```php
-use NotKinopoisk\Enums\CollectionType;
-
-// Топ популярных фильмов и сериалов
-$popular = $client->films()->getCollections(CollectionType::TOP_POPULAR_ALL);
-
-// Топ-250 фильмов
-$top250Movies = $client->films()->getCollections(CollectionType::TOP_250_MOVIES);
-
-// Топ-250 сериалов
-$top250Series = $client->films()->getCollections(CollectionType::TOP_250_SERIES);
-```
-
-### DistributionType
-
-```php
-use NotKinopoisk\Enums\DistributionType;
-
-$distributions = $client->films()->getDistributions(301);
-foreach ($distributions as $distribution) {
-    if ($distribution->type->isCinema()) {
-        echo "Кинотеатральный прокат";
-    } elseif ($distribution->type->isHomeVideo()) {
-        echo "Домашнее видео";
-    } elseif ($distribution->type->isDigital()) {
-        echo "Цифровой прокат";
-    }
-}
-```
+---
 
 ## 🧪 Тестирование
 
-Запуск всех тестов:
+Для запуска тестов используйте команду `composer test`. Подробная информация о тестировании доступна в [документации](docs/README.md).
 
-```bash
-./vendor/bin/phpunit
-```
-
-Запуск тестов enums:
-
-```bash
-./vendor/bin/phpunit --testsuite Enums
-```
-
-Запуск тестов моделей:
-
-```bash
-./vendor/bin/phpunit --testsuite Models
-```
-
-Запуск с покрытием кода:
-
-```bash
-./vendor/bin/phpunit --coverage-html coverage/html
-```
+---
 
 ## 📖 Документация
 
-Подробная документация по enums находится в [src/Enums/README.md](src/Enums/README.md).
+- **📚 Полная документация**: [docs/README.md](docs/README.md) - Подробное описание всех классов, методов и примеров
+- **🚀 Примеры использования**: [examples/README.md](examples/README.md) - Готовые примеры для быстрого старта
+- **🔧 Интерактивное меню**: [examples/index.php](examples/index.php) - Удобное меню для запуска примеров
 
-Примеры использования enums в [examples/enums_usage.php](examples/enums_usage.php).
+---
 
 ## 🔄 API
 
-### Фильмы
+Полная документация по API доступна в [документации сервисов](docs/services/) и [примерах использования](examples/README.md).
 
-```php
-$filmService = $client->films();
-
-// Получение фильма по ID
-$film = $filmService->getById(301);
-
-// Поиск по ключевому слову
-$results = $filmService->searchByKeyword('матрица');
-
-// Получение фактов
-$facts = $filmService->getFacts(301);
-
-// Получение отзывов
-$reviews = $filmService->getReviews(301);
-
-// Получение изображений
-$images = $filmService->getImages(301, ImageType::POSTER);
-
-// Получение кассовых сборов
-$boxOffice = $filmService->getBoxOffice(301);
-
-// Получение проката
-$distributions = $filmService->getDistributions(301);
-
-// Получение похожих фильмов
-$similar = $filmService->getSimilar(301);
-
-// Получение сиквелов и приквелов
-$sequels = $filmService->getSequelsAndPrequels(301);
-
-// Получение коллекций
-$top250 = $filmService->getCollections(CollectionType::TOP_250_MOVIES);
-```
-
-### Персоны
-
-```php
-$personService = $client->persons();
-
-// Поиск персон
-$results = $personService->search('Keanu Reeves');
-
-// Получение информации о персоне
-$person = $personService->getById(123);
-```
-
-### Пользователь
-
-```php
-$userService = $client->user();
-
-// Получение информации об API ключе
-$apiKeyInfo = $userService->getApiKeyInfo();
-
-// Получение оценок пользователя
-$votes = $userService->getVotes();
-```
+---
 
 ## 🏗️ Архитектура
 
@@ -334,6 +178,8 @@ $votes = $userService->getVotes();
 - **Разделение ответственности** - отдельные сервисы для разных сущностей
 - **Документированность** - подробные PHPDoc комментарии
 - **Тестируемость** - покрытие unit-тестами
+
+---
 
 ## ⚠️ Важные предостережения
 
@@ -353,20 +199,19 @@ $votes = $userService->getVotes();
 - Некоторые эндпоинты могут быть недоступны или возвращать неполные данные
 - Рекомендуется всегда обрабатывать ошибки и проверять возвращаемые данные
 
+---
+
 ## 🤝 Вклад в проект
 
-1. Форкните репозиторий
+1. Форкните репозиторий: [https://github.com/DevCraftClub/NotKinopoiskPHP](https://github.com/DevCraftClub/NotKinopoiskPHP)
 2. Создайте ветку для новой функции (`git checkout -b feature/amazing-feature`)
 3. Зафиксируйте изменения (`git commit -m 'Add amazing feature'`)
 4. Отправьте в ветку (`git push origin feature/amazing-feature`)
 5. Откройте Pull Request
 
+---
+
 ## 📄 Лицензия
 
 Этот проект лицензирован под MIT License - см. файл [LICENSE](LICENSE) для деталей.
 
-## 🙏 Благодарности
-
-- Kinopoisk за предоставление API
-- Сообщество PHP за отличные инструменты
-- Все контрибьюторы проекта

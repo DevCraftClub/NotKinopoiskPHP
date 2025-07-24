@@ -113,7 +113,7 @@ function showLibraryInfo() {
     echo "• Работает с kinopoiskapiunofficial.tech\n\n";
     
     echo "🌐 Документация:\n";
-    echo "• GitHub: https://github.com/your-repo\n";
+    echo "• GitHub: https://github.com/DevCraftClub/NotKinopoiskPHP\n";
     echo "• API: https://kinopoiskapiunofficial.tech\n";
     echo "• Примеры: examples/README.md\n\n";
 }
