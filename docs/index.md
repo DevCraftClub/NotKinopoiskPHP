@@ -91,7 +91,7 @@
 ### Установка
 
 ```bash
-composer require notkinopoisk/php-client
+composer require devcraftclub/kinopoiskapiunofficialtech
 ```
 
 ### Базовое использование
