@@ -57,4 +57,6 @@ interface ResponseInterface {
 	 */
 	public static function checkClass(string $cls): void;
 
+	public function toArray(): array;
+
 }

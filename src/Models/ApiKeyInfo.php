@@ -43,7 +43,7 @@ use NotKinopoisk\Enums\AccountType;
  * }
  * ```
  */
-class ApiKeyInfo {
+class ApiKeyInfo implements ModelInterface{
 
 	/**
 	 * Конструктор модели информации об API ключе

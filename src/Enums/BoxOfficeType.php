@@ -37,6 +37,10 @@ enum BoxOfficeType: string {
 
 	/** Мировые сборы */
 	case WORLD = 'WORLD';
+	/**
+	 * Средства спущенные на маркетинг
+	 */
+	case MARKETING = 'MARKETING';
 
 	/**
 	 * Проверяет, является ли тип бюджетом
@@ -83,10 +87,11 @@ enum BoxOfficeType: string {
 	 */
 	public function getDisplayName(): string {
 		return match ($this) {
-			self::BUDGET => 'Бюджет',
-			self::RUS    => 'Сборы в России',
-			self::USA    => 'Сборы в США',
-			self::WORLD  => 'Мировые сборы',
+			self::BUDGET    => 'Бюджет',
+			self::RUS       => 'Сборы в России',
+			self::USA       => 'Сборы в США',
+			self::WORLD     => 'Мировые сборы',
+			self::MARKETING => 'Средства спущенные на маркетинг',
 		};
 	}
 

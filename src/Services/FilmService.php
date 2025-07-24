@@ -27,6 +27,7 @@ use NotKinopoisk\Models\RelatedFilm;
 use NotKinopoisk\Models\Review;
 use NotKinopoisk\Models\Season;
 use NotKinopoisk\Models\Video;
+use NotKinopoisk\Responses\BudgetResponse;
 use NotKinopoisk\Responses\DefaultResponse;
 use NotKinopoisk\Responses\PaginatedResponse;
 
@@ -204,11 +205,13 @@ class FilmService extends AbstractService {
 	 *
 	 * @param   int  $id  Уникальный идентификатор фильма в Кинопоиске
 	 *
-	 * @return \NotKinopoisk\Models\Distribution[] Массив данных о прокате
+	 * @return \NotKinopoisk\Responses\DefaultResponse Массив данных о прокате
 	 *
-	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
 	 * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
-	 *
+	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
+	 * @throws \NotKinopoisk\Exception\KpValidationException При других ошибках API
+	 * @throws \NotKinopoisk\Exception\RateLimitException
+	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
 	 * @example
 	 * ```php
 	 * $distributions = $filmService->getDistributions(301);
@@ -217,10 +220,10 @@ class FilmService extends AbstractService {
 	 * }
 	 * ```
 	 */
-	public function getDistributions(int $id): array {
+	public function getDistributions(int $id): DefaultResponse {
 		$data = $this->get($this->buildUri("films/{$id}/distributions"));
 
-		return array_map(fn ($distData) => Distribution::fromArray($distData), $data['items']);
+		return DefaultResponse::fromArray($data, Distribution::class);
 	}
 
 	/**
@@ -231,11 +234,13 @@ class FilmService extends AbstractService {
 	 *
 	 * @param   int  $id  Уникальный идентификатор фильма в Кинопоиске
 	 *
-	 * @return \NotKinopoisk\Models\BoxOffice[] Массив данных о бюджете и сборах
+	 * @return \NotKinopoisk\Responses\BudgetResponse Массив данных о бюджете и сборах
 	 *
-	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
 	 * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
-	 *
+	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
+	 * @throws \NotKinopoisk\Exception\KpValidationException Если фильм не найден
+	 * @throws \NotKinopoisk\Exception\RateLimitException
+	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
 	 * @example
 	 * ```php
 	 * $boxOffice = $filmService->getBoxOffice(301);
@@ -244,10 +249,10 @@ class FilmService extends AbstractService {
 	 * }
 	 * ```
 	 */
-	public function getBoxOffice(int $id): array {
+	public function getBoxOffice(int $id): BudgetResponse {
 		$data = $this->get($this->buildUri("films/{$id}/box_office"));
 
-		return array_map(fn ($boxData) => BoxOffice::fromArray($boxData), $data['items']);
+		return BudgetResponse::fromArray($data, BoxOffice::class);
 	}
 
 	/**
@@ -258,11 +263,13 @@ class FilmService extends AbstractService {
 	 *
 	 * @param   int  $id  Уникальный идентификатор фильма в Кинопоиске
 	 *
-	 * @return \NotKinopoisk\Models\Award[] Массив наград фильма
+	 * @return \NotKinopoisk\Responses\DefaultResponse Массив наград фильма
 	 *
-	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
 	 * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
-	 *
+	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
+	 * @throws \NotKinopoisk\Exception\KpValidationException При других ошибках API
+	 * @throws \NotKinopoisk\Exception\RateLimitException
+	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
 	 * @example
 	 * ```php
 	 * $awards = $filmService->getAwards(301);
@@ -271,10 +278,10 @@ class FilmService extends AbstractService {
 	 * }
 	 * ```
 	 */
-	public function getAwards(int $id): array {
+	public function getAwards(int $id): DefaultResponse {
 		$data = $this->get($this->buildUri("films/{$id}/awards"));
 
-		return array_map(fn ($awardData) => Award::fromArray($awardData), $data['items']);
+		return DefaultResponse::fromArray($data, Award::class);
 	}
 
 	/**
@@ -285,11 +292,12 @@ class FilmService extends AbstractService {
 	 *
 	 * @param   int  $id  Уникальный идентификатор фильма в Кинопоиске
 	 *
-	 * @return \NotKinopoisk\Models\Video[] Массив видео материалов
+	 * @return \NotKinopoisk\Responses\DefaultResponse Массив видео материалов
 	 *
-	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
 	 * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
-	 *
+	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
+	 * @throws \NotKinopoisk\Exception\RateLimitException
+	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException|\NotKinopoisk\Exception\KpValidationException Если фильм не найден
 	 * @example
 	 * ```php
 	 * $videos = $filmService->getVideos(301);
@@ -299,10 +307,10 @@ class FilmService extends AbstractService {
 	 * }
 	 * ```
 	 */
-	public function getVideos(int $id): array {
+	public function getVideos(int $id): DefaultResponse {
 		$data = $this->get($this->buildUri("films/{$id}/videos"));
 
-		return array_map(fn ($videoData) => Video::fromArray($videoData), $data['items']);
+		return DefaultResponse::fromArray($data, Video::class);
 	}
 
 	/**
@@ -313,11 +321,13 @@ class FilmService extends AbstractService {
 	 *
 	 * @param   int  $id  Уникальный идентификатор фильма в Кинопоиске
 	 *
-	 * @return \NotKinopoisk\Models\RelatedFilm[] Массив похожих фильмов
+	 * @return \NotKinopoisk\Responses\DefaultResponse Массив похожих фильмов
 	 *
-	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
 	 * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
-	 *
+	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
+	 * @throws \NotKinopoisk\Exception\RateLimitException
+	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
+	 * @throws \NotKinopoisk\Exception\KpValidationException
 	 * @example
 	 * ```php
 	 * $similar = $filmService->getSimilar(301);
@@ -326,10 +336,10 @@ class FilmService extends AbstractService {
 	 * }
 	 * ```
 	 */
-	public function getSimilar(int $id): array {
+	public function getSimilar(int $id): DefaultResponse {
 		$data = $this->get($this->buildUri("films/{$id}/similars"));
 
-		return array_map(fn ($filmData) => RelatedFilm::fromArray($filmData), $data['items']);
+		return DefaultResponse::fromArray($data, RelatedFilm::class);
 	}
 
 	/**
@@ -342,11 +352,13 @@ class FilmService extends AbstractService {
 	 * @param   ImageType  $type  Тип изображений
 	 * @param   int        $page  Номер страницы для пагинации
 	 *
-	 * @return \NotKinopoisk\Models\Image[] Массив изображений
+	 * @return \NotKinopoisk\Responses\PaginatedResponse Массив изображений
 	 *
-	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
 	 * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
-	 *
+	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
+	 * @throws \NotKinopoisk\Exception\RateLimitException
+	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
+	 * @throws \NotKinopoisk\Exception\KpValidationException
 	 * @example
 	 * ```php
 	 * // Получение кадров из фильма
@@ -360,13 +372,15 @@ class FilmService extends AbstractService {
 	 * }
 	 * ```
 	 */
-	public function getImages(int $id, ImageType $type = ImageType::STILL, int $page = 1): array {
+	public function getImages(int $id, ImageType $type = ImageType::STILL, int $page = 1): PaginatedResponse {
 		$data = $this->get($this->buildUri("films/{$id}/images"), [
 			'type' => $type->value,
 			'page' => $page,
 		]);
 
-		return array_map(fn ($imageData) => Image::fromArray($imageData), $data['items']);
+		$response = PaginatedResponse::fromArray($data, Image::class);
+		$response->currentPage = $page;
+		return $response;
 	}
 
 	/**
@@ -379,11 +393,13 @@ class FilmService extends AbstractService {
 	 * @param   int                              $page   Номер страницы для пагинации
 	 * @param   \NotKinopoisk\Enums\ReviewOrder  $order  Порядок сортировки отзывов
 	 *
-	 * @return \NotKinopoisk\Models\Review[] Массив отзывов
+	 * @return \NotKinopoisk\Responses\PaginatedResponse Массив отзывов
 	 *
-	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
 	 * @throws \NotKinopoisk\Exception\ApiException При других ошибках API
-	 *
+	 * @throws \NotKinopoisk\Exception\InvalidApiKeyException
+	 * @throws \NotKinopoisk\Exception\RateLimitException
+	 * @throws \NotKinopoisk\Exception\ResourceNotFoundException Если фильм не найден
+	 * @throws \NotKinopoisk\Exception\KpValidationException
 	 * @example
 	 * ```php
 	 * // Получение последних отзывов
@@ -398,13 +414,15 @@ class FilmService extends AbstractService {
 	 * }
 	 * ```
 	 */
-	public function getReviews(int $id, int $page = 1, ReviewOrder $order = ReviewOrder::DATE_DESC): array {
+	public function getReviews(int $id, int $page = 1, ReviewOrder $order = ReviewOrder::DATE_DESC): PaginatedResponse {
 		$data = $this->get($this->buildUri("films/{$id}/reviews"), [
 			'page'  => $page,
 			'order' => $order->value,
 		]);
 
-		return array_map(fn ($reviewData) => Review::fromArray($reviewData), $data['items']);
+		$response = PaginatedResponse::fromArray($data, Review::class);
+		$response->currentPage = $page;
+		return $response;
 	}
 
 	/**
@@ -500,37 +518,6 @@ class FilmService extends AbstractService {
 		return $this->searchByFilters($filters);
 	}
 
-	/**
-	 * Поиск фильмов по фильтрам
-	 *
-	 * CREATE операция - создает поисковый запрос с использованием
-	 * различных фильтров для точного поиска фильмов.
-	 *
-	 * @param   array  $filters  Массив фильтров для поиска
-	 *
-	 * @return \NotKinopoisk\Models\FilmCollection Коллекция найденных фильмов
-	 *
-	 * @throws \NotKinopoisk\Exception\ApiException При ошибках API
-	 *
-	 * @example
-	 * ```php
-	 * $filters = [
-	 *     'genres' => [1], // боевик
-	 *     'yearFrom' => 2020,
-	 *     'yearTo' => 2024,
-	 *     'ratingFrom' => 7.0,
-	 *     'order' => 'RATING'
-	 * ];
-	 *
-	 * $results = $filmService->searchByFilters($filters);
-	 * echo "Найдено: {$results->getCount()} фильмов\n";
-	 * ```
-	 */
-	public function searchByFilters(array $filters = []): FilmCollection {
-		$data = $this->get($this->buildUri("films"), $filters);
-
-		return FilmCollection::fromArray($data);
-	}
 
 	/**
 	 * Получает коллекции фильмов
@@ -737,7 +724,7 @@ class FilmService extends AbstractService {
 	 * @return \NotKinopoisk\Responses\PaginatedResponse
 	 * @throws \NotKinopoisk\Exception\KpValidationException
 	 */
-	public function searchFilms(
+	public function searchFilmsByFilter(
 		?array      $country = NULL,
 		?array      $genre = NULL,
 		FilmOrder   $order = FilmOrder::RATING,
