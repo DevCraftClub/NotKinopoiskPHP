@@ -76,6 +76,97 @@
 - `$searchFilmsCountResult` (int) - Общее количество найденных фильмов
 - `$films` (array) - Массив найденных фильмов
 
+### 💰 [BudgetResponse](budget-response.md)
+
+Ответ с данными о бюджете фильма.
+
+**Основные возможности:**
+
+- Наследует функциональность DefaultResponse
+- Вычисление общего дохода от всех источников
+- Детализированная разбивка доходов по типам
+- Подсчет количества доходных статей
+
+**Специфичные методы:**
+
+- `getTotalRevenue()` - Вычисление общего дохода
+- `getRevenueBreakdown()` - Разбивка доходов по типам
+- `getRevenueItemsCount()` - Количество доходных статей
+
+### 🎬 [SequelPrequelResponse](sequel-prequel-response.md)
+
+Ответ с сиквелами, приквелами и связанными фильмами.
+
+**Основные возможности:**
+
+- Наследует функциональность SimpleResponse
+- Фильтрация фильмов по типу отношения
+- Статистика по типам отношений
+- Группировка фильмов по типам связей
+
+**Специфичные методы:**
+
+- `getSequels()` - Получение сиквелов
+- `getPrequels()` - Получение приквелов
+- `getRemakes()` - Получение римейков
+- `getSimilar()` - Получение похожих фильмов
+- `getStatistics()` - Статистика по типам отношений
+
+### 👥 [MovieStaffResponse](movie-staff-response.md)
+
+Ответ со съемочной командой фильма.
+
+**Основные возможности:**
+
+- Наследует функциональность SimpleResponse
+- Фильтрация персонала по профессиональным ролям
+- Получение различных групп персонала
+
+**Специфичные методы:**
+
+- `getActors()` - Получение актеров
+- `getDirectors()` - Получение режиссеров
+- `getWriters()` - Получение сценаристов
+- `getProducers()` - Получение продюсеров
+- `getCompositors()` - Получение композиторов
+- `getEditors()` - Получение монтажеров
+- `getDesigners()` - Получение художников
+
+### 📝 [ReviewResponse](review-response.md)
+
+Ответ с отзывами на фильм.
+
+**Основные возможности:**
+
+- Наследует функциональность PaginatedResponse
+- Статистика отзывов по типам
+- Поддержка всех методов пагинации
+
+**Специфичные свойства:**
+
+- `$totalPositiveReviews` (int) - Количество положительных отзывов
+- `$totalNegativeReviews` (int) - Количество отрицательных отзывов
+- `$totalNeutralReviews` (int) - Количество нейтральных отзывов
+
+### 📦 [SimpleResponse](simple-response.md)
+
+Базовый класс для простых ответов API.
+
+**Основные возможности:**
+
+- Хранение массива элементов без метаинформации
+- Создание из данных API с валидацией класса
+- Преобразование в массив для сериализации
+
+**Свойства:**
+
+- `$items` (array) - Массив элементов данных
+
+**Методы:**
+
+- `fromArray()` - Создание из массива данных
+- `toArray()` - Преобразование в массив
+
 ## 🔗 Связанные компоненты
 
 ### Модели
@@ -88,6 +179,8 @@
 - [Image](../models/image.md) - Изображения
 - [Video](../models/video.md) - Видео
 - [Person](../models/person.md) - Персоны
+- [BoxOffice](../models/box-office.md) - Данные о кассовых сборах
+- [RelatedFilm](../models/related-film.md) - Связанные фильмы
 
 ### Сервисы
 
@@ -256,6 +349,159 @@ $apiData = [
 $response = KeywordSearchResponse::fromArray($apiData, Film::class);
 
 echo "По запросу '{$response->keyword}' найдено {$response->searchFilmsCountResult} фильмов\n";
+```
+
+### Работа с бюджетом фильма
+
+```php
+use NotKinopoisk\Responses\BudgetResponse;
+use NotKinopoisk\Models\BoxOffice;
+
+// Данные о бюджете от API
+$budgetData = [
+    'total' => 3,
+    'items' => [
+        ['type' => 'RUS', 'amount' => 1000000],
+        ['type' => 'USA', 'amount' => 5000000],
+        ['type' => 'WORLD', 'amount' => 15000000]
+    ]
+];
+
+$budgetResponse = BudgetResponse::fromArray($budgetData, BoxOffice::class);
+
+// Анализ финансовых показателей
+$totalRevenue = $budgetResponse->getTotalRevenue();
+$breakdown = $budgetResponse->getRevenueBreakdown();
+$revenueCount = $budgetResponse->getRevenueItemsCount();
+
+echo "Общий доход: {$totalRevenue}\n";
+echo "Количество источников дохода: {$revenueCount}\n";
+
+foreach ($breakdown as $source => $amount) {
+    echo "Доход от {$source}: {$amount}\n";
+}
+```
+
+### Работа с сиквелами и приквелами
+
+```php
+use NotKinopoisk\Responses\SequelPrequelResponse;
+use NotKinopoisk\Models\RelatedFilm;
+
+// Данные о связанных фильмах
+$relatedData = [
+    ['kinopoiskId' => 1, 'relationType' => 'SEQUEL'],
+    ['kinopoiskId' => 2, 'relationType' => 'PREQUEL'],
+    ['kinopoiskId' => 3, 'relationType' => 'SIMILAR']
+];
+
+$response = SequelPrequelResponse::fromArray($relatedData, RelatedFilm::class);
+
+// Получение различных типов связанных фильмов
+$sequels = $response->getSequels();
+$prequels = $response->getPrequels();
+$similar = $response->getSimilar();
+
+$stats = $response->getStatistics();
+
+echo "Статистика связанных фильмов:\n";
+foreach ($stats as $type => $count) {
+    echo "- {$type}: {$count}\n";
+}
+```
+
+### Работа со съемочной командой
+
+```php
+use NotKinopoisk\Responses\MovieStaffResponse;
+use NotKinopoisk\Models\Staff;
+
+// Данные о съемочной команде
+$staffData = [
+    ['staffId' => 1, 'nameRu' => 'Иван Иванов', 'professionKey' => 'ACTOR'],
+    ['staffId' => 2, 'nameRu' => 'Петр Петров', 'professionKey' => 'DIRECTOR'],
+    ['staffId' => 3, 'nameRu' => 'Сидор Сидоров', 'professionKey' => 'WRITER']
+];
+
+$staffResponse = MovieStaffResponse::fromArray($staffData, Staff::class);
+
+// Получение различных групп персонала
+$actors = $staffResponse->getActors();
+$directors = $staffResponse->getDirectors();
+$writers = $staffResponse->getWriters();
+
+echo "Актеры (" . count($actors) . "):\n";
+foreach ($actors as $actor) {
+    echo "- {$actor->nameRu}\n";
+}
+
+echo "Режиссеры (" . count($directors) . "):\n";
+foreach ($directors as $director) {
+    echo "- {$director->nameRu}\n";
+}
+```
+
+### Работа с отзывами
+
+```php
+use NotKinopoisk\Responses\ReviewResponse;
+use NotKinopoisk\Models\Review;
+
+// Данные об отзывах
+$reviewData = [
+    'total' => 150,
+    'items' => [
+        ['reviewId' => 1, 'reviewType' => 'POSITIVE', 'reviewText' => 'Отличный фильм!'],
+        ['reviewId' => 2, 'reviewType' => 'NEGATIVE', 'reviewText' => 'Не понравилось']
+    ],
+    'current_page' => 1,
+    'total_pages' => 5,
+    'totalPositiveReviews' => 100,
+    'totalNegativeReviews' => 30,
+    'totalNeutralReviews' => 20
+];
+
+$reviewResponse = ReviewResponse::fromArray($reviewData, Review::class);
+
+// Анализ статистики отзывов
+$positiveCount = $reviewResponse->totalPositiveReviews;
+$negativeCount = $reviewResponse->totalNegativeReviews;
+$neutralCount = $reviewResponse->totalNeutralReviews;
+
+$totalReviews = $positiveCount + $negativeCount + $neutralCount;
+
+echo "Статистика отзывов:\n";
+echo "- Положительных: {$positiveCount} (" . round(($positiveCount / $totalReviews) * 100, 1) . "%)\n";
+echo "- Отрицательных: {$negativeCount} (" . round(($negativeCount / $totalReviews) * 100, 1) . "%)\n";
+echo "- Нейтральных: {$neutralCount} (" . round(($neutralCount / $totalReviews) * 100, 1) . "%)\n";
+```
+
+### Работа с простыми ответами
+
+```php
+use NotKinopoisk\Responses\SimpleResponse;
+use NotKinopoisk\Models\MyModel;
+
+// Простые данные от API
+$simpleData = [
+    ['id' => 1, 'name' => 'Первый элемент'],
+    ['id' => 2, 'name' => 'Второй элемент'],
+    ['id' => 3, 'name' => 'Третий элемент']
+];
+
+$response = SimpleResponse::fromArray($simpleData, MyModel::class);
+
+// Доступ к элементам
+$items = $response->items;
+echo "Количество элементов: " . count($items) . "\n";
+
+// Обработка элементов
+foreach ($items as $item) {
+    echo "ID: {$item->id}, Имя: {$item->name}\n";
+}
+
+// Преобразование в массив
+$array = $response->toArray();
 ```
 
 ### Обработка пустых ответов

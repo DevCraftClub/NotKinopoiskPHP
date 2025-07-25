@@ -34,6 +34,7 @@
 - [FilmOrder](film-order.md) - Порядок сортировки фильмов
 - [DistributionType](distribution-type.md) - Типы дистрибуции
 - [DistributionSubType](distribution-sub-type.md) - Подтипы дистрибуции
+- [ProductionStatus](production-status.md) - Статусы производства
 
 ### 📊 Статистика и награды
 

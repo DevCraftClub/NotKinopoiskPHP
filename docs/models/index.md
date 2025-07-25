@@ -53,6 +53,10 @@
 - [ApiKeyQouta](api-key-qouta.md) - Квота API ключа
 - [Filters](filters.md) - Фильтры
 
+### 🔍 Модели поиска
+
+- [PersonByNameResult](person-by-name-result.md) - Результат поиска персоны по имени
+
 ## 🔗 Связанные компоненты
 
 ### Сервисы
@@ -82,7 +86,7 @@
 
 ### Создание модели из массива данных
 
-```php
+````php
 <?php
 
 require_once 'vendor/autoload.php';
@@ -121,7 +125,27 @@ $staffData = [
 ];
 
 $staff = Staff::fromArray($staffData);
-```
+
+// Создание модели информации об API ключе
+$apiKeyData = [
+    'totalQuota' => ['value' => 1000, 'used' => 150],
+    'dailyQuota' => ['value' => 100, 'used' => 25],
+    'accountType' => 'FREE'
+];
+
+$apiKeyInfo = \NotKinopoisk\Models\ApiKeyInfo::fromArray($apiKeyData);
+
+// Создание модели результата поиска персоны
+$personSearchData = [
+    'kinopoiskId' => 66539,
+    'webUrl' => '10096',
+    'nameRu' => 'Винс Гиллиган',
+    'nameEn' => 'Vince Gilligan',
+    'sex' => 'MALE',
+    'posterUrl' => 'https://kinopoiskapiunofficial.tech/images/actor_posters/kp/10096.jpg'
+];
+
+$personResult = \NotKinopoisk\Models\PersonByNameResult::fromArray($personSearchData);
 
 ### Работа с моделями
 
@@ -144,9 +168,27 @@ if ($staff->isDirector()) {
 
 // Преобразование в массив
 $filmArray = $film->toArray();
-```
+
+// Работа с информацией об API ключе
+echo "Тип аккаунта: {$apiKeyInfo->accountType->getDisplayName()}\n";
+echo "Осталось запросов: {$apiKeyInfo->getRemainingTotalQuota()}\n";
+
+if ($apiKeyInfo->isUnlimited()) {
+    echo "Безлимитный аккаунт!\n";
+}
+
+// Работа с результатом поиска персоны
+echo "Персона: {$personResult->getDisplayName()}\n";
+echo "Полное имя: {$personResult->getFullName()}\n";
+
+if ($personResult->isMale()) {
+    echo "Пол: Мужской\n";
+}
+````
 
 ## 📊 Статистика моделей
+
+**Всего моделей: 28**
 
 ### Основные модели фильмов (6)
 
@@ -190,6 +232,10 @@ $filmArray = $film->toArray();
 - **ApiKeyInfo** - Информация об API ключе
 - **ApiKeyQouta** - Квоты запросов
 - **Filters** - Фильтры для поиска
+
+### Модели поиска (1)
+
+- **PersonByNameResult** - Результаты поиска персон
 
 ## 🔧 Общие методы
 
@@ -295,6 +341,69 @@ if ($staff->isDirector()) {
 }
 ```
 
+### Работа с информацией об API ключе
+
+```php
+$apiKeyInfo = ApiKeyInfo::fromArray($apiKeyData);
+
+echo "Тип аккаунта: {$apiKeyInfo->accountType->getDisplayName()}\n";
+echo "Общий лимит: {$apiKeyInfo->totalQuota->value}\n";
+echo "Использовано: {$apiKeyInfo->totalQuota->used}\n";
+echo "Осталось: {$apiKeyInfo->getRemainingTotalQuota()}\n";
+
+// Проверка типа аккаунта
+if ($apiKeyInfo->isUnlimited()) {
+    echo "Безлимитный аккаунт - ограничений нет\n";
+} else {
+    echo "Ограниченный аккаунт\n";
+
+    // Проверка лимитов
+    $remainingTotal = $apiKeyInfo->getRemainingTotalQuota();
+    $remainingDaily = $apiKeyInfo->getRemainingDailyQuota();
+
+    if ($remainingTotal <= 0) {
+        echo "Общий лимит исчерпан!\n";
+    } else {
+        echo "Осталось общих запросов: {$remainingTotal}\n";
+    }
+
+    if ($remainingDaily <= 0) {
+        echo "Дневной лимит исчерпан!\n";
+    } else {
+        echo "Осталось дневных запросов: {$remainingDaily}\n";
+    }
+}
+```
+
+### Работа с результатом поиска персоны
+
+```php
+$personResult = PersonByNameResult::fromArray($personSearchData);
+
+echo "ID: {$personResult->kinopoiskId}\n";
+echo "Имя: {$personResult->getDisplayName()}\n";
+echo "Полное имя: {$personResult->getFullName()}\n";
+echo "Постер: {$personResult->posterUrl}\n";
+
+// Проверка пола
+if ($personResult->isMale()) {
+    echo "Пол: Мужской\n";
+} elseif ($personResult->isFemale()) {
+    echo "Пол: Женский\n";
+} else {
+    echo "Пол: Неизвестен\n";
+}
+
+// Проверка наличия имен
+if ($personResult->nameRu) {
+    echo "Имя на русском: {$personResult->nameRu}\n";
+}
+
+if ($personResult->nameEn) {
+    echo "Имя на английском: {$personResult->nameEn}\n";
+}
+```
+
 ## 🔗 Связанные разделы
 
 - [Сервисы](../services/index.md) - Работа с API
@@ -306,3 +415,4 @@ if ($staff->isDirector()) {
 ---
 
 **📚 Навигация:** [Главная](../index.md) → Модели
+

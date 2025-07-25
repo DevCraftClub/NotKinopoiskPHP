@@ -12,83 +12,89 @@
 
 ```
 📁 docs/
-├── 📄 index.md                    # Главная страница
-├── 📄 navigation-map.md           # Карта навигации (этот файл)
-├── 📄 client.md                   # Основной клиент
+├── 📄 index.md                              # Главная страница
+├── 📄 navigation-map.md                     # Карта навигации (этот файл)
+├── 📄 client.md                             # Основной клиент
 │
-├── 📁 services/                   # Сервисы API
-│   ├── 📄 index.md               # Обзор сервисов
-│   ├── 📄 film-service.md        # Сервис фильмов
-│   ├── 📄 person-service.md      # Сервис персон
-│   ├── 📄 media-service.md       # Сервис медиа
-│   └── 📄 user-service.md        # Сервис пользователей
+├── 📁 services/                             # Сервисы API
+│   ├── 📄 index.md                          # Обзор сервисов
+│   ├── 📄 film-service.md                   # Сервис фильмов
+│   ├── 📄 person-service.md                 # Сервис персон
+│   ├── 📄 media-service.md                  # Сервис медиа
+│   └── 📄 user-service.md                   # Сервис пользователей
 │
-├── 📁 models/                     # Модели данных
-│   ├── 📄 index.md               # Обзор моделей
-│   ├── 📄 film.md                # Модель фильма
-│   ├── 📄 person.md              # Модель персоны
-│   ├── 📄 staff.md               # Модель съемочной группы
-│   ├── 📄 review.md              # Модель отзыва
-│   ├── 📄 fact.md                # Модель факта
-│   ├── 📄 image.md               # Модель изображения
-│   ├── 📄 video.md               # Модель видео
-│   ├── 📄 award.md               # Модель награды
-│   ├── 📄 box-office.md          # Модель кассовых сборов
-│   ├── 📄 country.md             # Модель страны
-│   ├── 📄 genre.md               # Модель жанра
-│   ├── 📄 episode.md             # Модель эпизода
-│   ├── 📄 season.md              # Модель сезона
-│   ├── 📄 external-source.md     # Модель внешнего источника
-│   ├── 📄 distribution.md        # Модель дистрибуции
-│   ├── 📄 film-search-result.md  # Модель результата поиска
-│   ├── 📄 person-spouse.md       # Модель супруга
-│   ├── 📄 person-film.md         # Модель фильма персоны
-│   ├── 📄 user-vote.md           # Модель голоса пользователя
-│   ├── 📄 film-collection.md     # Модель коллекции фильмов
-│   ├── 📄 filters.md             # Модель фильтров
-│   ├── 📄 related-film.md        # Модель связанного фильма
-│   ├── 📄 api-key-info.md        # Модель информации об API ключе
-│   ├── 📄 api-key-qouta.md       # Модель квоты API ключа
-│   └── 📄 media-post.md          # Модель медиа поста
+├── 📁 models/                               # Модели данных
+│   ├── 📄 index.md                          # Обзор моделей
+│   ├── 📄 film.md                           # Модель фильма
+│   ├── 📄 person.md                         # Модель персоны
+│   ├── 📄 staff.md                          # Модель съемочной группы
+│   ├── 📄 review.md                         # Модель отзыва
+│   ├── 📄 fact.md                           # Модель факта
+│   ├── 📄 image.md                          # Модель изображения
+│   ├── 📄 video.md                          # Модель видео
+│   ├── 📄 award.md                          # Модель награды
+│   ├── 📄 box-office.md                     # Модель кассовых сборов
+│   ├── 📄 country.md                        # Модель страны
+│   ├── 📄 genre.md                          # Модель жанра
+│   ├── 📄 episode.md                        # Модель эпизода
+│   ├── 📄 season.md                         # Модель сезона
+│   ├── 📄 external-source.md                # Модель внешнего источника
+│   ├── 📄 distribution.md                   # Модель дистрибуции
+│   ├── 📄 film-search-result.md             # Модель результата поиска
+│   ├── 📄 person-spouse.md                  # Модель супруга
+│   ├── 📄 person-film.md                    # Модель фильма персоны
+│   ├── 📄 user-vote.md                      # Модель голоса пользователя
+│   ├── 📄 film-collection.md                # Модель коллекции фильмов
+│   ├── 📄 filters.md                        # Модель фильтров
+│   ├── 📄 related-film.md                   # Модель связанного фильма
+│   ├── 📄 api-key-info.md                   # Модель информации об API ключе
+│   ├── 📄 api-key-qouta.md                  # Модель квоты API ключа
+│   └── 📄 media-post.md                     # Модель медиа поста
 │
-├── 📁 enums/                      # Перечисления
-│   ├── 📄 index.md               # Обзор перечислений
-│   ├── 📄 image-type.md          # Типы изображений
-│   ├── 📄 review-order.md        # Порядок сортировки отзывов
-│   ├── 📄 review-type.md         # Типы отзывов
-│   ├── 📄 fact-type.md           # Типы фактов
-│   ├── 📄 profession-key.md      # Ключи профессий
-│   ├── 📄 video-site.md          # Сайты видео
-│   ├── 📄 box-office-type.md     # Типы кассовых сборов
-│   ├── 📄 distribution-type.md   # Типы дистрибуции
-│   ├── 📄 relation-type.md       # Типы связей
-│   ├── 📄 sex.md                 # Пол
-│   ├── 📄 api-version.md         # Версии API
-│   ├── 📄 month.md               # Месяцы
-│   ├── 📄 film-order.md          # Порядок сортировки фильмов
-│   ├── 📄 content-type.md        # Типы контента
-│   ├── 📄 collection-type.md     # Типы коллекций
-│   ├── 📄 distribution-sub-type.md # Подтипы дистрибуции
-│   └── 📄 account-type.md        # Типы аккаунтов
+├── 📁 enums/                                # Перечисления
+│   ├── 📄 index.md                          # Обзор перечислений
+│   ├── 📄 image-type.md                     # Типы изображений
+│   ├── 📄 review-order.md                   # Порядок сортировки отзывов
+│   ├── 📄 review-type.md                    # Типы отзывов
+│   ├── 📄 fact-type.md                      # Типы фактов
+│   ├── 📄 profession-key.md                 # Ключи профессий
+│   ├── 📄 video-site.md                     # Сайты видео
+│   ├── 📄 box-office-type.md                # Типы кассовых сборов
+│   ├── 📄 distribution-type.md              # Типы дистрибуции
+│   ├── 📄 relation-type.md                  # Типы связей
+│   ├── 📄 sex.md                            # Пол
+│   ├── 📄 api-version.md                    # Версии API
+│   ├── 📄 month.md                          # Месяцы
+│   ├── 📄 film-order.md                     # Порядок сортировки фильмов
+│   ├── 📄 content-type.md                   # Типы контента
+│   ├── 📄 collection-type.md                # Типы коллекций
+│   ├── 📄 distribution-sub-type.md          # Подтипы дистрибуции
+│   ├── 📄 production-status.md              # Статусы производства
+│   └── 📄 account-type.md                   # Типы аккаунтов
 │
-├── 📁 responses/                  # Ответы API
-│   ├── 📄 index.md               # Обзор ответов
-│   ├── 📄 default-response.md    # Базовый ответ
-│   ├── 📄 paginated-response.md  # Пагинированный ответ
-│   └── 📄 keyword-search-response.md # Ответ поиска
+├── 📁 responses/                            # Ответы API
+│   ├── 📄 index.md                          # Обзор ответов
+│   ├── 📄 default-response.md               # Базовый ответ
+│   ├── 📄 paginated-response.md             # Пагинированный ответ
+│   ├── 📄 keyword-search-response.md        # Ответ поиска
+│   ├── 📄 budget-response.md                # Ответ с бюджетом
+│   ├── 📄 sequel-prequel-response.md        # Ответ с сиквелами/приквелами
+│   ├── 📄 movie-staff-response.md           # Ответ со съемочной командой
+│   ├── 📄 review-response.md                # Ответ с отзывами
+│   └── 📄 simple-response.md                # Простой ответ
 │
-├── 📁 exceptions/                 # Исключения
-│   ├── 📄 index.md               # Обзор исключений
-│   ├── 📄 api-exception.md       # Базовое исключение API
-│   ├── 📄 invalid-api-key-exception.md # Неверный API ключ
-│   ├── 📄 rate-limit-exception.md # Превышение лимита
-│   ├── 📄 resource-not-found-exception.md # Ресурс не найден
-│   └── 📄 kp-validation-exception.md # Ошибка валидации
+├── 📁 exceptions/                           # Исключения
+│   ├── 📄 index.md                          # Обзор исключений
+│   ├── 📄 api-exception.md                  # Базовое исключение API
+│   ├── 📄 invalid-api-key-exception.md      # Неверный API ключ
+│   ├── 📄 rate-limit-exception.md           # Превышение лимита
+│   ├── 📄 resource-not-found-exception.md   # Ресурс не найден
+│   └── 📄 kp-validation-exception.md        # Ошибка валидации
 │
-└── 📁 interfaces/                 # Интерфейсы
-    ├── 📄 index.md               # Обзор интерфейсов
-    ├── 📄 model-interface.md     # Интерфейс модели
-    └── 📄 response-interface.md  # Интерфейс ответа
+└── 📁 interfaces/                           # Интерфейсы
+    ├── 📄 index.md                          # Обзор интерфейсов
+    ├── 📄 model-interface.md                # Интерфейс модели
+    └── 📄 response-interface.md             # Интерфейс ответа
 ```
 
 ## 🔗 Быстрые ссылки
